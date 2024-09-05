@@ -8,12 +8,13 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-
-<div  layout:fragment="patient_register">
+<div layout:fragment="patient_register">
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-bs-toggle="tab" href="#personal_information" aria-selected="false" role="tab" tabindex="-1">인적사항</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#personal_information" aria-selected="false"
+               role="tab" tabindex="-1">인적사항</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#profile" aria-selected="true" role="tab">환자CRM</a>
@@ -24,76 +25,181 @@
     </ul>
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade active show" id="personal_information" role="tabpanel">
-            <form>
-                <fieldset>
-                    <div class="card m-2 mb-1">
-                        <div class="card-header text-center">
-                            환자 기본 정보
+            <div class="card m-2 mb-1">
+                <div class="card-header text-center">
+                    환자 기본 정보
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">환자이름</span>
+                            <input type="text" class="form-control" id="InputName" placeholder="이름 입력" required>
+                            <button class="btn btn-outline-primary" type="button" disabled>변경</button>
+                            <!--                                    disabled 사용 잠김-->
                         </div>
-                        <div class="card-body">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">환자이름</span>
-                                <input type="text" class="form-control" id="InputName" placeholder="이름 입력" required>
-                            </div>
-                            <div class="input-group mb-3">
-                             <span class="input-group-text">주민번호</span>
-                            <input type="text" class="form-control" id="resident_num_f" placeholder="주민번호 입력" autocomplete="off" maxlength="6" required>
-                                <span class="input-group-text">-</span>
-                                <input type="password" class="form-control" id="resident_num_l" placeholder="주민번호 입력" autocomplete="off" maxlength="7" required>
-                        </div>
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">차트번호</span>
+                            <input type="text" class="form-control" placeholder="차트번호 입력" required>
+                            <button class="btn btn-outline-primary" type="button">변경</button>
                         </div>
                     </div>
-
-
-                    <div>
-                        <label for="exampleSelect1" class="form-label mt-4">Example select</label>
-                        <select class="form-select" id="exampleSelect1">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                        </select>
+                    <div class="row">
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">주민번호</span>
+                            <input type="text" class="form-control" id="resident_num_f" placeholder="주민번호 입력"
+                                   autocomplete="off" maxlength="6" required>
+                            <span class="input-group-text">-</span>
+                            <input type="password" class="form-control" id="resident_num_l"
+                                   placeholder="주민번호 입력" autocomplete="off" maxlength="7" required>
+                        </div>
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">나이</span>
+                            <input type="text" class="form-control" placeholder="나이 입력(자동 계산)" readonly>
+                            <select class="form-select">
+                                <option selected>성별</option>
+                                <option value="m">남</option>
+                                <option value="w">여</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label for="exampleSelect1" class="form-label mt-4">Example disabled select</label>
-                        <select class="form-select" id="exampleDisabledSelect1" disabled="">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                        </select>
+                    <div class="row">
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">생년월일</span>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">주치의</span>
+                            <select class="form-select">
+                                <option selected>주치의</option>
+                                <option value="m">남</option>
+                                <option value="w">여</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label for="exampleSelect2" class="form-label mt-4">Example multiple select</label>
-                        <select multiple="" class="form-select" id="exampleSelect2">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                        </select>
+                    <div class="row">
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">자택전화</span>
+                            <input type="text" class="form-control" autocomplete="off" maxlength="3">
+                            <span class="input-group-text">-</span>
+                            <input type="text" class="form-control" autocomplete="off" maxlength="4">
+                            <span class="input-group-text">-</span>
+                            <input type="text" class="form-control" autocomplete="off" maxlength="4">
+                        </div>
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">Refer의사</span>
+                            <select class="form-select">
+                                <option selected>Refer의사</option>
+                                <option value="m">남</option>
+                                <option value="w">여</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label for="exampleTextarea" class="form-label mt-4">Example textarea</label>
-                        <textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
+                    <div class="row">
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">휴대전화</span>
+                            <input type="text" class="form-control" autocomplete="off" maxlength="3">
+                            <span class="input-group-text">-</span>
+                            <input type="text" class="form-control" autocomplete="off" maxlength="4">
+                            <span class="input-group-text">-</span>
+                            <input type="text" class="form-control" autocomplete="off" maxlength="4">
+                        </div>
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">치과위생사</span>
+                            <select class="form-select">
+                                <option selected>치과위생사</option>
+                                <option value="m">남</option>
+                                <option value="w">여</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </fieldset>
-            </form>
-        </div>
-        <div class="tab-pane fade" id="profile" role="tabpanel">
-            <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1
-                labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer
-                twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl
-                cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
-        </div>
-        <div class="tab-pane fade" id="#">
-            <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny
-                pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard
-                locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid
-                8-bit cred pitchfork.</p>
+                    <div class="row">
+                        <div class="input-group mb-3 col">
+                            <span class="input-group-text">E-mail</span>
+                            <input type="text" class="form-control" aria-label="Username">
+                            <span class="input-group-text">@</span>
+                            <input type="text" class="form-control" aria-label="Server">
+                        </div>
+                        <div class="input-group mb-3 col">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="zipp_btn" class="form-label">■ 주소 *</label><br/>
+                            <input type="text" class="form-control mb-2" id="zipp_code_id" name="zipp_code"
+                                   maxlength="10" placeholder="우편번호" style="width: 50%; display: inline;">
+                            <input type="button" id="zipp_btn" class="btn btn-primary" onclick="execDaumPostcode()"
+                                   value="우편번호 찾기"><br>
+                            <input type="text" class="form-control mb-2" name="user_add1" id="UserAdd1" maxlength="40"
+                                   placeholder="기본 주소를 입력하세요" required>
+                            <div class="invalid-feedback">주소를 입력해주시기 바랍니다!</div>
+                            <input type="text" class="form-control" name="user_add2" id="UserAdd2" maxlength="40"
+                                   placeholder="상세 주소를 입력하세요">
+                        </div>
+                        <div class="input-group mb-3 col">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark m-2">등록</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel">
+                <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation
+                    +1
+                    labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table
+                    craft
+                    beer
+                    twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
+                    vinyl
+                    cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit.</p>
+            </div>
+            <div class="tab-pane fade" id="#">
+                <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro
+                    fanny
+                    pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone
+                    skateboard
+                    locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify
+                    squid
+                    8-bit cred pitchfork.</p>
+            </div>
         </div>
     </div>
-</div>
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- CDN 방식 사용 -->
+    <script>
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    // 팝업을 통한 검색 결과 항목 클릭 시 실행
+                    var addr = ''; // 주소_결과값이 없을 경우 공백
+                    var extraAddr = ''; // 참고항목
+
+                    //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                    if (data.userSelectedType === 'R') { // 도로명 주소를 선택
+                        addr = data.roadAddress;
+                    } else { // 지번 주소를 선택
+                        addr = data.jibunAddress;
+                    }
+
+                    if (data.userSelectedType === 'R') {
+                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                            extraAddr += data.bname;
+                        }
+                        if (data.buildingName !== '' && data.apartment === 'Y') {
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if (extraAddr !== '') {
+                            extraAddr = ' (' + extraAddr + ')';
+                        }
+                    } else {
+                        document.getElementById("UserAdd1").value = '';
+                    }
+
+                    // 선택된 우편번호와 주소 정보를 input 박스에 넣는다.
+                    document.getElementById('zipp_code_id').value = data.zonecode;
+                    document.getElementById("UserAdd1").value = addr;
+                    document.getElementById("UserAdd1").value += extraAddr;
+                    document.getElementById("UserAdd2").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
+                }
+            }).open();
+        }
+    </script>
