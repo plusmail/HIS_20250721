@@ -26,15 +26,25 @@
         <div class="tab-pane fade active show" id="personal_information" role="tabpanel">
             <form>
                 <fieldset>
-                    <div>
-                        <label for="InputName" class="form-label mt-4">환자이름</label>
-                        <input type="text" class="form-control" id="InputName" aria-describedby="nameHelp" placeholder="이름 입력">
-                        <small id="nameHelp" class="form-text text-muted">환자 성함을 입력하세요.</small>
+                    <div class="card m-2 mb-1">
+                        <div class="card-header text-center">
+                            환자 기본 정보
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">환자이름</span>
+                                <input type="text" class="form-control" id="InputName" placeholder="이름 입력" required>
+                            </div>
+                            <div class="input-group mb-3">
+                             <span class="input-group-text">주민번호</span>
+                            <input type="text" class="form-control" id="resident_num_f" placeholder="주민번호 입력" autocomplete="off" maxlength="6" required>
+                                <span class="input-group-text">-</span>
+                                <input type="password" class="form-control" id="resident_num_l" placeholder="주민번호 입력" autocomplete="off" maxlength="7" required>
+                        </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="resident_num" class="form-label mt-4">주민번호</label>
-                        <input type="text" class="form-control" id="resident_num" placeholder="주민번호 입력" autocomplete="off">
-                    </div>
+
+
                     <div>
                         <label for="exampleSelect1" class="form-label mt-4">Example select</label>
                         <select class="form-select" id="exampleSelect1">
