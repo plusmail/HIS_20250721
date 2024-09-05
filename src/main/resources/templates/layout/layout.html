@@ -116,7 +116,13 @@
                         <input type="text" class="form-control" placeholder="차트번호 나오는곳" readonly>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control" placeholder="차트번호 입력">
+<!--                        <input type="text" class="form-control" placeholder="차트번호 입력">-->
+                            <input list="genderOptions" id="customSelect" class="form-control" placeholder="차트번호 입력">
+                            <datalist id="genderOptions">
+                                <option value="이재죵"> <!-- Male -->
+                                <option value="김애죠"> <!-- Female -->
+                                <option value="우잉재"> <!-- Other -->
+                            </datalist>
                     </div>
                     <div class="col-1 d-flex justify-content-center align-items-center">
                         <button type="button" class="icon-button btn-sm me-3">

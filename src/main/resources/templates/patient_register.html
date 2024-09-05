@@ -32,20 +32,20 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">환자이름</span>
+                            <span class="input-group-text" style="width: 6rem;">환자이름</span>
                             <input type="text" class="form-control" id="InputName" placeholder="이름 입력" required>
                             <button class="btn btn-outline-primary" type="button" disabled>변경</button>
                             <!--                                    disabled 사용 잠김-->
                         </div>
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">차트번호</span>
+                            <span class="input-group-text" style="width: 6rem;">차트번호</span>
                             <input type="text" class="form-control" placeholder="차트번호 입력" required>
                             <button class="btn btn-outline-primary" type="button">변경</button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">주민번호</span>
+                            <span class="input-group-text" style="width: 6rem;">주민번호</span>
                             <input type="text" class="form-control" id="resident_num_f" placeholder="주민번호 입력"
                                    autocomplete="off" maxlength="6" required>
                             <span class="input-group-text">-</span>
@@ -53,9 +53,9 @@
                                    placeholder="주민번호 입력" autocomplete="off" maxlength="7" required>
                         </div>
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">나이</span>
+                            <span class="input-group-text" style="width: 6rem;">나 이</span>
                             <input type="text" class="form-control" placeholder="나이 입력(자동 계산)" readonly>
-                            <select class="form-select">
+                            <select class="btn btn-outline-primary">
                                 <option selected>성별</option>
                                 <option value="m">남</option>
                                 <option value="w">여</option>
@@ -64,11 +64,11 @@
                     </div>
                     <div class="row">
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">생년월일</span>
+                            <span class="input-group-text" style="width: 6rem;">생년월일</span>
                             <input type="date" class="form-control">
                         </div>
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">주치의</span>
+                            <span class="input-group-text" style="width: 6rem;">주치의</span>
                             <select class="form-select">
                                 <option selected>주치의</option>
                                 <option value="m">남</option>
@@ -78,7 +78,7 @@
                     </div>
                     <div class="row">
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">자택전화</span>
+                            <span class="input-group-text" style="width: 6rem;">자택전화</span>
                             <input type="text" class="form-control" autocomplete="off" maxlength="3">
                             <span class="input-group-text">-</span>
                             <input type="text" class="form-control" autocomplete="off" maxlength="4">
@@ -86,7 +86,7 @@
                             <input type="text" class="form-control" autocomplete="off" maxlength="4">
                         </div>
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">Refer의사</span>
+                            <span class="input-group-text" style="width: 6rem;">Refer의사</span>
                             <select class="form-select">
                                 <option selected>Refer의사</option>
                                 <option value="m">남</option>
@@ -96,7 +96,7 @@
                     </div>
                     <div class="row">
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">휴대전화</span>
+                            <span class="input-group-text" style="width: 6rem;">휴대전화</span>
                             <input type="text" class="form-control" autocomplete="off" maxlength="3">
                             <span class="input-group-text">-</span>
                             <input type="text" class="form-control" autocomplete="off" maxlength="4">
@@ -104,7 +104,7 @@
                             <input type="text" class="form-control" autocomplete="off" maxlength="4">
                         </div>
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">치과위생사</span>
+                            <span class="input-group-text" style="width: 6rem;">치과위생사</span>
                             <select class="form-select">
                                 <option selected>치과위생사</option>
                                 <option value="m">남</option>
@@ -114,7 +114,7 @@
                     </div>
                     <div class="row">
                         <div class="input-group mb-3 col">
-                            <span class="input-group-text">E-mail</span>
+                            <span class="input-group-text" style="width: 6rem;">E-mail</span>
                             <input type="text" class="form-control" aria-label="Username">
                             <span class="input-group-text">@</span>
                             <input type="text" class="form-control" aria-label="Server">
@@ -162,6 +162,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <!-- CDN 방식 사용 -->
