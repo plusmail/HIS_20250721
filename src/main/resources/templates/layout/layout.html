@@ -11,6 +11,8 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <style>
     .icon-button {
         background: none;
@@ -36,35 +38,10 @@
         border-radius: 10px; /* 카드 모서리 둥글게 */
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
     }
-
-    .icon-button {
-        background-color: #f0f0f0; /* 아이콘 버튼 배경색 */
-        border: none; /* 버튼 테두리 제거 */
-        border-radius: 50%; /* 버튼을 동그랗게 */
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .btn-outline-dark {
-        background-color: white; /* 버튼 배경을 하얗게 */
-        color: black; /* 버튼 텍스트 색 */
-        border: 2px solid black; /* 테두리를 굵게 */
-    }
-
-    .btn-outline-dark:hover {
-        background-color: black; /* 호버 시 버튼 배경색 검정 */
-        color: white; /* 호버 시 텍스트 색상 흰색으로 */
-    }
-
-    .form-control {
-        border-radius: 5px; /* input 박스 모서리 둥글게 */
-        border: 1px solid #ced4da; /* input 테두리 색상 조정 */
-    }
 </style>
 <body>
+
+<!--네비바-->
 <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="home">HIS 병원업무관리시스템</a>
@@ -103,6 +80,7 @@
     </div>
 </nav>
 
+<!--메뉴바-->
 <div class="card m-2 mb-1">
     <div class="card-header">
         <strong>MENU</strong>
@@ -110,7 +88,7 @@
     <div class="card-body bg-light p-3"> <!-- 배경색을 밝게 수정 -->
         <div class="row">
             <!-- 첫 번째 박스 -->
-            <div class="col p-2 d-flex justify-content-center flex-column">
+            <div class="col d-flex justify-content-center flex-column">
                 <div class="row mb-3 ms-3">
                     <div class="col text-center">
                         <input type="text" class="form-control" placeholder="차트번호 나오는곳" readonly>
@@ -151,19 +129,19 @@
             <!-- 두 번째 박스 -->
             <div class="col-md-6 p-2 d-flex justify-content-center align-items-center">
                 <div class="d-flex flex-wrap justify-content-center">
-                    <button type="button" class="btn btn-outline-dark m-2" style="width: 120px; height: 60px;">
+                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
                         <i class="bi bi-person-plus"></i><br> 환자등록
                     </button>
-                    <button type="button" class="btn btn-outline-dark m-2" style="width: 120px; height: 60px;">
+                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
                         <i class="bi bi-calendar-check"></i><br> 예약
                     </button>
-                    <button type="button" class="btn btn-outline-dark m-2" style="width: 120px; height: 60px;">
+                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
                         <i class="bi bi-folder"></i><br> 접수
                     </button>
-                    <button type="button" class="btn btn-outline-dark m-2" style="width: 120px; height: 60px;">
+                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
                         <i class="bi bi-moon"></i><br> Dark Mode
                     </button>
-                    <button type="button" class="btn btn-outline-dark m-2" style="width: 120px; height: 60px;">
+                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
                         <i class="bi bi-moon"></i><br> Dark Mode
                     </button>
                 </div>
@@ -171,71 +149,6 @@
         </div>
     </div>
 </div>
-<!--<div class="card m-2 mb-1">
-    <div class="card-header">
-        MENU
-    </div>
-    <div class="card-body bg-dark-subtle p-1">
-        <div class="row">
-            &lt;!&ndash; 첫 번째 박스 &ndash;&gt;
-            <div class="col p-2 d-flex justify-content-center flex-column">
-                <div class="row mb-2 ms-3">
-                    <div class="col text-center">
-                        &lt;!&ndash;                <label class="col-form-label">차트번호</label>&ndash;&gt;
-                        <input type="text" class="form-control" placeholder="차트번호 나오는곳" readonly>
-                    </div>
-                    <div class="col">
-                        <input type="text" class="form-control" placeholder="차트번호 입력">
-                    </div>
-                    <div class="col-1 d-flex justify-content-center">
-                        <button type="button" class="icon-button btn-sm me-3">
-                            <i class="bi bi-arrow-left-circle-fill"></i>
-                        </button>
-                        <button type="button" class="icon-button btn-sm">
-                            <i class="bi bi-arrow-right-circle-fill"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="row ms-3">
-                    <div class="col text-center">
-                        &lt;!&ndash;                <label class="col-form-label">환자성명</label>&ndash;&gt;
-                        <input type="text" class="form-control" placeholder="환자성명 나오는곳" readonly>
-                    </div>
-                    <div class="col">
-                        <input type="text" class="form-control" placeholder="환자성명 입력">
-                    </div>
-                    <div class="col-1 d-flex justify-content-center">
-                        <button type="button" class="btn btn-dark">
-                            <i class="bi bi-search" style="padding: 0.8rem"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-            &lt;!&ndash; 두 번째 박스 &ndash;&gt;
-            <div class="col-md-6 p-2 d-flex justify-content-center align-items-center">
-                <div class="d-flex flex-wrap justify-content-center">
-                    <button type="button" class="btn btn-dark m-2" style="width: 120px; height: 60px; padding: 0.5rem">
-                        <i class="bi bi-person-plus"></i><br> 환자등록
-                    </button>
-                    <button type="button" class="btn btn-dark m-2" style="width: 120px; height: 60px; padding: 0.5rem">
-                        <i class="bi bi-calendar-check"></i><br> 예약
-                    </button>
-                    <button type="button" class="btn btn-dark m-2" style="width: 120px; height: 60px; padding: 0.5rem">
-                        <i class="bi bi-folder"></i><br> 접수
-                    </button>
-                    <button type="button" class="btn btn-dark m-2" style="width: 120px; height: 60px; padding: 0.5rem">
-                        Dark
-                    </button>
-                    <button type="button" class="btn btn-dark m-2" style="width: 120px; height: 60px; padding: 0.5rem">
-                        Dark
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>-->
 
 
 <!--사용자관리-->
@@ -250,6 +163,8 @@
 <div layout:fragment="reception" style="width: 100%"></div>
 <!--재고관리-->
 <div layout:fragment="inventory_management" style="width: 100%"></div>
+
+<script layout:fragment="postscript" th:inline="javascript"></script>
 
 
 </body>
