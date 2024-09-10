@@ -5,5 +5,160 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+    }
 
-<div  layout:fragment="medical_chart">진료차트 페이지</div>
+    .container {
+        display: flex;
+        width: 1000px;
+        margin: 20px auto;
+    }
+
+    /* 왼쪽 진료 기록 영역 */
+    .left-section {
+        width: 60%;
+        background-color: #e3e3ff;
+        border: 1px solid #ccc;
+        padding: 20px;
+    }
+
+    .patient-info {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .dental-chart {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .record-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    .record-table th, .record-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .record-table th {
+        background-color: #f2f2f2;
+    }
+
+    /* 오른쪽 등록 용어 검색 창 */
+    .right-section {
+        width: 40%;
+        background-color: #f9f9ff;
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin-left: 10px;
+    }
+
+    .search-box {
+        margin-bottom: 20px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+    }
+
+    .search-results {
+        border: 1px solid #ddd;
+        padding: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .search-results p {
+        background-color: #fff;
+        margin: 5px 0;
+        padding: 5px;
+        border: 1px solid #ddd;
+    }
+</style>
+<div layout:fragment="medical_chart">진료차트 페이지
+
+
+    <div class="container">
+        <!-- 왼쪽 진료 기록 영역 -->
+        <div class="left-section">
+            <div class="patient-info">
+                <div>
+                    <label for="patient-name">환자명: </label>
+                    <input type="text" id="patient-name" placeholder="환자 이름">
+                </div>
+                <div>
+                    <label for="visit-date">내원일: </label>
+                    <input type="date" id="visit-date">
+                </div>
+            </div>
+
+            <div class="dental-chart">
+                <!-- 치아 차트 -->
+                <h4>치과 차트</h4>
+                <img src="dental_chart_placeholder.png" alt="Dental Chart" style="width: 100%; max-width: 300px;">
+            </div>
+
+            <!-- 진료 기록 테이블 -->
+            <table class="record-table">
+                <thead>
+                <tr>
+                    <th>진료일</th>
+                    <th>선택치아</th>
+                    <th>구분</th>
+                    <th>내용</th>
+                    <th>진료의</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>2024-09-09</td>
+                    <td>7654</td>
+                    <td>검사</td>
+                    <td>치아 상태 확인</td>
+                    <td>홍길동</td>
+                    <td>허준</td>
+                </tr>
+                <tr>
+                    <td>2024-09-10</td>
+                    <td>1234</td>
+                    <td>처치</td>
+                    <td>치아 세척</td>
+                    <td>홍길동</td>
+                    <td>허준</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 오른쪽 등록 용어 검색 창 -->
+        <div class="right-section">
+            <h4>등록된 용어 검색 창</h4>
+            <div class="search-box">
+                <input type="text" placeholder="용어를 검색하세요">
+            </div>
+            <div class="search-results">
+                <p>치아 발치</p>
+                <p>치아 보철</p>
+                <p>스케일링</p>
+                <p>충치 치료</p>
+                <p>치아 교정</p>
+                <p>임플란트</p>
+            </div>
+        </div>
+    </div>
+
+</div>
