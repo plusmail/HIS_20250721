@@ -1,0 +1,41 @@
+.icon-button {
+    background: none;
+    border: none;
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.icon-button i {
+    font-size: 20px; /* Icon size */
+}
+
+.icon-button:hover {
+    transform: scale(1.1);
+}
+
+.card {
+    border-radius: 10px; /* 카드 모서리 둥글게 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
+}
+
+
+table {
+    width: 100%;
+    margin-top: 20px;
+}
+td, th {
+    text-align: center;
+    padding: 8px;
+}
+.delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+}

@@ -12,33 +12,9 @@
         crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<link rel="stylesheet" href="/css/layout.css">
 
-<style>
-    .icon-button {
-        background: none;
-        border: none;
-        padding: 0; /* Remove default padding */
-        margin: 0; /* Remove default margin */
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.2s ease-in-out;
-    }
 
-    .icon-button i {
-        font-size: 20px; /* Icon size */
-    }
-
-    .icon-button:hover {
-        transform: scale(1.1);
-    }
-
-    .card {
-        border-radius: 10px; /* 카드 모서리 둥글게 */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
-    }
-</style>
 <body>
 
 <!--네비바-->
@@ -86,49 +62,79 @@
         <strong>MENU</strong>
     </div>
     <div class="card-body bg-light p-3"> <!-- 배경색을 밝게 수정 -->
-        <div class="row">
+        <div class="col d-flex justify-content-center">
             <!-- 첫 번째 박스 -->
-            <div class="col d-flex justify-content-center flex-column">
-                <div class="row mb-3 ms-3">
-                    <div class="col text-center">
-                        <input type="text" class="form-control" placeholder="차트번호 나오는곳" readonly>
+            <div class="row d-flex flex-fill">
+                <div class="col">
+                    <div class="text-center row">
+                        <label>이름: ${name}(나이,성별)</label>
+                        <label>차트번호: 20201105001</label>
+                        <label>생일: 1996-09-13</label>
+                        <label>고객구분: 고객구분</label>
                     </div>
-                    <div class="col">
-<!--                        <input type="text" class="form-control" placeholder="차트번호 입력">-->
+                </div>
+                <div class="col">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <input type="text" class="form-control" placeholder="환자성명 입력">
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary">
+                                <i class="bi bi-search" style="padding: 0.5rem;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
                             <input list="genderOptions" id="customSelect" class="form-control" placeholder="차트번호 입력">
                             <datalist id="genderOptions">
                                 <option value="이재죵">
                                 <option value="김애죠">
                                 <option value="우잉재">
                             </datalist>
-                    </div>
-                    <div class="col-1 d-flex justify-content-center align-items-center">
-                        <button type="button" class="icon-button btn-sm me-3">
-                            <i class="bi bi-arrow-left-circle-fill"></i>
-                        </button>
-                        <button type="button" class="icon-button btn-sm">
-                            <i class="bi bi-arrow-right-circle-fill"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="row ms-3">
-                    <div class="col text-center">
-                        <input type="text" class="form-control" placeholder="환자성명 나오는곳" readonly>
-                    </div>
-                    <div class="col">
-                        <input type="text" class="form-control" placeholder="환자성명 입력">
-                    </div>
-                    <div class="col-1 d-flex justify-content-center align-items-center">
-                        <button type="button" class="btn btn-primary btn-sm"> <!-- 버튼 색상 변경 -->
-                            <i class="bi bi-search" style="padding: 0.5rem;"></i>
-                        </button>
+                        </div>
+                        <div class="col d-flex align-self-center">
+                            <button type="button" class="icon-button btn-sm me-3">
+                                <i class="bi bi-arrow-left-circle-fill"></i>
+                            </button>
+                            <button type="button" class="icon-button btn-sm">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                <!-- <div class="col ms-3">
+                     <div class="col">
+                         <input type="text" class="form-control" placeholder="환자성명 입력">
+                     </div>
+                     <div class="row-1 ">
+                         <button type="button" class="btn btn-primary btn-sm"> &lt;!&ndash; 버튼 색상 변경 &ndash;&gt;
+                             <i class="bi bi-search" style="padding: 0.5rem;"></i>
+                         </button>
+                     </div>
+                     <div class="row">
+                         <input list="genderOptions" id="customSelect" class="form-control" placeholder="차트번호 입력">
+                         <datalist id="genderOptions">
+                             <option value="이재죵">
+                             <option value="김애죠">
+                             <option value="우잉재">
+                         </datalist>
+                     </div>
+                     <div class="row-1">
+                         <button type="button" class="icon-button btn-sm me-3">
+                             <i class="bi bi-arrow-left-circle-fill"></i>
+                         </button>
+                         <button type="button" class="icon-button btn-sm">
+                             <i class="bi bi-arrow-right-circle-fill"></i>
+                         </button>
+                     </div>
+                 </div>-->
             </div>
 
             <!-- 두 번째 박스 -->
-            <div class="col-md-6 p-2 d-flex justify-content-center align-items-center">
-                <div class="d-flex flex-wrap justify-content-center">
+            <div class="row d-flex flex-fill">
+                <div class="d-flex justify-content-center">
                     <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
                         <i class="bi bi-person-plus"></i><br> 환자등록
                     </button>
@@ -139,10 +145,10 @@
                         <i class="bi bi-folder"></i><br> 접수
                     </button>
                     <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
-                        <i class="bi bi-moon"></i><br> Dark Mode
+                        <i class="bi bi-file-earmark-medical"></i><br> 진료내역
                     </button>
                     <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
-                        <i class="bi bi-moon"></i><br> Dark Mode
+                        <i class="bi bi-file-medical"></i><br> 처방전
                     </button>
                 </div>
             </div>
@@ -164,7 +170,7 @@
 <!--재고관리-->
 <div layout:fragment="inventory_management" style="width: 100%"></div>
 
-<script layout:fragment="postscript" th:inline="javascript"></script>
+<script layout:fragment="patientscript" th:inline="javascript"></script>
 
 
 </body>
