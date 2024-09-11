@@ -185,12 +185,15 @@
         .custom-container {
             padding: 0 10px; /* 왼쪽과 오른쪽에 10px 여백 추가 */
         }
+
         .card {
             margin: 0 -10px; /* 카드의 양쪽 여백 제거 */
         }
+
         .card-body {
             padding: 20px; /* 카드 내용에 여백 추가 */
         }
+
         .fixed-box {
             padding: 10px; /* 재료 목록 박스에 여백 추가 */
         }
@@ -214,7 +217,6 @@
     <div id="myTabContent" class="tab-content mt-3">
         <!-- 재료등록 탭 -->
         <div class="tab-pane fade show active" id="material_management" role="tabpanel">
-
             <!-- 재료 정보 입력 폼 -->
             <div class="form-container">
                 <form onsubmit="addMaterial(); return false;">
@@ -298,6 +300,20 @@
                             </div>
                         </div>
                     </fieldset>
+                    <div class="col">
+                        <div class="card m-2 mb-1">
+                            <div class="card-header text-center">
+                                재료 목록
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="fixed-box" id="materialList">
+                                        <p>현재 등록된 재료가 없습니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
