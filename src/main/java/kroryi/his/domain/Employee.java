@@ -54,7 +54,7 @@ public class Employee {
     @Column(name = "emp_status", length = 10)
     private String empStatus;
 
-    @OneToMany(mappedBy = "checkDoc")
-    private Set<MedicalChart> medicalCharts = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "checkDoc")
+//    private Set<MedicalChart> medicalCharts = new LinkedHashSet<>();
 
 }
