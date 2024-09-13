@@ -5,51 +5,91 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
 
-<div  layout:fragment="reservation">
+<div layout:fragment="reservation">
+    <div class="row d-flex justify-content-center">
+        <div class="col-4">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button onclick="prevMonth()">이전</button>
+                    <span id="monthYear"></span>
+                    <button onclick="nextMonth()">다음</button>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>일</th>
+                        <th>월</th>
+                        <th>화</th>
+                        <th>수</th>
+                        <th>목</th>
+                        <th>금</th>
+                        <th>토</th>
+                    </tr>
+                    </thead>
+                    <tbody id="calendar-body">
 
-    <div class="calendar">
-        <div class="calendar-header">
-            <button onclick="prevMonth()">이전</button>
-            <span id="monthYear"></span>
-            <button onclick="nextMonth()">다음</button>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="con">
+                <button type="submit">예약 목록</button>
+                <button type="submit">개인 예약 현황</button>
+                <table id="reservationTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>시간</th>
+                        <th>환자이름</th>
+                        <th>내용</th>
+                    </tr>
+                    </thead>
+                    <tbody id="reservation-body">
+
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <table>
-            <thead>
-            <tr>
-                <th>일</th>
-                <th>월</th>
-                <th>화</th>
-                <th>수</th>
-                <th>목</th>
-                <th>금</th>
-                <th>토</th>
-            </tr>
-            </thead>
-            <tbody id="calendar-body">
+        <div class="col-4">
+            <div class="row">
+                <div class="con2">
+                    <h1>예약</h1>
 
+                    <form id="reservationForm">
+                        <label for="name">이름:</label>
+                        <input type="text" id="name" required><br>
 
-            </tbody>
-        </table>
+                        <label for="date">날짜:</label>
+                        <input type="date" id="date" required><br>
+
+                        <label for="time">시간:</label>
+                        <input type="time" id="time" required><br>
+
+                        <button type="submit">예약 추가</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <div class="con2">
+                    <h1>예약</h1>
+
+                    <form id="reservationForm">
+                        <label for="name">이름:</label>
+                        <input type="text" id="name" required><br>
+
+                        <label for="date">날짜:</label>
+                        <input type="date" id="date" required><br>
+
+                        <label for="time">시간:</label>
+                        <input type="time" id="time" required><br>
+
+                        <button type="submit">예약 추가</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="con">
-        <button type="submit">예약 목록</button>
-        <button type="submit">개인 예약 현황</button>
-        <table id="reservationTable" class="table table-hover">
-            <thead>
-            <tr>
-                <th>시간</th>
-                <th>환자이름</th>
-                <th>내용</th>
-            </tr>
-            </thead>
-            <tbody id="reservation-body">
-
-            </tbody>
-        </table>
-    </div>
-
-
-
 </div>
 
 <script layout:fragment="reservationscript" th:inline="javascript">
