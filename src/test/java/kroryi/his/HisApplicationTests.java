@@ -19,8 +19,9 @@ class HisApplicationTests {
 
     @Test
     public void getNumber(){
+        patientRegisterService.registerPatient();
 
-        log.info("number---> {}", patientRegisterService.generateChartNum());
+//        log.info("number---> {}", patientRegisterService.generateChartNum());
     }
 
 }

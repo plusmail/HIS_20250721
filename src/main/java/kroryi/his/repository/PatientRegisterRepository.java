@@ -9,5 +9,4 @@ public interface PatientRegisterRepository extends JpaRepository<PatientRegister
 
     PatientRegister findTopByChartNumStartingWithOrderByChartNumDesc(String chartNum);
 
-
 }

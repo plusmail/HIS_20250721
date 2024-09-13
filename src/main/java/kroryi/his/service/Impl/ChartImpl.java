@@ -1,4 +1,4 @@
-package kroryi.his.Impl;
+package kroryi.his.service.Impl;
 
 import kroryi.his.service.ChartService;
 

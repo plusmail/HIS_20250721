@@ -23,19 +23,23 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
 }
 
-
-table {
-    width: 100%;
-    margin-top: 20px;
-}
 td, th {
     text-align: center;
     padding: 8px;
 }
-.delete-btn {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+/* 모달 다이얼로그의 최대 너비를 설정하여 화면 크기에 맞게 조절 */
+.modal-dialog {
+    max-width: 90%; /* 화면의 90% 너비까지 허용 */
+    margin: 1.75rem auto; /* 수직 중앙 배치 */
+}
+
+/* 모달 바디가 너무 길 경우 스크롤 추가 */
+.modal-body {
+    max-height: 70vh; /* 화면 높이의 70%를 최대 높이로 설정 */
+    overflow-y: auto; /* 수직 스크롤 가능 */
+}
+
+/* 테이블 헤더 및 바디를 정의 */
+.table-hover thead th {
+    background-color: #f8f9fa; /* 헤더 배경색 */
 }
