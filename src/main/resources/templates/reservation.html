@@ -4,6 +4,117 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
+<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cerulean/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 
 
-<div  layout:fragment="reservation">진료예약 페이지</div>
+
+<div  layout:fragment="reservation">
+    <div class="calendar">
+        <div class="calendar-header">
+            <button onclick="prevMonth()">이전</button>
+            <span id="monthYear"></span>
+            <button onclick="nextMonth()">다음</button>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>일</th>
+                <th>월</th>
+                <th>화</th>
+                <th>수</th>
+                <th>목</th>
+                <th>금</th>
+                <th>토</th>
+            </tr>
+            </thead>
+            <tbody id="calendar-body">
+
+            </tbody>
+        </table>
+    </div>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .calendar {
+            width: 350px;
+            margin: 0 auto;
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .calendar-header button {
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            width: 14.28%;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        const monthYear = document.getElementById('monthYear');
+        const calendarBody = document.getElementById('calendar-body');
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            monthYear.innerText = `${year}년 ${month + 1}월`;
+
+            calendarBody.innerHTML = '';
+
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+                    if (i === 0 && j < firstDay) {
+                        cell.innerHTML = '';
+                    } else if (date > lastDate) {
+                        break;
+                    } else {
+                        cell.innerHTML = date;
+                        date++;
+                    }
+                    row.appendChild(cell);
+                }
+
+                calendarBody.appendChild(row);
+            }
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        renderCalendar();
+    </script>
+</div>
