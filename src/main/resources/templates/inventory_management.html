@@ -204,119 +204,100 @@
 <div layout:fragment="inventory_management" style="padding: 10px">
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-bs-toggle="tab" href="#material_management" aria-selected="true" role="tab">재료등록</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#material_status" aria-selected="true"
+               role="tab">재료현황보기</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#material_transaction" aria-selected="false" role="tab">재료출납관리</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#material_transaction" aria-selected="false"
+               role="tab">재료출납관리</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#material_status" aria-selected="false" role="tab">재료현황보기</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#material_management" aria-selected="false"
+               role="tab">재료등록</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#company_management" aria-selected="false"
+               role="tab">재료사관리</a>
         </li>
     </ul>
 
     <div id="myTabContent" class="tab-content mt-3">
-        <!-- 재료등록 탭 -->
-        <div class="tab-pane fade show active" id="material_management" role="tabpanel">
-            <!-- 재료 정보 입력 폼 -->
-            <div class="form-container">
-                <form onsubmit="addMaterial(); return false;">
-                    <fieldset>
-                        <div class="card m-2 mb-1">
-                            <div class="card-header text-center">
-                                재료 등록
+        <!-- 재료현황보기 탭 -->
+        <div class="tab-pane fade show active" id="material_status" role="tabpanel">
+            <div class="card m-2 mb-1">
+                <div class="card-header text-center">
+                    재료 현황 보기
+                </div>
+                <div class="card-body">
+                    <!-- 검색 필드 -->
+                    <div class="search-box">
+                        <div class="row row-gap">
+                            <div class="col-md-2 mb-3">
+                                <label for="referenceDate" class="form-label">기준일자</label>
+                                <input type="date" class="form-control" name="referenceDate" id="referenceDate">
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <!-- 재료 등록 폼 -->
-                                    <div class="col-md-8">
-                                        <form onsubmit="addMaterial(); return false;">
-                                            <div class="row">
-                                                <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">재료코드</span>
-                                                    <input type="text" class="form-control" id="materialCode"
-                                                           placeholder="재료코드 입력">
-                                                </div>
-                                                <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">재료명</span>
-                                                    <input type="text" class="form-control" id="materialName"
-                                                           placeholder="재료명 입력">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">단위</span>
-                                                    <input type="text" class="form-control" id="unit"
-                                                           placeholder="단위 입력">
-                                                </div>
-                                                <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">구입단가</span>
-                                                    <input type="text" class="form-control" id="purchasePrice"
-                                                           placeholder="구입단가 입력">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="input-group mb-3 col">
-                                                        <span class="input-group-text"
-                                                              style="width: 8rem;">표준발주수량</span>
-                                                    <input type="number" class="form-control" id="standardQuantity"
-                                                           placeholder="수량 입력">
-                                                </div>
-                                                <div class="input-group mb-3 col">
-                                                        <span class="input-group-text"
-                                                              style="width: 8rem;">최소보관수량</span>
-                                                    <input type="number" class="form-control" id="minQuantity"
-                                                           placeholder="수량 입력">
-                                                </div>
-                                                <div class="input-group mb-3 col">
-                                                        <span class="input-group-text"
-                                                              style="width: 8rem;">재고관리여부</span>
-                                                    <select class="form-select">
-                                                        <option selected>재고관리여부</option>
-                                                        <option value="y">예</option>
-                                                        <option value="n">아니오</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="input-group mb-3 col">
-                                                <span class="input-group-text" style="width: 4rem;">메모</span>
-                                                <input type="text" class="form-control" id="memo"
-                                                       placeholder="메모 입력">
-                                            </div>
-                                            <div class="button-group">
-                                                <button type="submit" class="btn btn-primary">저장</button>
-                                                <button type="reset" class="btn btn-secondary">취소</button>
-                                            </div>
-                                        </form>
-                                    </div>
-
-                                    <!-- 재료 목록 테이블 -->
-                                    <div class="col-md-4 mb-3">
-                                        <h5>재료 목록</h5>
-                                        <div class="fixed-box" id="materialList">
-                                            <p>현재 등록된 재료가 없습니다.</p>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="oneCompanyName" class="form-label">업체명</label>
+                                <input type="text" class="form-control" name="companyName" id="oneCompanyName"
+                                       placeholder="업체명 입력">
                             </div>
-                        </div>
-                    </fieldset>
-                    <div class="col">
-                        <div class="card m-2 mb-1">
-                            <div class="card-header text-center">
-                                재료 목록
+                            <div class="col-md-2 mb-3">
+                                <label for="materialCategory" class="form-label">재료명</label>
+                                <input type="text" class="form-control" name="materialCategory" id="materialCategory"
+                                       placeholder="재료명 입력">
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="fixed-box" id="materialList">
-                                        <p>현재 등록된 재료가 없습니다.</p>
-                                    </div>
-                                </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="belowSafetyStock" class="form-label">안전재고량 미달품목</label>
+                                <select class="form-select" id="belowSafetyStock" name="belowSafetyStock">
+                                    <option value="">전체</option>
+                                    <option value="yes">예</option>
+                                    <option value="no">아니오</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="stockManagementItem" class="form-label">재고관리품목</label>
+                                <select class="form-select" name="stockManagementItem" id="stockManagementItem">
+                                    <option value="">전체</option>
+                                    <option value="yes">예</option>
+                                    <option value="no">아니오</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-3 align-bottom">
+                                <button type="button" class="btn btn-primary mt-4" onclick="oneSearch()">검색
+                                </button>
+                                <button type="reset" class="btn btn-secondary mt-4">초기화</button>
                             </div>
                         </div>
                     </div>
-                </form>
+
+                    <!-- 재료 목록 테이블 -->
+                    <div class="fixed-box">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>재료코드</th>
+                                <th>재료명</th>
+                                <th>단위</th>
+                                <th>현재고량</th>
+                                <th>안전재고량</th>
+                                <th>안전재고량 미달여부</th>
+                                <th>재고관리여부</th>
+                                <th>업체명</th>
+                                <th>담당자연락처</th>
+                            </tr>
+                            </thead>
+                            <tbody id="materialStatusList">
+                            <!-- 재료 데이터가 여기에 추가됩니다 -->
+                            <tr>
+                                <td colspan="11">현재 등록된 재료가 없습니다.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+
 
         <!-- 재료출납관리 탭 -->
         <div class="tab-pane fade" id="material_transaction" role="tabpanel">
@@ -329,31 +310,33 @@
                     <div class="search-box">
                         <div class="row row-cols-auto align-items-end">
                             <div class="row mb-3 align-items-center">
-                                <label for="transactionStartDate" class="form-label">입출고일자</label>
+                                <label for="transactionDate" class="form-label">입출고일자</label>
                                 <div class="col">
-                                    <input type="date" class="form-control" id="transactionStartDate">
+                                    <input type="date" name="transactionStartDate" class="form-control"
+                                           id="transactionStartDate">
                                 </div>
                                 <div class="col-auto d-flex align-items-center justify-content-center">
                                     <span>~</span>
                                 </div>
                                 <div class="col">
-                                    <input type="date" class="form-control" id="transactionEndDate">
+                                    <input type="date" name="transactionEndDate" class="form-control"
+                                           id="transactionEndDate">
                                 </div>
                             </div>
                             <div class="col mb-3">
-                                <label for="companyNameTransaction" class="form-label">재료명</label>
-                                <input type="text" class="form-control" id="companyNameTransaction"
+                                <label for="twoMaterialNameSearch" class="form-label">재료명</label>
+                                <input type="text" name="materialName" class="form-control" id="twoMaterialNameSearch"
                                        placeholder="재료명 입력">
                             </div>
                             <div class="col mb-3">
-                                <label for="materialCodeTransaction" class="form-label">재료코드</label>
-                                <input type="text" class="form-control" id="materialCodeTransaction"
+                                <label for="twoMaterialCodeSearch" class="form-label">재료코드</label>
+                                <input type="text" class="form-control" name="materialCode" id="twoMaterialCodeSearch"
                                        placeholder="재료코드 입력">
                             </div>
                             <div class="col mb-3">
-                                <button type="button" class="btn btn-primary mt-4" onclick="searchTransactions()">검색
+                                <button type="button" class="btn btn-primary mt-4" onclick="twoSearch()">검색
                                 </button>
-                                <button type="reset" class="btn btn-secondary mt-4">초기화</button>
+                                <button type="reset" class="btn btn-secondary mt-4" id="twoSearchReset">초기화</button>
                             </div>
                         </div>
                     </div>
@@ -364,18 +347,17 @@
                             <thead>
                             <tr>
                                 <th>입출일자</th>
-                                <th>재료번호</th>
+                                <th>재료코드</th>
                                 <th>재료명</th>
                                 <th>단위</th>
                                 <th>입고량</th>
                                 <th>출고량</th>
                                 <th>잔량</th>
-                                <th>업체코드</th>
                                 <th>업체명</th>
-                                <th>담당자명</th>
+                                <th>담당자 연락처</th>
                             </tr>
                             </thead>
-                            <tbody id="materialTransactionList">
+                            <tbody id="transactionList">
                             <!-- 등록된 데이터가 없을 경우 메시지 표시 -->
                             <tr>
                                 <td colspan="10">현재 등록된 출납 내역이 없습니다.</td>
@@ -391,31 +373,32 @@
                             <div class="row row-gap">
                                 <div class="col-md-2 mb-3">
                                     <label for="transactionDate" class="form-label">입출일자</label>
-                                    <input type="date" class="form-control" id="transactionDate">
+                                    <input type="date" name="transactionDate" class="form-control" id="transactionDate">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label for="transactionMaterialCode" class="form-label">재료코드</label>
-                                    <input type="text" class="form-control" id="transactionMaterialCode"
+                                    <label for="twoMaterialCode" class="form-label">재료코드</label>
+                                    <input type="text" name="materialCode" class="form-control" id="twoMaterialCode"
                                            placeholder="재료코드 입력">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label for="transactionMaterialName" class="form-label">재료명</label>
-                                    <input type="text" class="form-control" id="transactionMaterialName"
+                                    <label for="twoMaterialName" class="form-label">재료명</label>
+                                    <input type="text" name="materialName" class="form-control" id="twoMaterialName"
                                            placeholder="재료명 입력">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label for="transactionQuantityIn" class="form-label">입고량</label>
-                                    <input type="number" class="form-control" id="transactionQuantityIn"
+                                    <label for="stockIn" class="form-label">입고량</label>
+                                    <input type="number" class="form-control" name="stockIn" id="stockIn"
                                            placeholder="입고량 입력">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label for="transactionQuantityOut" class="form-label">출고량</label>
-                                    <input type="number" class="form-control" id="transactionQuantityOut"
+                                    <label for="stockOut" class="form-label">출고량</label>
+                                    <input type="number" class="form-control" name="stockOut" id="stockOut"
                                            placeholder="출고량 입력">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <button type="submit" class="btn btn-primary mt-4">저장</button>
-                                    <button type="reset" class="btn btn-secondary mt-4">취소</button>
+                                    <button type="submit" class="btn btn-primary mt-4" id="saveTransaction">저장</button>
+                                    <button type="reset" class="btn btn-secondary mt-4" id="resetTransaction">취소
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -424,84 +407,284 @@
             </div>
         </div>
 
-        <!-- 재료현황보기 탭 -->
-        <div class="tab-pane fade" id="material_status" role="tabpanel">
-            <div class="card m-2 mb-1">
-                <div class="card-header text-center">
-                    재료 현황 보기
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <h5>재료 현황</h5>
+        <!-- 재료등록 탭 -->
+        <div class="tab-pane fade" id="material_management" role="tabpanel">
+            <!-- 재료 정보 입력 폼 -->
+            <div class="form-container">
+                <form onsubmit="searchMaterialCompany(); return false;">
+                    <div class="card m-2 mb-1">
+                        <div class="card-header text-center">
+                            업체/재료 검색
+                        </div>
+                        <div class="card-body">
+                            <!-- 업체/재료 상단 검색 영역 -->
+                            <div class="search-box">
+                                <div class="row row-cols-auto align-items-end">
+                                    <div class="col mb-3">
+                                        <label for="threeCompanyNameSearch" class="form-label">업체명</label>
+                                        <input type="text" class="form-control" name="companyName"
+                                               id="threeCompanyNameSearch"
+                                               placeholder="업체명 입력">
+                                    </div>
+                                    <div class="col mb-3">
+                                        <label for="threeMaterialNameSearch" class="form-label">재료명</label>
+                                        <input type="text" class="form-control" name="materialName"
+                                               id="threeMaterialNameSearch"
+                                               placeholder="재료명 입력">
+                                    </div>
+                                    <div class="col mb-3">
+                                        <button type="button" class="btn btn-primary mt-4"
+                                                onclick="threeSearch()">검색
+                                        </button>
+                                        <button type="reset" class="btn btn-secondary mt-4" id="threeSearchReset">초기화
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- 검색 필드 -->
+                            <!-- 업체/재료 검색 목록 테이블 -->
+                            <div class="fixed-box">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>재료번호</th>
+                                        <th>재료명</th>
+                                        <th>단위</th>
+                                        <th>단가</th>
+                                        <th>최소주문수량</th>
+                                        <th>업체명</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="materialCompanyList">
+                                    <!-- 등록된 데이터가 없을 경우 메시지 표시 -->
+                                    <tr>
+                                        <td colspan="10">현재 등록된 업체가 없습니다.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+
+
+                <fieldset>
+                    <div class="card m-2 mb-1">
+                        <div class="card-header text-center">
+                            재료 등록
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- 재료 등록 폼 -->
+                                <div class="col-md-8">
+                                    <form onsubmit="addMaterial(); return false;">
+                                        <div class="row">
+                                            <div class="input-group mb-3 col">
+                                                <span class="input-group-text" style="width: 6rem;">재료코드</span>
+                                                <input type="text" class="form-control" name="threeMaterialCode"
+                                                       id="threeMaterialCode"
+                                                       placeholder="재료코드 입력">
+                                            </div>
+                                            <div class="input-group mb-3 col">
+                                                <span class="input-group-text" style="width: 6rem;">재료명</span>
+                                                <input type="text" class="form-control" name="threeMaterialName"
+                                                       id="threeMaterialName"
+                                                       placeholder="재료명 입력">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-group mb-3 col">
+                                                <span class="input-group-text" style="width: 6rem;">단위</span>
+                                                <input type="text" name="materialUnit" class="form-control"
+                                                       id="materialUnit"
+                                                       placeholder="단위 입력">
+                                            </div>
+                                            <div class="input-group mb-3 col">
+                                                <span class="input-group-text" style="width: 6rem;">구입단가</span>
+                                                <input type="text" class="form-control" name="materialUnitPrice"
+                                                       id="materialUnitPrice"
+                                                       placeholder="구입단가 입력">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-group mb-3 col">
+                                                        <span class="input-group-text"
+                                                              style="width: 8rem;">발주수량</span>
+                                                <input type="number" class="form-control" name="orderQuantity"
+                                                       id="orderQuantity"
+                                                       placeholder="수량 입력">
+                                            </div>
+                                            <div class="input-group mb-3 col">
+                                                        <span class="input-group-text"
+                                                              style="width: 8rem;">최소보관수량</span>
+                                                <input type="number" class="form-control" name="minQuantity"
+                                                       id="minQuantity"
+                                                       placeholder="수량 입력">
+                                            </div>
+                                            <div class="input-group mb-3 col">
+                                                        <span class="input-group-text"
+                                                              style="width: 8rem;">재고관리여부</span>
+                                                <select class="form-select" name="stockManagementItem"
+                                                        id="threeStockManagementItem">
+                                                    <option selected>재고관리여부</option>
+                                                    <option value="y">예</option>
+                                                    <option value="n">아니오</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="input-group mb-3 col">
+                                            <span class="input-group-text" style="width: 4rem;">메모</span>
+                                            <input type="text" class="form-control" name="threeMemo" id="threeMemo"
+                                                   placeholder="메모 입력">
+                                        </div>
+                                        <div class="button-group">
+                                            <button type="submit" class="btn btn-primary" id="addMaterialBtn">저장
+                                            </button>
+                                            <button type="reset" class="btn btn-secondary" id="resetMaterial">취소
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- 재료 목록 테이블 -->
+                                <div class="col-md-4 mb-3">
+                                    <h5>재료 목록</h5>
+                                    <div class="fixed-box" id="materialAddList">
+                                        <p>저장해야하는거 들어가야함</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="tab-pane fade" id="company_management" role="tabpanel">
+        <!-- 재료사 정보 입력 폼 -->
+        <div class="form-container">
+            <form onsubmit="newCompanySearch(); return false;">
+                <div class="card m-2 mb-1">
+                    <div class="card-header text-center">
+                        업체/재료 검색
+                    </div>
+                    <div class="card-body">
+                        <!-- 업체/재료 상단 검색 영역 -->
                         <div class="search-box">
-                            <div class="row row-gap">
-                                <div class="col-md-2 mb-3">
-                                    <label for="searchDate" class="form-label">기준일자</label>
-                                    <input type="date" class="form-control" id="searchDate">
+                            <div class="row row-cols-auto align-items-end">
+                                <div class="col mb-3">
+                                    <label for="fourCompanyNameSearch" class="form-label">업체명</label>
+                                    <input type="text" class="form-control" name="companyName"
+                                           id="fourCompanyNameSearch"
+                                           placeholder="업체명 입력">
                                 </div>
-                                <div class="col-md-2 mb-3">
-                                    <label for="companyName" class="form-label">업체명</label>
-                                    <input type="text" class="form-control" id="companyName" placeholder="업체명 입력">
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <label for="materialCategory" class="form-label">재료분류</label>
-                                    <input type="text" class="form-control" id="materialCategory" placeholder="재료분류 입력">
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <label for="belowSafetyStock" class="form-label">안전재고량 미달품목</label>
-                                    <select class="form-select" id="belowSafetyStock">
-                                        <option value="">전체</option>
-                                        <option value="yes">예</option>
-                                        <option value="no">아니오</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <label for="stockManagementItem" class="form-label">재고관리품목</label>
-                                    <select class="form-select" id="stockManagementItem">
-                                        <option value="">전체</option>
-                                        <option value="yes">예</option>
-                                        <option value="no">아니오</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2 mb-3 align-bottom">
-                                    <button type="button" class="btn btn-primary mt-4" onclick="searchMaterials()">검색
+                                <div class="col mb-3">
+                                    <button type="button" class="btn btn-primary mt-4" onclick="fourSearch()">검색
                                     </button>
-                                    <button type="reset" class="btn btn-secondary mt-4">초기화</button>
+                                    <button type="reset" class="btn btn-secondary mt-4" id="forSearchReset">초기화</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 재료 목록 테이블 -->
+                        <!-- 업체/재료 검색 목록 테이블 -->
                         <div class="fixed-box">
                             <table class="table table-bordered">
                                 <thead>
                                 <tr>
-                                    <th>재료번호</th>
-                                    <th>재료명</th>
-                                    <th>단위</th>
-                                    <th>국가</th>
-                                    <th>현재고량</th>
-                                    <th>안전재고량</th>
                                     <th>업체코드</th>
                                     <th>업체명</th>
+                                    <th>전화번호</th>
                                     <th>담당자이름</th>
                                     <th>담당자연락처</th>
-                                    <th>재고조정</th>
+                                    <th>메모</th>
                                 </tr>
                                 </thead>
-                                <tbody id="materialStatusList">
-                                <!-- 재료 데이터가 여기에 추가됩니다 -->
+                                <tbody id="newCompanyList">
                                 <tr>
-                                    <td colspan="11">현재 등록된 재료가 없습니다.</td>
+                                    <td colspan="7">현재 등록된 업체가 없습니다.</td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
+
+            <fieldset>
+                <div class="card m-2 mb-1">
+                    <div class="card-header text-center">
+                        재료사 정보 입력
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- 재료사 등록 폼 -->
+                            <div class="col-md-12">
+                                <form onsubmit="addNewCompany(); return false;">
+                                    <div class="row">
+                                        <div class="input-group mb-3 col">
+                                            <span class="input-group-text" style="width: 8rem;">업체코드</span>
+                                            <input type="text" class="form-control" id="fourCompanyCode"
+                                                   name="fourCompanyCode"
+                                                   placeholder="코드 입력">
+                                        </div>
+                                        <div class="input-group mb-3 col">
+                                            <span class="input-group-text" style="width: 8rem;">업체명</span>
+                                            <input type="text" class="form-control" id="fourCompanyName"
+                                                   name="fourCompanyName"
+                                                   placeholder="업체명 입력">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-group mb-3 col">
+                                                        <span class="input-group-text"
+                                                              style="width: 8rem;">사업자등록번호</span>
+                                            <input type="text" class="form-control" id="businessNumber"
+                                                   name="businessNumber"
+                                                   placeholder="사업자등록번호 입력">
+                                        </div>
+                                        <div class="input-group mb-3 col">
+                                            <span class="input-group-text" style="width: 8rem;">전화번호</span>
+                                            <input type="text" class="form-control" id="companyNumber"
+                                                   name="companyNumber"
+                                                   placeholder="전화번호 입력">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-group mb-3 col">
+                                                        <span class="input-group-text"
+                                                              style="width: 8rem;">담당자 이름</span>
+                                            <input type="text" class="form-control" id="managerName"
+                                                   name="managerName"
+                                                   placeholder="담당자 이름 입력">
+                                        </div>
+                                        <div class="input-group mb-3 col">
+                                                        <span class="input-group-text"
+                                                              style="width: 8rem;">담당자 연락처</span>
+                                            <input type="text" class="form-control" id="managerNumber"
+                                                   name="managerNumber"
+                                                   placeholder="담당자 연락처 입력">
+                                        </div>
+                                    </div>
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 8rem;">메모</span>
+                                        <input type="text" class="form-control" id="companyMemo"
+                                               name="companyMemo"
+                                               placeholder="메모 입력">
+                                    </div>
+                                    <div class="button-group">
+                                        <button type="submit" class="btn btn-primary" id="addCompanyBtn">저장</button>
+                                        <button type="reset" class="btn btn-secondary" id="resetCompanyBtn">취소</button>
+                                        <button type="button" class="btn btn-danger" id="deleteCompanyBtn">삭제</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
         </div>
     </div>
 </div>
@@ -510,14 +693,15 @@
 <script>
     function addMaterial() {
         // 입력된 값을 가져오기
-        const materialCode = document.getElementById('materialCode').value;
-        const materialName = document.getElementById('materialName').value;
-        const unit = document.getElementById('unit').value;
-        const purchasePrice = document.getElementById('purchasePrice').value;
-        const standardQuantity = document.getElementById('standardQuantity').value;
+        const threeMaterialCode = document.getElementById('threeMaterialCode').value;
+        const threeMaterialName = document.getElementById('threeMaterialName').value;
+        const materialUnit = document.getElementById('materialUnit').value;
+        const materialUnitPrice = document.getElementById('materialUnitPrice').value;
+        const orderQuantity = document.getElementById('orderQuantity').value;
         const minQuantity = document.getElementById('minQuantity').value;
-        const available = document.querySelector('input[name="availability"]:checked').value;
-        const memo = document.getElementById('memo').value;
+        const stockManagementItem = document.getElementById('stockManagementItem').value;
+        // const available = document.querySelector('input[name="availability"]:checked').value;
+        const threeMemo = document.getElementById('threeMemo').value;
 
         // 테이블에 새로운 재료 정보 추가
         const materialList = document.getElementById('materialList');
@@ -529,7 +713,7 @@
                         <th>재료명</th>
                         <th>단위</th>
                         <th>구입단가</th>
-                        <th>표준발주수량</th>
+                        <th>발주수량</th>
                         <th>최소보관수량</th>
                         <th>재고관리여부</th>
                         <th>메모</th>
@@ -537,14 +721,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>${materialCode}</td>
-                        <td>${materialName}</td>
-                        <td>${unit}</td>
-                        <td>${purchasePrice}</td>
-                        <td>${standardQuantity}</td>
+                        <td>${threeMaterialCode}</td>
+                        <td>${threeMaterialName}</td>
+                        <td>${materialUnit}</td>
+                        <td>${materialUnitPrice}</td>
+                        <td>${orderQuantity}</td>
                         <td>${minQuantity}</td>
-                        <td>${available}</td>
-                        <td>${memo}</td>
+                        <td>${stockManagement}</td>
+                        <td>${threeMemo}</td>
                     </tr>
                 </tbody>
             </table>
