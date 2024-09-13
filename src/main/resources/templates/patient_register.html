@@ -4,25 +4,22 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
-<!--<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cerulean/bootstrap.min.css" rel="stylesheet">-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"-->
-<!--        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"-->
-<!--        crossorigin="anonymous"></script>-->
 
 
 <div layout:fragment="patient_register">
 
-    <!--탭 화면 구성-->
+    <!--탭 화면 구성 -->
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a class="nav-link active" data-bs-toggle="tab" href="#tab1" aria-selected="true" role="tab">인적사항</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab2" aria-selected="false" tabindex="-1"
+            <a class="nav-link disabled" data-bs-toggle="tab" href="#tab2" aria-selected="false" tabindex="-1"
                role="tab">환자CRM</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab3" a aria-selected="false" tabindex="-2" role="tab">CDB/FVR</a>
+            <a class="nav-link disabled" data-bs-toggle="tab" href="#tab3" a aria-selected="false" tabindex="-2"
+               role="tab">CDB/FVR</a>
         </li>
     </ul>
     <div id="myTabContent" class="tab-content">
@@ -35,33 +32,41 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-8">
+                            <div class="mb-1 text-end">
+                                <button type="button" class="btn btn-success" id="patient_reg">차트등록</button>
+                                <button type="button" class="btn btn-danger">차트삭제</button>
+                            </div>
                             <div class="row">
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">환자이름</span>
-                                    <input type="text" class="form-control" id="InputName" placeholder="이름 입력" required>
-                                    <button class="btn btn-outline-primary" type="button" disabled>변경</button>
+                                    <input type="text" name="name" class="form-control" id="name" placeholder="이름 입력"
+                                           required>
+<!--                                    <button class="btn btn-outline-primary" type="button" disabled>변경</button>-->
                                     <!--                                    disabled 사용 잠김-->
                                 </div>
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">차트번호</span>
-                                    <input type="text" class="form-control" placeholder="차트번호 입력" required>
-                                    <button class="btn btn-outline-primary" type="button">변경</button>
+                                    <input type="text" name="chartNum" class="form-control" id="chartNum"
+                                           placeholder="차트번호(자동입력)" readonly>
+<!--                                    <button class="btn btn-outline-primary" type="button">변경</button>-->
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">주민번호</span>
-                                    <input type="text" class="form-control" id="resident_num_f" placeholder="주민번호 입력"
+                                    <input type="text" name="firstPaResidentNum" class="form-control"
+                                           id="firstPaResidentNum" placeholder="주민번호 입력"
                                            autocomplete="off" maxlength="6" required>
                                     <span class="input-group-text">-</span>
-                                    <input type="password" class="form-control" id="resident_num_l"
+                                    <input type="password" name="lastPaResidentNum" class="form-control"
+                                           id="lastPaResidentNum"
                                            placeholder="주민번호 입력" autocomplete="off" maxlength="7" required>
                                 </div>
                                 <div class="input-group mb-3 col">
-                                    <span class="input-group-text" style="width: 6rem;">나 이</span>
-                                    <input type="text" class="form-control" placeholder="나이 입력(자동 계산)" readonly>
-                                    <select class="btn btn-outline-primary">
-                                        <option selected>성별</option>
+                                    <span class="input-group-text" style="width: 6rem;">나이(만)</span>
+                                    <input type="text" name="age" id="age" class="form-control" placeholder="나이(자동입력)" readonly>
+                                    <select class="btn btn-outline-primary" name="gender" id="gender">
+                                        <option selected value="">성별</option>
                                         <option value="m">남</option>
                                         <option value="w">여</option>
                                     </select>
@@ -70,48 +75,31 @@
                             <div class="row">
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">생년월일</span>
-                                    <input type="date" class="form-control">
+                                    <input type="date" name="birthDate" id="birthDate" class=" form-control">
                                 </div>
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">주치의</span>
-                                    <select class="form-select">
-                                        <option selected>주치의</option>
+                                    <select class="form-select" name="mainDoc" id="mainDoc">
+                                        <option selected value="">주치의</option>
                                         <option value="m">남</option>
                                         <option value="w">여</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row">
+                                <!-- 자택전화 -->
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">자택전화</span>
-                                    <input type="text" class="form-control" autocomplete="off" maxlength="3">
+                                    <input type="text" class="form-control" id="homeNum" autocomplete="off" maxlength="3" placeholder="010">
                                     <span class="input-group-text">-</span>
-                                    <input type="text" class="form-control" autocomplete="off" maxlength="4">
+                                    <input type="text" class="form-control" id="homeNum2" autocomplete="off" maxlength="4" placeholder="1234">
                                     <span class="input-group-text">-</span>
-                                    <input type="text" class="form-control" autocomplete="off" maxlength="4">
-                                </div>
-                                <div class="input-group mb-3 col">
-                                    <span class="input-group-text" style="width: 6rem;">Refer의사</span>
-                                    <select class="form-select">
-                                        <option selected>Refer의사</option>
-                                        <option value="m">남</option>
-                                        <option value="w">여</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="input-group mb-3 col">
-                                    <span class="input-group-text" style="width: 6rem;">휴대전화</span>
-                                    <input type="text" class="form-control" autocomplete="off" maxlength="3">
-                                    <span class="input-group-text">-</span>
-                                    <input type="text" class="form-control" autocomplete="off" maxlength="4">
-                                    <span class="input-group-text">-</span>
-                                    <input type="text" class="form-control" autocomplete="off" maxlength="4">
+                                    <input type="text" class="form-control" id="homeNum3" autocomplete="off" maxlength="4" placeholder="5678">
                                 </div>
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">치과위생사</span>
-                                    <select class="form-select">
-                                        <option selected>치과위생사</option>
+                                    <select class="form-select" name="dentalHygienist" id="dentalHygienist">
+                                        <option selected value="">치과위생사</option>
                                         <option value="m">남</option>
                                         <option value="w">여</option>
                                     </select>
@@ -119,14 +107,22 @@
                             </div>
                             <div class="row">
                                 <div class="col">
+                                    <!-- 휴대전화 -->
                                     <div class="input-group mb-3 col">
-                                        <span class="input-group-text" style="width: 6rem;">E-mail</span>
-                                        <input type="text" class="form-control" aria-label="Username">
-                                        <span class="input-group-text">@</span>
-                                        <input type="text" class="form-control" aria-label="Server">
+                                        <span class="input-group-text" style="width: 6rem;">휴대전화</span>
+                                        <input type="text" class="form-control" id="phoneNum" autocomplete="off" maxlength="3" placeholder="010">
+                                        <span class="input-group-text">-</span>
+                                        <input type="text" class="form-control" id="phoneNum2" autocomplete="off" maxlength="4" placeholder="1234">
+                                        <span class="input-group-text">-</span>
+                                        <input type="text" class="form-control" id="phoneNum3" autocomplete="off" maxlength="4" placeholder="5678">
                                     </div>
-                                    <!--                    </div>-->
-                                    <!--                    <div class="row">-->
+                                    <!-- E-mail -->
+                                    <div class="input-group mb-2 col">
+                                        <span class="input-group-text" style="width: 6rem;">E-mail</span>
+                                        <input type="text" class="form-control" id="emailLocal" aria-label="Username" placeholder="user">
+                                        <span class="input-group-text">@</span>
+                                        <input type="text" class="form-control" id="emailDomain" aria-label="Server" placeholder="example.com">
+                                    </div>
                                     <div class="col">
                                         <label for="zipp_btn" class="form-label">■ 주소 *</label><br/>
                                         <input type="text" class="form-control mb-2" id="zipp_code_id" name="zipp_code"
@@ -134,11 +130,13 @@
                                         <input type="button" id="zipp_btn" class="btn btn-primary"
                                                onclick="execDaumPostcode()"
                                                value="우편번호 찾기"><br>
-                                        <input type="text" class="form-control mb-2" name="user_add1" id="UserAdd1"
+                                        <input type="text" class="form-control mb-2" name="defaultAddress"
+                                               id="defaultAddress"
                                                maxlength="40"
                                                placeholder="기본 주소를 입력하세요" required>
                                         <div class="invalid-feedback">주소를 입력해주시기 바랍니다!</div>
-                                        <input type="text" class="form-control" name="user_add2" id="UserAdd2"
+                                        <input type="text" class="form-control" name="detailedAddress"
+                                               id="detailedAddress"
                                                maxlength="40"
                                                placeholder="상세 주소를 입력하세요">
                                     </div>
@@ -153,16 +151,16 @@
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
                                                     <span class="input-group-text" style="width: 6rem;">내원유형</span>
-                                                    <select class="form-select">
-                                                        <option selected>내원유형</option>
+                                                    <select class="form-select" name="visitPath" id="visitPath">
+                                                        <option selected value="">내원유형</option>
                                                         <option value="m">남</option>
                                                         <option value="w">여</option>
                                                     </select>
                                                 </div>
                                                 <div class="input-group mb-3 col">
                                                     <span class="input-group-text" style="width: 6rem;">성향</span>
-                                                    <select class="form-select">
-                                                        <option selected>성향</option>
+                                                    <select class="form-select" name="tendency" id="tendency">
+                                                        <option selected value="">성향</option>
                                                         <option value="m">남</option>
                                                         <option value="w">여</option>
                                                     </select>
@@ -171,58 +169,26 @@
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
                                                     <span class="input-group-text" style="width: 6rem;">고객분류</span>
-                                                    <select class="form-select">
-                                                        <option selected>고객분류</option>
+                                                    <select class="form-select" name="category" id="category">
+                                                        <option selected value="">고객분류</option>
                                                         <option value="m">남</option>
                                                         <option value="w">여</option>
                                                     </select>
                                                 </div>
                                                 <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">상담구분</span>
-                                                    <select class="form-select">
-                                                        <option selected>상담구분</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">고객구분</span>
-                                                    <select class="form-select">
-                                                        <option selected>고객구분1</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
-                                                    <select class="form-select">
-                                                        <option selected>고객구분2</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
-                                                    <select class="form-select">
-                                                        <option selected>고객구분3</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
+
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
                                                     <span class="input-group-text" style="width: 6rem;">최초내원</span>
-                                                    <select class="form-select">
-                                                        <option selected>고객구분1</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
-                                                    <select class="form-select">
-                                                        <option selected>고객구분2</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
+                                                    <input type="date" name="firstVisit" id="firstVisit"
+                                                           class="form-control">
                                                 </div>
                                                 <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">생년월일</span>
-                                                    <input type="date" class="form-control">
+                                                    <span class="input-group-text" style="width: 6rem;">최종내원</span>
+                                                    <input type="date" name="lastVisit" id="lastVisit"
+                                                           class="form-control" disabled>
                                                 </div>
                                             </div>
                                         </div>
@@ -234,46 +200,48 @@
                         <div class="col-4">
                             <ul class="nav nav-tabs" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active" data-bs-toggle="tab" href="#home" aria-selected="true" role="tab">Home</a>
+                                    <a class="nav-link active" data-bs-toggle="tab" href="#home" aria-selected="true"
+                                       role="tab">Memo</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link" data-bs-toggle="tab" href="#profile" aria-selected="false" tabindex="-1" role="tab">Profile</a>
+                                    <a class="nav-link disabled" data-bs-toggle="tab" href="#profile"
+                                       aria-selected="false"
+                                       tabindex="-1" role="tab">Profile</a>
                                 </li>
                             </ul>
-                            <div id="myTabContent" class="tab-content">
+                            <div id="myTabContent1" class="tab-content">
                                 <div class="tab-pane fade show active" id="home" role="tabpanel">
-                                    <table class="table table-striped table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">First</th>
-                                            <th scope="col">Last</th>
-                                            <th scope="col">Handle</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto</td>
-                                            <td>@mdo</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">2</th>
-                                            <td>Jacob</td>
-                                            <td>Thornton</td>
-                                            <td>@fat</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td colspan="2">Larry the Bird</td>
-                                            <td>@twitter</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="container mt-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div></div> <!-- 왼쪽에 아무것도 없으면 비워둠 -->
+                                            <h6 onclick="addRow()">+ 새 메모 추가</h6>
+                                        </div>
+                                        <table class="table table-bordered" id="memoTable">
+                                            <thead>
+                                            <tr>
+                                                <th>날짜</th>
+                                                <th>내용</th>
+                                                <th>삭제</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td><input type="date" class="form-control"></td>
+                                                <td>
+                                                    <textarea class="form-control"></textarea>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-primary mb-1" onclick="deleteRow(this)">등록
+                                                    </button>
+                                                    <button class="btn btn-danger" onclick="deleteRow(this)">삭제</button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="tab-pane fade" id="profile" role="tabpanel">
-                                    <p>Food truck fixie locavore,  assumenda labore aesthetic magna delectus mollit.</p>
+                                    <p>Food truck fixie locavore, assumenda labore aesthetic magna delectus mollit.</p>
                                 </div>
                             </div>
                         </div>
@@ -282,19 +250,106 @@
             </div>
         </div>
         <div class="tab-pane fade" id="tab2" role="tabpanel">
-            <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid.
-                Exercitation.</p>
+            <p>Food truck fixie locavore, </p>
         </div>
         <div class="tab-pane fade" id="tab3" role="tabpanel">
-            <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo
-                retro.</p>
+            <p>Etsy mixtape wayfarers,</p>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/patientregister.js"></script>
 </div>
 
 
-<script layout:fragment="postscript" th:inline="javascript">
+<script layout:fragment="patientscript" th:inline="javascript">
+    const patient_register = document.getElementById("patient_reg")
+    const name = document.getElementById("name")
+    const firstPaResidentNum = document.getElementById("firstPaResidentNum")
+    const lastPaResidentNum = document.getElementById("lastPaResidentNum")
+    const birthDate = document.getElementById("birthDate")
+    const gender = document.getElementById("gender")
+    const defaultAddress = document.getElementById("defaultAddress")
+    const detailedAddress = document.getElementById("detailedAddress")
+    const mainDoc = document.getElementById("mainDoc")
+    const dentalHygienist = document.getElementById("dentalHygienist")
+    const visitPath = document.getElementById("visitPath")
+    const category = document.getElementById("category")
+    const tendency = document.getElementById("tendency")
+    const firstVisit = document.getElementById("firstVisit")
+    const lastVisit = document.getElementById("lastVisit")
+    const chartNum = document.querySelector("#chartNum")
 
+    const homeNum1 = document.getElementById("homeNum");
+    const homeNum2 = document.getElementById("homeNum2");
+    const homeNum3 = document.getElementById("homeNum3");
+    const phoneNum1 = document.getElementById("phoneNum");
+    const phoneNum2 = document.getElementById("phoneNum2");
+    const phoneNum3 = document.getElementById("phoneNum3");
+    const emailLocal = document.getElementById("emailLocal");
+    const emailDomain = document.getElementById("emailDomain");
+
+    patient_register.addEventListener("click", (e) => {
+        const patientObj = {
+            name: name.value,
+            firstPaResidentNum: firstPaResidentNum.value,
+            lastPaResidentNum: lastPaResidentNum.value,
+            birthDate: birthDate.value,
+            gender: gender.value,
+            homeNum: `${homeNum1.value}-${homeNum2.value}-${homeNum3.value}`,
+            phoneNum: `${phoneNum1.value}-${phoneNum2.value}-${phoneNum3.value}`,
+            email: `${emailLocal.value}@${emailDomain.value}`,
+            defaultAddress: defaultAddress.value,
+            detailedAddress: detailedAddress.value,
+            mainDoc: mainDoc.value,
+            dentalHygienist: dentalHygienist.value,
+            visitPath: visitPath.value,
+            category: category.value,
+            tendency: tendency.value,
+            firstVisit: firstVisit.value,
+            lastVisit: lastVisit.value
+        };
+        console.log(patientObj)
+        addReply(patientObj).then(result => {
+            console.log("Received result:", result);
+            // 단일 필드 값 설정
+            name.value = result.name || '';
+            chartNum.value = result.chartNum || '';
+            firstPaResidentNum.value = result.firstPaResidentNum || '';
+            lastPaResidentNum.value = result.lastPaResidentNum || '';
+            birthDate.value = result.birthDate || '';
+            gender.value = result.gender || '';
+            defaultAddress.value = result.defaultAddress || '';
+            dentalHygienist.value = result.dentalHygienist || '';
+            mainDoc.value = result.mainDoc || '';
+            visitPath.value = result.visitPath || '';
+            category.value = result.category || '';
+            tendency.value = result.tendency || '';
+            firstVisit.value = result.firstVisit || '';
+            lastVisit.value = result.lastVisit || '';
+
+            // 자택전화 나누기
+            const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
+            document.getElementById("homeNum").value = homeNum1 || '';
+            document.getElementById("homeNum2").value = homeNum2 || '';
+            document.getElementById("homeNum3").value = homeNum3 || '';
+
+            // 휴대전화 나누기
+            const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
+            document.getElementById("phoneNum").value = phoneNum1 || '';
+            document.getElementById("phoneNum2").value = phoneNum2 || '';
+            document.getElementById("phoneNum3").value = phoneNum3 || '';
+
+            // 이메일 나누기
+            const [emailLocalPart, emailDomainPart] = result.email.split('@');
+            document.getElementById("emailLocal").value = emailLocalPart || '';
+            document.getElementById("emailDomain").value = emailDomainPart || '';
+        }).catch(e => {
+            alert("Exception....")
+            console.log(e)
+        })
+    }, false)
+
+    // 주소등록
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function (data) {
@@ -320,16 +375,97 @@
                         extraAddr = ' (' + extraAddr + ')';
                     }
                 } else {
-                    document.getElementById("UserAdd1").value = '';
+                    document.getElementById("defaultAddress").value = '';
                 }
 
                 // 선택된 우편번호와 주소 정보를 input 박스에 넣는다.
                 document.getElementById('zipp_code_id').value = data.zonecode;
-                document.getElementById("UserAdd1").value = addr;
-                document.getElementById("UserAdd1").value += extraAddr;
-                document.getElementById("UserAdd2").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
+                document.getElementById("defaultAddress").value = addr;
+                document.getElementById("defaultAddress").value += extraAddr;
+                document.getElementById("detailedAddress").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
             }
         }).open();
     }
 
+    // 테이블 기능-------------------------------------------------------------------------------
+    // 새 행 추가 함수
+    function addRow() {
+        const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+
+        // 날짜 입력란
+        const dateCell = newRow.insertCell(0);
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.className = 'form-control';
+        dateCell.appendChild(dateInput);
+및
+        // 내용 입력란
+        const memoCell = newRow.insertCell(1);
+        const memoInput = document.createElement('textarea');
+        memoInput.className = 'form-control';
+        memoCell.appendChild(memoInput);
+
+        // 삭제 버튼
+        const deleteCell = newRow.insertCell(2);
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-danger';
+        deleteButton.innerText = '삭제';
+        deleteButton.onclick = function () {
+            deleteRow(this);
+        };
+        deleteCell.appendChild(deleteButton);
+    }
+    // 행 삭제 함수
+    function deleteRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+    // 테이블 기능-----------------------------------------------------------------------------
+
+    // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
+    const birthDateInput = document.getElementById('birthDate');
+    const ageInput = document.getElementById('age');
+
+    function calculateAge(birthDate) {
+        const today = new Date();
+        const birthDateObj = new Date(birthDate);
+        let age = today.getFullYear() - birthDateObj.getFullYear();
+        const monthDifference = today.getMonth() - birthDateObj.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
+            age--;
+        }
+        return age;
+    }
+
+    birthDateInput.addEventListener('change', () => {
+        const birthDate = birthDateInput.value;
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            ageInput.value = age;
+        } else {
+            ageInput.value = '';
+        }
+    });
+    // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
+
+
+    /*function splitPhoneNumbers(homeNum, phoneNum, email) {
+        // 자택전화
+        const [homeNum1, homeNum2, homeNum3] = homeNum.split('-');
+        document.getElementById('homeNum').value = homeNum1 || '';
+        document.getElementById('homeNum2').value = homeNum2 || '';
+        document.getElementById('homeNum3').value = homeNum3 || '';
+
+        // 휴대전화
+        const [phoneNum1, phoneNum2, phoneNum3] = phoneNum.split('-');
+        document.getElementById('phoneNum').value = phoneNum1 || '';
+        document.getElementById('phoneNum2').value = phoneNum2 || '';
+        document.getElementById('phoneNum3').value = phoneNum3 || '';
+
+        // E-mail
+        const [emailLocal, emailDomain] = email.split('@');
+        document.getElementById('emailLocal').value = emailLocal || '';
+        document.getElementById('emailDomain').value = emailDomain || '';
+    }*/
 </script>
