@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = "memos")
 @Builder
 @Getter
 @Setter
@@ -23,7 +23,11 @@ public class PatientRegister {
     @Column(name = "chart_num")
     private String chartNum;
 
-    @OneToMany(mappedBy = "patientRegister", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "patientRegister",
+            cascade = {CascadeType.ALL},
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     private Set<PatientRegisterMemo> memos;
     // 환자이름
 //    @NotNull
