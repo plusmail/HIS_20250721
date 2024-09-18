@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -35,5 +36,12 @@ public class CompanyRegisterController {
         result.put("companyRegister", companyRegister);
 
         return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "업체목록 GET", notes = "DB에 등록된 업체 목록 조회")
+    @GetMapping("/")
+    public ResponseEntity<List<CompanyRegister>> getAllCompanies() {
+        List<CompanyRegister> companies = companyRegisterService.getAllCompanies();
+        return ResponseEntity.ok(companies);
     }
 }
