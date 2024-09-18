@@ -8,12 +8,10 @@ import kroryi.his.service.CompanyRegisterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,20 +24,16 @@ public class CompanyRegisterController {
     private final CompanyRegisterService companyRegisterService;
 
     @ApiOperation(value = "회사등록 POST", notes = "POST 방식으로 회사 등록")
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, CompanyRegister> register(@Valid @RequestBody CompanyDTO companyDTO,
-                                                 BindingResult bindingResult) throws BindException {
+    @PostMapping(value = "/", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Map<String, Object>> register(@ModelAttribute CompanyDTO companyDTO) {
         log.info("CompanyDTO->{}", companyDTO);
 
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
-
-        Map<String, CompanyRegister> result = new HashMap<>();
         CompanyRegister companyRegister = companyRegisterService.register(companyDTO);
         log.info("CompanyRegister->{}", companyRegister);
-        result.put("companyRegister", companyRegister);
-        return result;
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("companyRegister", companyRegister);
+
+        return ResponseEntity.ok(result);
     }
 }

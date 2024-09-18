@@ -233,8 +233,8 @@
                     <div class="search-box">
                         <div class="row row-gap">
                             <div class="col-md-2 mb-3">
-                                <label for="referenceDate" class="form-label">최초등록일자</label>
-                                <input type="date" class="form-control" name="referenceDate" id="referenceDate">
+                                <label for="firstRegisterDate" class="form-label">최초등록일자</label>
+                                <input type="date" class="form-control" name="firstRegisterDate" id="firstRegisterDate">
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label for="oneCompanyName" class="form-label">업체명</label>
@@ -310,28 +310,28 @@
                     <div class="search-box">
                         <div class="row row-cols-auto align-items-end">
                             <div class="row mb-3 align-items-center">
-                                <label for="transactionDate" class="form-label">입출고일자</label>
+                                <label for="transactionDate" class="form-label">입출일자</label>
                                 <div class="col">
-                                    <input type="date" name="transactionStartDate" class="form-control"
+                                    <input type="date" name="transactionDate" class="form-control"
                                            id="transactionStartDate">
                                 </div>
                                 <div class="col-auto d-flex align-items-center justify-content-center">
                                     <span>~</span>
                                 </div>
                                 <div class="col">
-                                    <input type="date" name="transactionEndDate" class="form-control"
+                                    <input type="date" name="transactionDate" class="form-control"
                                            id="transactionEndDate">
                                 </div>
+                            </div>
+                            <div class="col mb-3">
+                                <label for="twoCompanyNameSearch" class="form-label">업체명</label>
+                                <input type="text" class="form-control" name="companyName" id="twoCompanyNameSearch"
+                                       placeholder="업체명 입력">
                             </div>
                             <div class="col mb-3">
                                 <label for="twoMaterialNameSearch" class="form-label">재료명</label>
                                 <input type="text" name="materialName" class="form-control" id="twoMaterialNameSearch"
                                        placeholder="재료명 입력">
-                            </div>
-                            <div class="col mb-3">
-                                <label for="twoMaterialCodeSearch" class="form-label">재료코드</label>
-                                <input type="text" class="form-control" name="materialCode" id="twoMaterialCodeSearch"
-                                       placeholder="재료코드 입력">
                             </div>
                             <div class="col mb-3">
                                 <button type="button" class="btn btn-primary mt-4" onclick="twoSearch()">검색
@@ -376,7 +376,7 @@
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label for="twoMaterialCode" class="form-label">업체명</label>
-                                    <input type="text" name="materialCode" class="form-control" id="twoMaterialCode"
+                                    <input type="text" name="materialCode" class="form-control" id="twoCompanyCode"
                                            placeholder="업체명 입력">
                                 </div>
                                 <div class="col-md-2 mb-3">
@@ -401,8 +401,10 @@
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end mb-3">
                                     <button type="button" class="btn btn-success mt-4" id="newTransaction">재료조회</button>
-                                    <button type="submit" class="btn btn-primary mt-4 ms-2" id="saveTransaction">저장</button>
-                                    <button type="reset" class="btn btn-secondary mt-4 ms-2" id="resetTransaction">취소</button>
+                                    <button type="submit" class="btn btn-primary mt-4 ms-2" id="saveTransaction">저장
+                                    </button>
+                                    <button type="reset" class="btn btn-secondary mt-4 ms-2" id="resetTransaction">취소
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -488,8 +490,8 @@
                                             <div class="input-group mb-3 col">
                                                 <span class="input-group-text" style="width: 6rem;">업체명</span>
                                                 <input type="text" class="form-control" name="companyName"
-                                                id="threeCompanyName"
-                                                placeholder="업체명 입력">
+                                                       id="threeCompanyName"
+                                                       placeholder="업체명 입력">
                                                 <span class="btn btn-outline-primary" style="width: 6rem;"><i
                                                         class="bi bi-search addReplyBtn"
                                                         style="padding: 0.5rem;"></i></span>
@@ -627,55 +629,46 @@
                         <div class="row">
                             <!-- 재료사 등록 폼 -->
                             <div class="col-md-12">
+                                <form id="companyForm" action="/inventory_management/" method="post">
                                     <div class="row">
                                         <div class="input-group mb-3 col">
                                             <span class="input-group-text" style="width: 8rem;">업체코드</span>
                                             <input type="text" class="form-control" id="fourCompanyCode"
-                                                   name="companyCode"
-                                                   placeholder="코드 입력">
+                                                   name="companyCode" placeholder="코드 입력" required>
                                         </div>
                                         <div class="input-group mb-3 col">
                                             <span class="input-group-text" style="width: 8rem;">업체명</span>
                                             <input type="text" class="form-control" id="fourCompanyName"
-                                                   name="companyName"
-                                                   placeholder="업체명 입력">
+                                                   name="companyName" placeholder="업체명 입력" required>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="input-group mb-3 col">
-                                                        <span class="input-group-text"
-                                                              style="width: 8rem;">사업자등록번호</span>
+                                            <span class="input-group-text" style="width: 8rem;">사업자등록번호</span>
                                             <input type="text" class="form-control" id="businessNumber"
-                                                   name="businessNumber"
-                                                   placeholder="사업자등록번호 입력">
+                                                   name="businessNumber" placeholder="사업자등록번호 입력" required>
                                         </div>
                                         <div class="input-group mb-3 col">
                                             <span class="input-group-text" style="width: 8rem;">전화번호</span>
                                             <input type="text" class="form-control" id="companyNumber"
-                                                   name="companyNumber"
-                                                   placeholder="전화번호 입력">
+                                                   name="companyNumber" placeholder="전화번호 입력">
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="input-group mb-3 col">
-                                                        <span class="input-group-text"
-                                                              style="width: 8rem;">담당자 이름</span>
-                                            <input type="text" class="form-control" id="managerName"
-                                                   name="managerName"
+                                            <span class="input-group-text" style="width: 8rem;">담당자 이름</span>
+                                            <input type="text" class="form-control" id="managerName" name="managerName"
                                                    placeholder="담당자 이름 입력">
                                         </div>
                                         <div class="input-group mb-3 col">
-                                                        <span class="input-group-text"
-                                                              style="width: 8rem;">담당자 연락처</span>
+                                            <span class="input-group-text" style="width: 8rem;">담당자 연락처</span>
                                             <input type="text" class="form-control" id="managerNumber"
-                                                   name="managerNumber"
-                                                   placeholder="담당자 연락처 입력">
+                                                   name="managerNumber" placeholder="담당자 연락처 입력">
                                         </div>
                                     </div>
                                     <div class="input-group mb-3 col">
                                         <span class="input-group-text" style="width: 8rem;">메모</span>
-                                        <input type="text" class="form-control" id="companyMemo"
-                                               name="companyMemo"
+                                        <input type="text" class="form-control" id="companyMemo" name="companyMemo"
                                                placeholder="메모 입력">
                                     </div>
                                     <div class="button-group">
@@ -683,6 +676,7 @@
                                         <button type="reset" class="btn btn-secondary" id="resetCompanyBtn">취소</button>
                                         <button type="button" class="btn btn-danger" id="deleteCompanyBtn">삭제</button>
                                     </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -694,31 +688,7 @@
 
 
 <script>
-    function addNewCompany() {
-        // 폼 요소 가져오기
-        const addCompanyBtn = document.getElementById('addCompanyBtn').value;
-        const companyCode = document.getElementById('fourCompanyCode').value;
-        const companyName = document.getElementById('fourCompanyName').value;
-        const businessNumber = document.getElementById('businessNumber').value;
-        const companyNumber = document.getElementById('companyNumber').value;
-        const managerName = document.getElementById('managerName').value;
-        const managerNumber = document.getElementById('managerNumber').value;
-        const companyMemo = document.getElementById('companyMemo').value;
 
-
-        addCompanyBtn.addEventListener("click", (e)=>{
-            const companyObj = {
-                companyCode,
-                companyName,
-                businessNumber,
-                companyNumber,
-                managerName,
-                managerNumber,
-                companyMemo
-            }
-            console.log(companyObj);
-        })
-    }
 </script>
 
 </body>
