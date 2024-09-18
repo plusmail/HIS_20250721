@@ -9,6 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -17,6 +19,7 @@ public class CompanyRegisterServiceImpl implements CompanyRegisterService {
     private final ModelMapper modelMapper;
 
 
+    //업체 등록 테스트 함수
     @Override
     public CompanyRegister registerCompany() {
         CompanyRegister company = CompanyRegister.builder()
@@ -32,6 +35,7 @@ public class CompanyRegisterServiceImpl implements CompanyRegisterService {
         return companyRegisterRepository.save(company);
     }
 
+    //웹상에 입력한 업체 등록 데이터를 DB에 저장하기
     @Override
     public CompanyRegister register(CompanyDTO companyDTO) {
         CompanyRegister companyRegister = modelMapper.map(companyDTO, CompanyRegister.class);
@@ -44,5 +48,10 @@ public class CompanyRegisterServiceImpl implements CompanyRegisterService {
         return companyRegisterRepository.save(companyRegister);
     }
 
+    //DB에 등록된 업체 목록 가져오기
+    @Override
+    public List<CompanyRegister> getAllCompanies() {
+        return companyRegisterRepository.findAll();
+    }
 
 }
