@@ -31,10 +31,10 @@ public class MedicalChart {
     @Column(name = "medical_content", nullable = false)
     private String medicalContent;
 
-    @Column(name = "check_doc")
-    private String checkDoc;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "check_doc", nullable = false, referencedColumnName = "EmployeeID",foreignKey = @ForeignKey(name = "fk_medical_chart_employee"))
-//    private Employee checkDoc;
+//    @Column(name = "check_doc")
+//    private String checkDoc;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "check_doc", nullable = false, referencedColumnName = "EmployeeID",foreignKey = @ForeignKey(name = "fk_medical_chart_employee"))
+    private Employee checkDoc;
 
 }
