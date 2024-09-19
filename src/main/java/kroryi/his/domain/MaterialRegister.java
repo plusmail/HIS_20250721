@@ -1,5 +1,6 @@
 package kroryi.his.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class MaterialRegister {
 
     //company의 업체코드와 join
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "company_Code")
     private CompanyRegister companyRegister;
 
