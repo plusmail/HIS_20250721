@@ -7,8 +7,17 @@ import java.util.List;
 
 
 public interface CompanyRegisterService {
-    CompanyRegister registerCompany();
     CompanyRegister register(CompanyDTO companyDTO);
+
+    CompanyRegister registerCompany();
+
+    List<CompanyRegister> searchByName(String companyName);
+
+    boolean isCompanyCodeDuplicate(String companyCode);
+
+    void addCompany(CompanyRegister company);
+
+    void deleteCompany(String companyCode);
 
     List<CompanyRegister> getAllCompanies();
 

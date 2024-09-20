@@ -15,11 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 public class CompanyRegisterServiceImpl implements CompanyRegisterService {
+
     private final CompanyRegisterRepository companyRegisterRepository;
     private final ModelMapper modelMapper;
 
 
-    //업체 등록 테스트 함수
     @Override
     public CompanyRegister registerCompany() {
         CompanyRegister company = CompanyRegister.builder()
@@ -35,23 +35,40 @@ public class CompanyRegisterServiceImpl implements CompanyRegisterService {
         return companyRegisterRepository.save(company);
     }
 
-    //웹상에 입력한 업체 등록 데이터를 DB에 저장하기
     @Override
-    public CompanyRegister register(CompanyDTO companyDTO) {
-        CompanyRegister companyRegister = modelMapper.map(companyDTO, CompanyRegister.class);
-
-        // 기존 회사 코드로 데이터가 있는지 확인할 수 있습니다.
-        if (companyRegisterRepository.findByCompanyCode(companyRegister.getCompanyCode()) != null) {
-            throw new RuntimeException("동일한 업체코드가 존재합니다. 업체목록을 확인해주세요.");
-        }
-
-        return companyRegisterRepository.save(companyRegister);
+    public List<CompanyRegister> searchByName(String companyName) {
+        return companyRegisterRepository.findByCompanyNameContainingIgnoreCase(companyName);
     }
 
-    //DB에 등록된 업체 목록 가져오기
+    @Override
+    public boolean isCompanyCodeDuplicate(String companyCode) {
+        return companyRegisterRepository.existsByCompanyCode(companyCode);
+    }
+
+    @Override
+    public void addCompany(CompanyRegister company) {
+        if (isCompanyCodeDuplicate(company.getCompanyCode())) {
+            throw new IllegalArgumentException("중복된 회사 코드입니다.");
+        }
+        companyRegisterRepository.save(company);
+    }
+
+    @Override
+    public void deleteCompany(String companyCode) {
+        companyRegisterRepository.deleteById(companyCode);
+    }
+
     @Override
     public List<CompanyRegister> getAllCompanies() {
         return companyRegisterRepository.findAll();
     }
+
+    @Override
+    public CompanyRegister register(CompanyDTO companyDTO) {
+        CompanyRegister companyRegister = modelMapper.map(companyDTO, CompanyRegister.class);
+
+        return companyRegisterRepository.save(companyRegister);
+    }
+
 
 }
