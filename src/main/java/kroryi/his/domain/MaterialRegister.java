@@ -17,14 +17,16 @@ import java.util.List;
 @Setter
 @Table(name = "materials")
 public class MaterialRegister {
-    @OneToMany(mappedBy = "materialRegister", cascade = CascadeType.ALL)
-    private List<MaterialTransactionRegister> materialTransactionList = new ArrayList<>();
 
-    //company의 업체코드와 join
+    //company의 업체코드와 join. 무한참조 방지
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "company_Code")
     private CompanyRegister companyRegister;
+
+    //Transaction과 조인
+    @OneToMany(mappedBy = "materialRegister", cascade = CascadeType.ALL)
+    private List<MaterialTransactionRegister> materialTransactionList = new ArrayList<>();
 
     //재료명
     @Column(name = "material_Name", nullable = false,length = 30)

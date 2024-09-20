@@ -99,5 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Error fetching company list:", error);
             });
     }
+    updateCompanyList();
 
 });
