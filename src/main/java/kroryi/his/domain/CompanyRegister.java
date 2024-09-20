@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-@Table(name = "companies")
+@Table(name = "company")
 public class CompanyRegister {
 
     //material 테이블과 일대다 관계 (FK = companyCode)

@@ -1,5 +1,6 @@
 package kroryi.his.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,8 +16,9 @@ import java.time.LocalDate;
 @Table(name = "material_transactions")
 public class MaterialTransactionRegister {
 
-    //material 테이블과 join
+    //material 테이블과 join. 무한참조 방지
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "material_Code", nullable = false)
     private MaterialRegister materialRegister;
 
