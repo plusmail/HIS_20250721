@@ -1,9 +1,25 @@
 /* 네모난 고정 영역을 유지하기 위한 스타일 */
 .fixed-box {
-    height: 400px;
+    height: 250px; /* 중복 제거, 하나로 통일 */
     border: 1px solid #ccc;
-    padding: 10px;
     overflow-y: auto;
+}
+
+.fixed-box table {
+    width: 100%;
+}
+
+/* 테이블 헤더 중앙 정렬 */
+table thead th {
+    text-align: center;
+    position: sticky; /* 스크롤 시 고정 */
+    top: 0;
+    background-color: #1bb7ff; /* 고정된 헤더의 배경색 */
+}
+
+/* 테이블 내용 중앙 정렬 */
+.table tbody td {
+    text-align: center;
 }
 
 /* 재료 목록과 재료 입력을 감싸는 컨테이너 */
@@ -18,19 +34,12 @@
 }
 
 .table-container {
+    margin-top: 20px; /* 중복 제거, 하나로 통일 */
     margin-bottom: 20px;
 }
 
 .row-gap {
     margin-bottom: 15px;
-}
-
-.table thead th {
-    text-align: center;
-}
-
-.table tbody td {
-    text-align: center;
 }
 
 .radio-group {
@@ -45,16 +54,19 @@
     resize: none;
 }
 
+/* 버튼 그룹의 정렬 및 간격 설정 */
 .button-group {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
 
+/* 버튼 그룹 내의 버튼 스타일 */
 .button-group button {
     margin: 0;
 }
 
+/* 커스텀 행 스타일 */
 .custom-row {
     display: flex;
     align-items: center;
@@ -73,12 +85,12 @@
     flex: 1;
 }
 
-/* Ensure the form and elements do not exceed the container width */
+/* 컨테이너 너비 제한 */
 .container {
-    max-width: 1200px; /* Adjust to fit your design requirements */
+    max-width: 1200px; /* 너비 제한 */
 }
 
-/* 검색 필드의 배치를 이미지처럼 수평으로 정렬 */
+/* 검색 필드의 배치를 수평으로 정렬 */
 .search-box .row-gap {
     display: flex;
     align-items: flex-end;
@@ -94,7 +106,6 @@
     justify-content: center;
 }
 
-/* 검색 필드 전체 레이아웃이 유지되도록 */
 .search-box .col-md-2 {
     padding-right: 10px;
 }
@@ -103,54 +114,7 @@
     width: 100px;
 }
 
-/* 검색창과 테이블 간의 공간 유지 */
-.table-container {
-    margin-top: 20px;
-}
-
-/* 테이블 고정 영역 스타일 */
-.fixed-box {
-    height: 250px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-}
-
-.fixed-box table {
-    width: 100%;
-}
-
-/* 테이블 헤더 중앙 정렬 */
-table thead th {
-    text-align: center;
-}
-
-.search-box .row-gap {
-    display: flex;
-    align-items: flex-end;
-}
-
-.search-box .btn {
-    width: 100px;
-}
-
-.fixed-box {
-    height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-}
-
-.fixed-box table {
-    width: 100%;
-}
-
-table thead th {
-    text-align: center;
-}
-
-table tbody td {
-    text-align: center;
-}
-
+/* 거래 입력 박스 스타일 */
 .transaction-entry-box {
     border: 1px solid #ccc;
     padding: 10px;
@@ -166,18 +130,16 @@ table tbody td {
     justify-content: center;
 }
 
+/* 커스텀 컨테이너 스타일 */
 .custom-container {
     padding: 0 10px; /* 왼쪽과 오른쪽에 10px 여백 추가 */
 }
 
+/* 카드 스타일 */
 .card {
     margin: 0 -10px; /* 카드의 양쪽 여백 제거 */
 }
 
 .card-body {
     padding: 20px; /* 카드 내용에 여백 추가 */
-}
-
-.fixed-box {
-    padding: 10px; /* 재료 목록 박스에 여백 추가 */
 }
