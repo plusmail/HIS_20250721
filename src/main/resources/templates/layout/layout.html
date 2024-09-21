@@ -4,43 +4,19 @@
       lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>HOME</title>
+    <title>HIS</title>
 </head>
 <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cerulean/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
-<style>
-    .icon-button {
-        background: none;
-        border: none;
-        padding: 0; /* Remove default padding */
-        margin: 0; /* Remove default margin */
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.2s ease-in-out;
-    }
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<link rel="stylesheet" href="/css/layout.css">
 
-    .icon-button i {
-        font-size: 20px; /* Icon size */
-    }
-
-    .icon-button:hover {
-        transform: scale(1.1);
-    }
-
-    .card {
-        border-radius: 10px; /* 카드 모서리 둥글게 */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
-    }
-</style>
 <body>
-
 <!--네비바-->
-<nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg bg-dark py-1" data-bs-theme="dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="home">HIS 병원업무관리시스템</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02"
@@ -48,109 +24,101 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarColor02">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="admin_management">사용자관리
-                        <span class="visually-hidden">(current)</span>
+                    <a class="nav-link" href="admin_management" id="admin_management">
+                        <i class="bi bi-gear"></i>사용자관리
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="patient_register">환자등록</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="reservation">진료예약</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="medical_chart">진료차트</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="reception">진료접수</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="inventory_management">재고관리</a>
-                </li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control me-sm-2" type="search" placeholder="Search">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-            </form>
         </div>
     </div>
 </nav>
 
 <!--메뉴바-->
-<div class="card m-2 mb-1">
+<div class="card m-2">
     <div class="card-header">
         <strong>MENU</strong>
     </div>
     <div class="card-body bg-light p-3"> <!-- 배경색을 밝게 수정 -->
-        <div class="row">
+        <div class="col d-flex justify-content-center">
             <!-- 첫 번째 박스 -->
-            <div class="col d-flex justify-content-center flex-column">
-                <div class="row mb-3 ms-3">
-                    <div class="col text-center">
-                        <!--                <label class="col-form-label">차트번호</label>-->
-                        <input type="text" class="form-control" placeholder="차트번호 나오는곳" readonly>
-                    </div>
-                    <div class="col">
-<!--                        <input type="text" class="form-control" placeholder="차트번호 입력">-->
-                            <input list="genderOptions" id="customSelect" class="form-control" placeholder="차트번호 입력">
-                            <datalist id="genderOptions">
-                                <option value="이재죵">
-                                <option value="김애죠">
-                                <option value="우잉재">
-                            </datalist>
-                    </div>
-                    <div class="col-1 d-flex justify-content-center align-items-center">
-                        <button type="button" class="icon-button btn-sm me-3">
-                            <i class="bi bi-arrow-left-circle-fill"></i>
-                        </button>
-                        <button type="button" class="icon-button btn-sm">
-                            <i class="bi bi-arrow-right-circle-fill"></i>
-                        </button>
-                    </div>
+            <div class="row d-flex flex-fill">
+                <div id="patientInfo" class="col">
                 </div>
-                <div class="row ms-3">
-                    <div class="col text-center">
-                        <!--                <label class="col-form-label">환자성명</label>-->
-                        <input type="text" class="form-control" placeholder="환자성명 나오는곳" readonly>
-                    </div>
-                    <div class="col">
-                        <input type="text" class="form-control" placeholder="환자성명 입력">
-                    </div>
-                    <div class="col-1 d-flex justify-content-center align-items-center">
-                        <button type="button" class="btn btn-primary btn-sm"> <!-- 버튼 색상 변경 -->
-                            <i class="bi bi-search" style="padding: 0.5rem;"></i>
-                        </button>
+                <div class="col d-flex align-self-center">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <input type="text" class="form-control" id="patient_name_keyword" placeholder="환자성명 입력">
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary" id="addReplyBtn">
+                                <i class="bi bi-search" style="padding: 0.5rem;"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-
             <!-- 두 번째 박스 -->
-            <div class="col-md-6 p-2 d-flex justify-content-center align-items-center">
-                <div class="d-flex flex-wrap justify-content-center">
-                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
+            <div class="row d-flex flex-fill">
+                <div class="d-flex justify-content-center">
+                    <a class="btn btn-primary m-2" href="patient_register" style="width: 100px;">
                         <i class="bi bi-person-plus"></i><br> 환자등록
-                    </button>
-                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
+                    </a>
+                    <a class="btn btn-primary m-2" href="reservation" style="width: 100px;">
                         <i class="bi bi-calendar-check"></i><br> 예약
-                    </button>
-                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
-                        <i class="bi bi-folder"></i><br> 접수
-                    </button>
-                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
-                        <i class="bi bi-moon"></i><br> Dark Mode
-                    </button>
-                    <button type="button" class="btn btn-primary m-2" style="width: 120px; height: 60px;">
-                        <i class="bi bi-moon"></i><br> Dark Mode
-                    </button>
+                    </a>
+                    <a class="btn btn-primary m-2" href="reception" style="width: 100px;">
+                        <i class="bi bi-folder"></i><br> 진료접수
+                    </a>
+                    <a class="btn btn-primary m-2" href="medical_chart" style="width: 100px;">
+                        <i class="bi bi-file-earmark-medical"></i><br> 진료차트
+                    </a>
+                    <a class="btn btn-primary m-2" href="inventory_management" style="width: 100px;">
+                        <i class="bi bi-box-seam"></i><br> 재고관리
+                    </a>
+                    <a class="btn btn-primary m-2" href="inventory_management" style="width: 100px;">
+                        <i class="bi bi-file-medical"></i><br> 보험청구
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
+</div>
+<div class="modal SearchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">환자 정보</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="patientTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">이름</th>
+                        <th scope="col">나이</th>
+                        <th scope="col">성별</th>
+                        <th scope="col">차트번호</th>
+                        <th scope="col">생일</th>
+                        <th scope="col">휴대전화</th>
+                    </tr>
+                    </thead>
+                    <tbody id="patientTableBody">
+                    <!-- Rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary SearchBtn">확인</button>
+                <button type="button" class="btn btn-outline-dark closeBtn">닫기</button>
+            </div>
+        </div>
+    </div>
+</div><!--    register modal-->
 
 <!--사용자관리-->
 <div layout:fragment="admin_management" style="width: 100%"></div>
@@ -165,8 +133,11 @@
 <!--재고관리-->
 <div layout:fragment="inventory_management" style="width: 100%"></div>
 
-<script layout:fragment="postscript" th:inline="javascript"></script>
+<script layout:fragment="patientscript" th:inline="javascript"></script>
 
 
 </body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/layout.js"></script>
+<script src="/js/patientregister.js"></script>
 </html>
