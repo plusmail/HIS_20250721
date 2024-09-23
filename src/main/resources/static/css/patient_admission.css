@@ -1,0 +1,21 @@
+.custom-context-menu {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 150px;
+}
+
+.custom-context-menu div {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.custom-context-menu div:hover {
+    background-color: #f0f0f0;
+}
+
+.selected {
+    background-color: #d3e5ff;
+}
