@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<!-- 재료사 정보 입력 폼 -->
+<div class="form-container">
+    <form onsubmit="newCompanySearch(); return false;" action="/inventory_management">
+        <div class="card m-2 mb-1">
+            <div class="card-header text-center">
+                업체/재료 검색
+            </div>
+            <div class="card-body">
+                <!-- 업체/재료 상단 검색 영역 -->
+                <div class="search-box">
+                    <div class="row row-cols-auto align-items-end">
+                        <div class="col mb-3">
+                            <label for="fourCompanyNameSearch" class="form-label">업체명</label>
+                            <input type="text" class="form-control" name="companyName"
+                                   id="fourCompanyNameSearch"
+                                   placeholder="업체명 입력">
+                        </div>
+                        <div class="col mb-3">
+                            <button type="button" class="btn btn-primary mt-4" onclick="fourSearch()">검색
+                            </button>
+                            <button type="reset" class="btn btn-secondary mt-4" id="forSearchReset">초기화</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 업체/재료 검색 목록 테이블 -->
+                <div class="fixed-box">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>업체코드</th>
+                            <th>업체명</th>
+                            <th>전화번호</th>
+                            <th>담당자이름</th>
+                            <th>담당자연락처</th>
+                            <th>메모</th>
+                        </tr>
+                        </thead>
+                        <tbody id="newCompanyList">
+                        <tr>
+                            <td colspan="7">현재 등록된 업체가 없습니다.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form id="companyForm">
+        <fieldset>
+            <div class="card m-2 mb-1">
+                <div class="card-header text-center">
+                    재료사 정보 입력
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- 재료사 등록 폼 -->
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="input-group mb-3 col">
+                                    <span class="input-group-text" style="width: 8rem;">업체코드</span>
+                                    <input type="text" class="form-control" id="fourCompanyCode"
+                                           name="companyCode"
+                                           placeholder="코드 입력">
+                                </div>
+                                <div class="input-group mb-3 col">
+                                    <span class="input-group-text" style="width: 8rem;">업체명</span>
+                                    <input type="text" class="form-control" id="fourCompanyName"
+                                           name="companyName"
+                                           placeholder="업체명 입력">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-group mb-3 col">
+                                    <span class="input-group-text" style="width: 8rem;">사업자등록번호</span>
+                                    <input type="text" class="form-control" id="businessNumber"
+                                           name="businessNumber"
+                                           placeholder="사업자등록번호 입력">
+                                </div>
+                                <div class="input-group mb-3 col">
+                                    <span class="input-group-text" style="width: 8rem;">전화번호</span>
+                                    <input type="text" class="form-control" id="companyNumber"
+                                           name="companyNumber"
+                                           placeholder="전화번호 입력">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-group mb-3 col">
+                                    <span class="input-group-text" style="width: 8rem;">담당자 이름</span>
+                                    <input type="text" class="form-control" id="managerName"
+                                           name="managerName"
+                                           placeholder="담당자 이름 입력">
+                                </div>
+                                <div class="input-group mb-3 col">
+                                    <span class="input-group-text" style="width: 8rem;">담당자 연락처</span>
+                                    <input type="text" class="form-control" id="managerNumber"
+                                           name="managerNumber"
+                                           placeholder="담당자 연락처 입력">
+                                </div>
+                            </div>
+                            <div class="input-group mb-3 col">
+                                <span class="input-group-text" style="width: 8rem;">메모</span>
+                                <input type="text" class="form-control" id="companyMemo"
+                                       name="companyMemo"
+                                       placeholder="메모 입력">
+                            </div>
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary" id="addCompanyBtn">저장</button>
+                                <button type="button" class="btn btn-danger" id="deleteCompanyBtn">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+<script src="/js/company_register.js"></script>
+</html>

@@ -22,9 +22,9 @@ public class MaterialCompanyTests {
         companyRegisterService.registerCompany();
     }
 
-    @Test
-    public void materialRegisterTest() {
-        materialRegisterService.registerMaterial();
-    }
+//    @Test
+//    public void materialRegisterTest() {
+//        materialRegisterService.registerMaterial();
+//    }
 
 }

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <!-- 재료 정보 입력 폼 -->
+    <div class="form-container">
+        <form id="materialform" onsubmit="searchMaterialCompany(); return false;">
+            <div class="card m-2 mb-1">
+                <div class="card-header text-center">업체/재료 검색</div>
+                <div class="card-body">
+                    <!-- 업체/재료 상단 검색 영역 -->
+                    <div class="search-box">
+                        <div class="row row-cols-auto align-items-end">
+                            <div class="col mb-3">
+                                <label for="threeCompanyNameSearch" class="form-label">업체명</label>
+                                <input type="text" class="form-control" name="companyName"
+                                       id="threeCompanyNameSearch" placeholder="업체명 입력">
+                            </div>
+                            <div class="col mb-3">
+                                <label for="threeMaterialNameSearch" class="form-label">재료명</label>
+                                <input type="text" class="form-control" name="materialName"
+                                       id="threeMaterialNameSearch" placeholder="재료명 입력">
+                            </div>
+                            <div class="col mb-3">
+                                <button type="button" class="btn btn-primary mt-4" onclick="threeSearch()">검색</button>
+                                <button type="reset" class="btn btn-secondary mt-4" id="threeSearchReset">초기화</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 업체/재료 검색 목록 테이블 -->
+                    <div class="fixed-box">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>재료코드</th>
+                                <th>재료명</th>
+                                <th>단위</th>
+                                <th>단가</th>
+                                <th>최소보관수량</th>
+                                <th>재고관리여부</th>
+                                <th>업체명</th>
+                            </tr>
+                            <tbody id="materialCompanyList">
+                            <tr>
+                                <td colspan="10">현재 등록된 업체가 없습니다.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <fieldset>
+            <div class="card m-2 mb-1">
+                <div class="card-header text-center">재료 등록</div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- 재료 등록 폼 -->
+                        <div class="col-md-12">
+                            <form onsubmit="addMaterial(); return false;">
+                                <div class="row">
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 6rem;">업체명</span>
+                                        <input type="text" class="form-control" name="companyName" id="threeCompanyName" placeholder="업체명 입력">
+                                        <span class="btn btn-outline-primary" style="width: 6rem;"><i class="bi bi-search addReplyBtn" style="padding: 0.5rem;"></i></span>
+                                    </div>
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 6rem;">업체코드</span>
+                                        <input type="text" class="form-control" name="companyCode" id="threeCompanyCode" placeholder="업체코드 입력">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 6rem;">재료명</span>
+                                        <input type="text" class="form-control" name="materialName" id="threeMaterialName" placeholder="재료명 입력">
+                                    </div>
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 6rem;">재료코드</span>
+                                        <input type="text" class="form-control" name="materialCode" id="threeMaterialCode" placeholder="재료코드 입력">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 6rem;">단위</span>
+                                        <input type="text" name="materialUnit" class="form-control" id="materialUnit" placeholder="단위 입력">
+                                    </div>
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 6rem;">구입단가</span>
+                                        <input type="text" class="form-control" name="materialUnitPrice" id="materialUnitPrice" placeholder="구입단가 입력">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 8rem;">최소보관수량</span>
+                                        <input type="number" class="form-control" name="minQuantity" id="minQuantity" placeholder="수량 입력">
+                                    </div>
+                                    <div class="input-group mb-3 col">
+                                        <span class="input-group-text" style="width: 8rem;">재고관리여부</span>
+                                        <select class="form-select" name="stockManagementItem" id="threeStockManagementItem">
+                                            <option selected>재고관리여부</option>
+                                            <option value="y">예</option>
+                                            <option value="n">아니오</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="button-group">
+                                    <button type="submit" class="btn btn-primary" id="addMaterialBtn">저장</button>
+                                    <button type="reset" class="btn btn-secondary" id="resetMaterial">취소</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+<script src="/js/material_register.js"></script>
+</html>
