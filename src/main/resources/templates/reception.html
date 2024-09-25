@@ -58,6 +58,7 @@
         <!-- 날짜 선택 기능 -->
         <input type="date" class="date-input" id="currentDate">
 
+
         <!--  접수 버튼-->
         <button class="btn btn-info ReceptionBtn">접수</button>
 
@@ -71,7 +72,7 @@
         <button class="btn btn-success">진료실 보내기</button>
     </div>
     <div style="display: flex;">
-        <!-- 첫 번째 테이블: 일상발생 현황 -->
+        <!-- 진료대기테이블 -->
         <table id="waitingPatientsTable" border="1" cellspacing="0" cellpadding="5" style="width: 460px" >
             <thead>
             <tr>
@@ -93,7 +94,7 @@
             </tbody>
         </table>
 
-        <!-- 두 번째 테이블: 관련 현황 -->
+        <!-- 진료중테이블 -->
         <table id="treatmentPatientsTable" border="1" cellspacing="0" cellpadding="5" style="margin-left: 10px; width: 460px ">
             <thead>
             <tr>
@@ -115,8 +116,8 @@
             </tbody>
         </table>
 
-        <!-- 세 번째 테이블: 이상발생 현황 -->
-        <table border="1" cellspacing="0" cellpadding="5" style="margin-left: 10px; width: 460px">
+        <!-- 진료완료테이블 -->
+        <table id="completedPatientsTable" border="1" cellspacing="0" cellpadding="5" style="margin-left: 10px; width: 460px">
             <thead>
             <tr>
                 <th colspan="7" bgcolor="#FF9999">진료 완료 환자:0명</th>
