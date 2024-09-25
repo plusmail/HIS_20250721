@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DB에서 저장된 회사 목록을 불러오는 함수
     function searchMaterialCompany() {
-        fetch('/inventory_management/search?materialName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
+        fetch('/inventory_management/searchMaterial?materialName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('newCompanyList');
@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 검색 함수
     function fourSearch() {
-        const companyName = document.getElementById('fourCompanyNameSearch').value;
+        const materialName = document.getElementById('threeMaterialNameSearch').value;
 
-        fetch(`/inventory_management/search?companyName=${encodeURIComponent(companyName)}`)
+        fetch(`/inventory_management/searchMaterial?materialName=${encodeURIComponent(materialName)}`)
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('newCompanyList');
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stockManagementItem: document.getElementById('threeStockManagementItem').value
         };
 
-        fetch('/inventory_management/material/add', {
+        fetch('/inventory_management/addMaterial', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 검색된 재료 목록 업데이트
     function updateMaterialList() {
-        fetch('/inventory_management/material/search')
+        fetch('/inventory_management/searchMaterial')
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('materialCompanyList');

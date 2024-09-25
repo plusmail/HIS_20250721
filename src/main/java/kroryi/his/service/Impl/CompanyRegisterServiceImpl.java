@@ -23,11 +23,11 @@ public class CompanyRegisterServiceImpl implements CompanyRegisterService {
     @Override
     public CompanyRegister registerCompany() {
         CompanyRegister company = CompanyRegister.builder()
-                .companyCode("dt123")
-                .companyName("조은이덴탈")
+                .companyCode("dt12345")
+                .companyName("조은이덴탈2")
                 .businessNumber("0156132154")
                 .companyNumber("053-0000-0000")
-                .managerName("백지영")
+                .managerName("백지영2")
                 .managerNumber("010-0000-0000")
                 .companyMemo("첫 업체 등록")
                 .build();

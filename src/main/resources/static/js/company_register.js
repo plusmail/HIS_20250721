@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DB에서 저장된 회사 목록을 불러오는 함수
     function loadCompanyList() {
-        fetch('/inventory_management/search?companyName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
+        fetch('/inventory_management/searchCompany?companyName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('newCompanyList');
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function fourSearch() {
         const companyName = document.getElementById('fourCompanyNameSearch').value;
 
-        fetch(`/inventory_management/search?companyName=${encodeURIComponent(companyName)}`)
+        fetch(`/inventory_management/searchCompany?companyName=${encodeURIComponent(companyName)}`)
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('newCompanyList');
@@ -58,53 +58,56 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // 추가 버튼 클릭 시 데이터 전송
-    document.getElementById('addCompanyBtn').addEventListener('click', (event) => {
-        event.preventDefault();  // 기본 submit 동작 방지
-        const companyData = {
-            companyCode: document.getElementById('fourCompanyCode').value,
-            companyName: document.getElementById('fourCompanyName').value,
-            businessNumber: document.getElementById('businessNumber').value,
-            companyNumber: document.getElementById('companyNumber').value,
-            managerName: document.getElementById('managerName').value,
-            managerNumber: document.getElementById('managerNumber').value,
-            companyMemo: document.getElementById('companyMemo').value
-        };
-
-        fetch('/inventory_management/add', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(companyData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("업체가 저장되었습니다.");
-
-                    // 폼 리셋
-                    document.getElementById('companyForm').reset();
-
-                    // 테이블 전체 다시 검색하여 업데이트
-                    loadCompanyList();  // 전체 데이터 다시 불러오기
-                } else {
-                    alert(data.message);  // 중복된 경우 메시지 출력
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    });
-
     // 페이지가 처음 로딩될 때 회사 목록을 자동으로 불러오기
     loadCompanyList();
 });
 
+// 추가 버튼 클릭 시 데이터 전송
+document.getElementById('addCompanyBtn').addEventListener('click', (event) => {
+    event.preventDefault();  // 기본 submit 동작 방지
+    event.stopPropagation();
+
+    console.log("111111111111111111111111")
+    const companyData = {
+        companyCode: document.getElementById('fourCompanyCode').value,
+        companyName: document.getElementById('fourCompanyName').value,
+        businessNumber: document.getElementById('businessNumber').value,
+        companyNumber: document.getElementById('companyNumber').value,
+        managerName: document.getElementById('managerName').value,
+        managerNumber: document.getElementById('managerNumber').value,
+        companyMemo: document.getElementById('companyMemo').value
+    };
+
+    fetch('/inventory_management/addCompany', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(companyData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            if (data.success) {
+                alert("업체가 저장되었습니다.");
+
+                // 폼 리셋
+                document.getElementById('companyForm').reset();
+
+                // 테이블 전체 다시 검색하여 업데이트
+                loadCompanyList();  // 전체 데이터 다시 불러오기
+            } else {
+                alert("이미 등록된 업체입니다.");  // 중복된 경우 메시지 출력
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+});
 
 // 테이블 업데이트 함수 (저장된 업체 리스트를 다시 불러와서 테이블에 표시)
 function updateCompanyList() {
-    fetch('/inventory_management/search?companyName=')  // companyName 파라미터를 빈 문자열로 전달
+    fetch('/inventory_management/searchCompany?companyName=')  // companyName 파라미터를 빈 문자열로 전달
         .then(response => response.json())
         .then(data => {
             const tbody = document.getElementById('newCompanyList');

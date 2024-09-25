@@ -3,9 +3,14 @@
     height: 250px; /* 중복 제거, 하나로 통일 */
     border: 1px solid #ccc;
     overflow-y: auto;
+    box-sizing: border-box; /* 스크롤바 너비 포함하여 계산 */
+    margin: 0;
 }
 
 .fixed-box table {
+
+    margin: 0;
+    padding: 0;
     width: 100%;
 }
 

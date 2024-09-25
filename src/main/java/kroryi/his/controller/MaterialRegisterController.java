@@ -30,7 +30,7 @@ import java.util.Map;
 public class MaterialRegisterController {
     private final MaterialRegisterService materialRegisterService;
 
-    @GetMapping("/search")
+    @GetMapping("/searchMaterial")
     public List<MaterialRegister> searchMaterial(@RequestParam(value = "materialName", required = false) String materialName) {
         if (materialName == null || materialName.isEmpty()) {
             return materialRegisterService.getAllMaterial();  // 검색어가 없을 때 전체 업체 반환
@@ -39,7 +39,7 @@ public class MaterialRegisterController {
     }
 
     // 업체 추가
-    @PostMapping("/add")
+    @PostMapping("/addMaterial")
     public ResponseEntity<?> addMaterial(@RequestBody MaterialRegister material) {
         try {
             materialRegisterService.addMaterial(material);
@@ -51,27 +51,27 @@ public class MaterialRegisterController {
     }
 
     // 업체 삭제
-    @DeleteMapping("/delete")
+    @DeleteMapping("/deleteMaterial")
     public ResponseEntity<String> deleteMaterial(@RequestParam String materialCode) {
         // 회사 삭제 로직
         materialRegisterService.deleteMaterial(materialCode);
         return ResponseEntity.ok("재료가 삭제되었습니다.");
     }
 
-    @ApiOperation(value = "재료등록 POST", notes = "POST 방식으로 재료 등록")
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, MaterialRegister> register(@Valid @RequestBody MaterialDTO materialDTO,
-                                                  BindingResult bindingResult) throws BindException {
-        log.info("MaterialDTO->{}", materialDTO);
-
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
-
-        Map<String, MaterialRegister> result = new HashMap<>();
-        MaterialRegister materialRegister = materialRegisterService.register(materialDTO);
-        log.info("CompanyRegister->{}", materialRegister);
-        result.put("companyRegister", materialRegister);
-        return result;
-    }
+//    @ApiOperation(value = "재료등록 POST", notes = "POST 방식으로 재료 등록")
+//    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public Map<String, MaterialRegister> register(@Valid @RequestBody MaterialDTO materialDTO,
+//                                                  BindingResult bindingResult) throws BindException {
+//        log.info("MaterialDTO->{}", materialDTO);
+//
+//        if (bindingResult.hasErrors()) {
+//            throw new BindException(bindingResult);
+//        }
+//
+//        Map<String, MaterialRegister> result = new HashMap<>();
+//        MaterialRegister materialRegister = materialRegisterService.register(materialDTO);
+//        log.info("CompanyRegister->{}", materialRegister);
+//        result.put("companyRegister", materialRegister);
+//        return result;
+//    }
 }
