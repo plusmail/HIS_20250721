@@ -49,7 +49,6 @@
     }
 
 
-
 </style>
 
 <div layout:fragment="reception">
@@ -66,10 +65,10 @@
     </div>
     <div style="display: flex;">
         <!-- 진료대기테이블 -->
-        <table id="waitingPatientsTable" border="1" cellspacing="0" cellpadding="5" style="width: 460px" >
+        <table id="waitingPatientsTable" border="1" cellspacing="0" cellpadding="5" style="width: 460px">
             <thead>
             <tr>
-                <th colspan="7" bgcolor="#FFCCCC">진료 대기 환자: 0명</th>
+                <th colspan="6" bgcolor="#FFCCCC">진료 대기 환자: 0명</th>
             </tr>
             <tr>
                 <th>0</th>
@@ -78,7 +77,7 @@
                 <th>의사</th>
                 <th>예약시간</th>
                 <th>접수시간</th>
-                <th>대기시간</th>
+
             </tr>
             </thead>
             <tbody style="height: 300px" class="scrollable-tbody">
@@ -88,7 +87,8 @@
         </table>
 
         <!-- 진료중테이블 -->
-        <table id="treatmentPatientsTable" border="1" cellspacing="0" cellpadding="5" style="margin-left: 10px; width: 460px ">
+        <table id="treatmentPatientsTable" border="1" cellspacing="0" cellpadding="5"
+               style="margin-left: 10px; width: 460px ">
             <thead>
             <tr>
                 <th colspan="7" bgcolor="#CCFFCC">진료중환자 : 0명</th>
@@ -110,17 +110,17 @@
         </table>
 
         <!-- 진료완료테이블 -->
-        <table id="completedPatientsTable" border="1" cellspacing="0" cellpadding="5" style="margin-left: 10px; width: 460px">
+        <table id="completedPatientsTable" border="1" cellspacing="0" cellpadding="5"
+               style="margin-left: 10px; width: 460px">
             <thead>
             <tr>
-                <th colspan="7" bgcolor="#FF9999">진료 완료 환자:0명</th>
+                <th colspan="6" bgcolor="#FF9999">진료 완료 환자:0명</th>
             </tr>
             <tr>
                 <th>0</th>
                 <th>차트번호</th>
                 <th>환자이름</th>
                 <th>의사</th>
-                <th>대기시간</th>
                 <th>접수시간</th>
                 <th>진료완료시간</th>
             </tr>
@@ -131,7 +131,9 @@
         </table>
     </div>
 
-
+    <div th:fragment="reception_js">
+        <script th:src="@{/js/patient_admission.js}"></script>
+    </div>
 </div>
 
 
