@@ -1,18 +1,24 @@
 // 날짜
-document.getElementById('currentDate').value = new Date().toISOString().substring(0,10);
+document.getElementById('currentDate').value = new Date().toISOString().substring(0, 10);
 
 // 접수 버튼 클릭 시 세션에서 데이터 가져와 테이블에 추가하는 코드
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector(".ReceptionBtn").addEventListener("click", () => {
+    // Initialize reception button event listener
+    document.querySelector(".ReceptionBtn").addEventListener("click", handleReceptionButtonClick);
+
+    // Add context menu functionality to all tables
+    addContextMenuToTable("#waitingPatientsTable");
+    addContextMenuToTable("#treatmentPatientsTable");
+    addContextMenuToTable("#completedPatientsTable");
+
+    // Handle reception button click event
+    function handleReceptionButtonClick() {
         const retrievedPatient = JSON.parse(sessionStorage.getItem('selectedPatient'));
         if (retrievedPatient) {
             const table = document.querySelector("#waitingPatientsTable tbody");
             const newRow = table.insertRow();
-
             const receptionTime = new Date().toLocaleString(); // 전체 년월일시간
             const onlyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // 시간만 추출
-
-            const waitingTime = "대기시간"; // 대기 시간
 
             const doctorDropdown = `
                 <select class="doctor-dropdown">
@@ -29,25 +35,44 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${doctorDropdown}</td> <!-- 의사 선택 드롭다운 -->
                 <td>${retrievedPatient.appointmentTime || ''}</td> <!-- 예약시간 비워둠 -->
                 <td>${onlyTime}</td> <!-- 시간만 표시 (접수 시간) -->
-                <td>${waitingTime}</td>
             `;
 
             // 새 행에 컨텍스트 메뉴 이벤트 리스너 추가
             addContextMenuToRow(newRow, receptionTime);
             updateRowCount(table); // 행 번호 업데이트 호출
+            updatePatientCount("#waitingPatientsTable", "진료 대기 환자: ");
         }
-    });
-
-    // 진료대기, 진료중, 진료완료 테이블 모두에 컨텍스트 메뉴 기능 추가
-    addContextMenuToTable("#waitingPatientsTable");
-    addContextMenuToTable("#treatmentPatientsTable");
-    addContextMenuToTable("#completedPatientsTable");
+    }
 
     // 행 번호를 업데이트하는 함수
     function updateRowCount(table) {
         const rows = table.querySelectorAll("tbody tr");
         rows.forEach((row, index) => {
             row.cells[0].textContent = index + 1; // 첫 번째 셀에 행 번호 업데이트
+        });
+    }
+
+    // 환자 수를 업데이트하는 함수
+    function updatePatientCount(tableSelector, headerText) {
+        const table = document.querySelector(tableSelector);
+        const patientCountHeader = table.querySelector("thead th[colspan]");
+        const currentCount = table.querySelectorAll("tbody tr").length;
+        patientCountHeader.textContent = `${headerText}${currentCount}명`;
+    }
+
+    // 행에 컨텍스트 메뉴 추가하는 함수
+    function addContextMenuToRow(row, receptionTime) {
+        row.addEventListener('contextmenu', function (e) {
+            e.preventDefault(); // 기본 컨텍스트 메뉴 방지
+            createContextMenu(e, this, receptionTime);
+        });
+    }
+
+    // 테이블의 모든 행에 컨텍스트 메뉴 이벤트 리스너 추가
+    function addContextMenuToTable(tableSelector) {
+        const tableRows = document.querySelectorAll(`${tableSelector} tbody tr`);
+        tableRows.forEach(row => {
+            addContextMenuToRow(row); // 각 행에 컨텍스트 메뉴 추가
         });
     }
 
@@ -71,10 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             { text: "위로 이동", action: () => moveRow(row, -1) },
             { text: "아래로 이동", action: () => moveRow(row, 1) },
             { text: "마지막으로 이동", action: () => moveRowToLast(row) },
-            { text: "접수 취소", action: () => {
-                    row.remove();
-                    updateRowCount(table); // 행 삭제 후 행 번호 업데이트
-                }},
+            { text: "접수 취소", action: () => cancelReception(row) },
             { text: "진료 중 테이블로 이동", action: () => moveToInTreatmentTable(row) },
             { text: "진료 완료 테이블로 이동", action: () => moveToCompletedTable(row) }
         ];
@@ -92,20 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(menu);
     }
 
-    // 행에 컨텍스트 메뉴 추가하는 함수
-    function addContextMenuToRow(row, receptionTime) {
-        row.addEventListener('contextmenu', function (e) {
-            e.preventDefault(); // 기본 컨텍스트 메뉴 방지
-            createContextMenu(e, this, receptionTime);
-        });
-    }
-
-    // 테이블의 모든 행에 컨텍스트 메뉴 이벤트 리스너 추가
-    function addContextMenuToTable(tableSelector) {
-        const tableRows = document.querySelectorAll(`${tableSelector} tbody tr`);
-        tableRows.forEach(row => {
-            addContextMenuToRow(row); // 각 행에 컨텍스트 메뉴 추가
-        });
+    // 접수 취소 함수
+    function cancelReception(row) {
+        row.remove();
+        const waitingPatientsTable = document.querySelector("#waitingPatientsTable")
+        updateRowCount(waitingPatientsTable); // 행 삭제 후 행 번호 업데이트
+        updatePatientCount("#waitingPatientsTable", "진료 대기 환자: "); // 대기 환자 수 업데이트
     }
 
     // 행을 위아래로 이동하는 함수
@@ -138,8 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // 진료 중 테이블로 행을 이동하는 함수
     function moveToInTreatmentTable(row) {
         const inTreatmentTable = document.querySelector("#treatmentPatientsTable tbody");
-
-        // 진료 중 테이블로 이동 시 필요한 정보 설정
         const treatmentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // 진료 시작 시간
         const receptionTimeCell = row.cells[5].textContent; // 대기 테이블에서 접수 시간 가져오기
 
@@ -155,39 +167,35 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         row.remove(); // 대기 테이블에서 행 제거
-        updateRowCount(inTreatmentTable); // 진료 중 테이블 행 번호 업데이트
+        updateRowCount('#waitingPatientsTable'); // 진료 중 테이블 행 번호 업데이트
+        updatePatientCount('#treatmentPatientsTable', "진료 중 환자:")
         addContextMenuToRow(newRow); // 새 행에 컨텍스트 메뉴 추가
     }
 
     // 진료 완료 테이블로 행을 이동하는 함수
     function moveToCompletedTable(row) {
         const completedTable = document.querySelector("#completedPatientsTable tbody");
-
-        // 진료 완료 테이블로 이동 시 필요한 정보 설정
         const completionTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // 완료 시간
         const receptionTimeCell = row.cells[5].textContent; // 접수 시간 (진료 중 테이블에서 가져오기)
 
-        // 진료 중 테이블에서 의사 이름 가져오기
         const doctorNameCell = row.cells[3].textContent; // 진료 중 테이블에서 의사 이름 가져오기
 
-        // 새 행 생성
         const newRow = completedTable.insertRow();
         newRow.innerHTML = `
             <td>${completedTable.rows.length}</td> <!-- 행 번호 -->
             <td>${row.cells[1].textContent}</td> <!-- 차트 번호 -->
             <td>${row.cells[2].textContent}</td> <!-- 환자 이름 -->
             <td>${doctorNameCell}</td> <!-- 의사 이름 -->
-            <td>${"대기"}</td> <!-- 대기 시간 비워둠 -->
             <td>${receptionTimeCell}</td> <!-- 접수 시간 -->
             <td>${completionTime}</td> <!-- 완료 시간 (현재 시간) -->
         `;
 
         row.remove(); // 진료 중 테이블에서 행 제거
-        updateRowCount(completedTable); // 완료 테이블 행 번호 업데이트
-        addContextMenuToRow(newRow); // 새 행에 컨텍스트 메뉴 추가
+        updateRowCount(completedTable); // 진료 완료 테이블 행 번호 업데이트
+        addContextMenuToRow('#completedPatientsTable', "진료 완료 환자: "); // 새 행에 컨텍스트 메뉴 추가
     }
 
-    // 컨텍스트 메뉴 제거 함수
+    // 컨텍스트 메뉴 제거하는 함수
     function removeContextMenu() {
         const existingMenu = document.querySelector(".custom-context-menu");
         if (existingMenu) {
@@ -195,9 +203,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 페이지 클릭 시 컨텍스트 메뉴 제거
+    // 문서 클릭 시 컨텍스트 메뉴 제거
     document.addEventListener("click", removeContextMenu);
 });
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().substring(0, 10);
@@ -216,11 +227,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         tableRows.forEach(row => {
             const entry = {
-                chartNum: row.cells[0].textContent, // 차트 번호
-                name: row.cells[1].textContent, // 환자 이름
-                doctor: row.cells[2].textContent, // 의사 이름
-                receptionTime: row.cells[5].textContent, // 접수 시간
-                completionTime: row.cells[6].textContent // 완료 시간
+                chartNum: row.cells[1].textContent, // 차트 번호
+                name: row.cells[2].textContent, // 환자 이름
+                doctor: row.cells[3].textContent, // 의사 이름
+                receptionTime: row.cells[4].textContent, // 접수 시간
+                completionTime: row.cells[5].textContent // 완료 시간
             };
             completedData.push(entry);
         });
@@ -245,14 +256,15 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.innerHTML = ""; // 기존 데이터 초기화
 
         if (data[date]) {
-            data[date].forEach(entry => {
+            data[date].forEach((entry, index) => { // index로 행 번호를 추가
                 const newRow = tableBody.insertRow();
                 newRow.innerHTML = `
-                    <td>${entry.chartNum}</td>
-                    <td>${entry.name}</td>
-                    <td>${entry.doctor}</td>
-                    <td>${entry.receptionTime}</td>
-                    <td>${entry.completionTime}</td>
+                    <td>${index + 1}</td> <!-- 행 번호 -->
+                    <td>${entry.chartNum}</td> <!-- 차트 번호 -->
+                    <td>${entry.name}</td> <!-- 환자 이름 -->
+                    <td>${entry.doctor}</td> <!-- 의사 이름 -->
+                    <td>${entry.receptionTime}</td> <!-- 접수 시간 -->
+                    <td>${entry.completionTime}</td> <!-- 완료 시간 -->
                 `;
             });
         }
@@ -264,6 +276,53 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("진료 완료 데이터가 저장되었습니다.");
     });
 });
+
+
+document.getElementById('saveButton').addEventListener('click', () => {
+    const selectedDate = document.getElementById('currentDate').value;
+    const completedData = JSON.parse(localStorage.getItem('completedData')) || {};
+
+    if (completedData[selectedDate]) {
+        const dataToSend = completedData[selectedDate];
+
+        // 전체 날짜와 시간을 가져옵니다.
+        const currentDateTime = new Date();
+        const formattedDateTime = currentDateTime.toISOString(); // 전체 년월일시간 (ISO 형식)
+
+        // dataToSend에 전체 날짜와 시간을 추가합니다.
+        dataToSend.appointmentTime = formattedDateTime;
+
+        console.log("전송할 데이터:", dataToSend); // 전송할 데이터 확인
+        fetch('/api/saveCompletedData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend), // 데이터 전송
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 좋지 않습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert("데이터가 성공적으로 저장되었습니다.");
+                } else {
+                    alert("데이터 저장 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("데이터 저장 중 오류가 발생했습니다.");
+            });
+    } else {
+        alert("저장할 데이터가 없습니다.");
+    }
+});
+
+
 
 
 
