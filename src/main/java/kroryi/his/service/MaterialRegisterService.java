@@ -6,17 +6,14 @@ import kroryi.his.dto.MaterialDTO;
 import java.util.List;
 
 public interface MaterialRegisterService {
-    MaterialRegister register(MaterialDTO materialDTO);
+    List<MaterialRegister> getAllMaterial();
 
-    List<MaterialRegister> searchByName(String materialName);
+    MaterialRegister register(MaterialDTO materialDTO);
 
     boolean isMaterialCodeDuplicate(String materialCode);
 
-    void addMaterial(MaterialRegister register);
+    List<MaterialRegister> searchByName(String materialName);
 
     void deleteMaterial(String materialCode);
-
-    List<MaterialRegister> getAllMaterial();
-
 
 }

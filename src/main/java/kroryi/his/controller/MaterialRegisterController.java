@@ -30,6 +30,37 @@ import java.util.Map;
 public class MaterialRegisterController {
     private final MaterialRegisterService materialRegisterService;
 
+    // 재료 등록
+    @ApiOperation(value = "회사등록 POST", notes = "POST 방식으로 회사 등록")
+    @PostMapping(value = "/addMaterial", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> register(@Valid @RequestBody MaterialDTO materialDTO,
+                                        BindingResult bindingResult) throws BindException {
+        log.info("MaterialDTO->{}", materialDTO);
+
+        if (bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 재료 등록
+            MaterialRegister materialRegister = materialRegisterService.register(materialDTO);
+            log.info("MaterialRegister->{}", materialRegister);
+
+            // 성공 응답
+            result.put("success", true);
+            result.put("companyRegister", materialRegister);
+        } catch (IllegalArgumentException e) {
+            // 중복된 경우 예외 처리 및 실패 응답
+            log.warn("재료 등록 실패: {}", e.getMessage());
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+
+        return result;
+    }
+
     @GetMapping("/searchMaterial")
     public List<MaterialRegister> searchMaterial(@RequestParam(value = "materialName", required = false) String materialName) {
         if (materialName == null || materialName.isEmpty()) {
@@ -38,40 +69,14 @@ public class MaterialRegisterController {
         return materialRegisterService.searchByName(materialName);  // 검색어에 따른 업체 반환
     }
 
-    // 업체 추가
-    @PostMapping("/addMaterial")
-    public ResponseEntity<?> addMaterial(@RequestBody MaterialRegister material) {
-        try {
-            materialRegisterService.addMaterial(material);
-            return ResponseEntity.ok(Collections.singletonMap("success", true));
-        } catch (IllegalArgumentException e) {
-            // 중복일 경우 에러 메시지 전달
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", e.getMessage()));
-        }
-    }
 
-    // 업체 삭제
+    // 재료 삭제
     @DeleteMapping("/deleteMaterial")
     public ResponseEntity<String> deleteMaterial(@RequestParam String materialCode) {
-        // 회사 삭제 로직
+        // 재료 삭제 로직
         materialRegisterService.deleteMaterial(materialCode);
         return ResponseEntity.ok("재료가 삭제되었습니다.");
     }
 
-//    @ApiOperation(value = "재료등록 POST", notes = "POST 방식으로 재료 등록")
-//    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public Map<String, MaterialRegister> register(@Valid @RequestBody MaterialDTO materialDTO,
-//                                                  BindingResult bindingResult) throws BindException {
-//        log.info("MaterialDTO->{}", materialDTO);
-//
-//        if (bindingResult.hasErrors()) {
-//            throw new BindException(bindingResult);
-//        }
-//
-//        Map<String, MaterialRegister> result = new HashMap<>();
-//        MaterialRegister materialRegister = materialRegisterService.register(materialDTO);
-//        log.info("CompanyRegister->{}", materialRegister);
-//        result.put("companyRegister", materialRegister);
-//        return result;
-//    }
+
 }

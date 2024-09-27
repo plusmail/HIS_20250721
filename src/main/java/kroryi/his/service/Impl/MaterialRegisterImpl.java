@@ -20,11 +20,9 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
     private final MaterialRegisterRepository materialRepository;
     private final ModelMapper modelMapper;
 
-
-
     @Override
-    public List<MaterialRegister> searchByName(String materialName) {
-        return materialRepository.findBymaterialNameContainingIgnoreCase(materialName);
+    public List<MaterialRegister> getAllMaterial() {
+        return materialRepository.findAll();
     }
 
     @Override
@@ -33,28 +31,21 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
     }
 
     @Override
-    public void addMaterial(MaterialRegister register) {
-        if (isMaterialCodeDuplicate(register.getMaterialCode())) {
-            throw new IllegalArgumentException("중복된 회사 코드입니다.");
-        }
-        materialRepository.save(register);
-    }
-
-    @Override
-    public void deleteMaterial(String materialCode) {
-        materialRepository.deleteById(materialCode);
-    }
-
-    @Override
-    public List<MaterialRegister> getAllMaterial() {
-        return materialRepository.findAll();
-    }
-
-    @Override
     public MaterialRegister register(MaterialDTO materialDTO) {
         MaterialRegister materialRegister = modelMapper.map(materialDTO, MaterialRegister.class);
 
         return materialRepository.save(materialRegister);
+    }
+
+    @Override
+    public List<MaterialRegister> searchByName(String materialName) {
+        return materialRepository.findByMaterialNameContainingIgnoreCase(materialName);
+    }
+
+    // 재료 삭제
+    @Override
+    public void deleteMaterial(String materialCode) {
+        materialRepository.deleteById(materialCode);
     }
 
 }

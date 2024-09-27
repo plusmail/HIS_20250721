@@ -19,56 +19,59 @@ public class CompanyRegisterServiceImpl implements CompanyRegisterService {
     private final CompanyRegisterRepository companyRegisterRepository;
     private final ModelMapper modelMapper;
 
-
-    @Override
-    public CompanyRegister registerCompany() {
-        CompanyRegister company = CompanyRegister.builder()
-                .companyCode("dt12345")
-                .companyName("조은이덴탈2")
-                .businessNumber("0156132154")
-                .companyNumber("053-0000-0000")
-                .managerName("백지영2")
-                .managerNumber("010-0000-0000")
-                .companyMemo("첫 업체 등록")
-                .build();
-        log.info("company->{}", company);
-        return companyRegisterRepository.save(company);
-    }
-
-    @Override
-    public List<CompanyRegister> searchByName(String companyName) {
-        return companyRegisterRepository.findByCompanyNameContainingIgnoreCase(companyName);
-    }
-
-    @Override
-    public boolean isCompanyCodeDuplicate(String companyCode) {
-        return companyRegisterRepository.existsByCompanyCode(companyCode);
-    }
-
-    @Override
-    public void addCompany(CompanyRegister company) {
-        if (isCompanyCodeDuplicate(company.getCompanyCode())) {
-            throw new IllegalArgumentException("중복된 회사 코드입니다.");
-        }
-        companyRegisterRepository.save(company);
-    }
-
-    @Override
-    public void deleteCompany(String companyCode) {
-        companyRegisterRepository.deleteById(companyCode);
-    }
+//가짜데이터 등록
+//    @Override
+//    public CompanyRegister registerCompany() {
+//        CompanyRegister company = CompanyRegister.builder()
+//                .companyCode("dt12345")
+//                .companyName("조은이덴탈2")
+//                .businessNumber("0156132154")
+//                .companyNumber("053-0000-0000")
+//                .managerName("백지영2")
+//                .managerNumber("010-0000-0000")
+//                .companyMemo("첫 업체 등록")
+//                .build();
+//        log.info("company->{}", company);
+//        return companyRegisterRepository.save(company);
+//    }
 
     @Override
     public List<CompanyRegister> getAllCompanies() {
         return companyRegisterRepository.findAll();
     }
 
+    // 업체코드 중복체크 로직
+    @Override
+    public boolean isCompanyCodeDuplicate(String companyCode) {
+        return companyRegisterRepository.existsByCompanyCode(companyCode);
+    }
+
+    // 실제 업체 등록시 업체코드 중복체크
     @Override
     public CompanyRegister register(CompanyDTO companyDTO) {
-        CompanyRegister companyRegister = modelMapper.map(companyDTO, CompanyRegister.class);
+        if (isCompanyCodeDuplicate(companyDTO.getCompanyCode())) {
+            throw new IllegalArgumentException("이미 등록된 업체입니다.");
+        }
 
+        CompanyRegister companyRegister = modelMapper.map(companyDTO, CompanyRegister.class);
         return companyRegisterRepository.save(companyRegister);
     }
+
+    // 업체 검색
+    @Override
+    public List<CompanyRegister> searchByName(String companyName) {
+        return companyRegisterRepository.findByCompanyNameContainingIgnoreCase(companyName);
+    }
+
+    // 업체 삭제
+    @Override
+    public void deleteCompany(String companyCode) {
+        companyRegisterRepository.deleteById(companyCode);
+    }
+
+
+
+
 
 
 }

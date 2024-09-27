@@ -17,10 +17,10 @@ public class MaterialCompanyTests {
     @Autowired
     MaterialRegisterService materialRegisterService;
 
-    @Test
-    public void companyRegisterTest() {
-        companyRegisterService.registerCompany();
-    }
+//    @Test
+//    public void companyRegisterTest() {
+//        companyRegisterService.registerCompany();
+//    }
 
 //    @Test
 //    public void materialRegisterTest() {

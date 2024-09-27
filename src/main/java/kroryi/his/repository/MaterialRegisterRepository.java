@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MaterialRegisterRepository extends JpaRepository<MaterialRegister, String> {
-    List<MaterialRegister> findBymaterialNameContainingIgnoreCase(String materialName);
+    List<MaterialRegister> findByMaterialNameContainingIgnoreCase(String materialName);
 
     boolean existsByMaterialCode(String materialCode);
 }

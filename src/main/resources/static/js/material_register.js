@@ -1,134 +1,122 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // DB에서 저장된 회사 목록을 불러오는 함수
-    function searchMaterialCompany() {
-        fetch('/inventory_management/searchMaterial?materialName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('newCompanyList');
-                tbody.innerHTML = '';
+//재료 목록 로딩 함수
+function loadMaterialList() {
+    fetch('/inventory_management/searchMaterial?materialName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('newMaterialList');
+            tbody.innerHTML = '';
 
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7">현재 등록된 재료가 없습니다.</td></tr>';
-                } else {
-                    data.forEach(material => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                    <td>${material.materialCode}</td>
-                    <td>${material.materialName}</td>
-                    <td>${material.materialUnit}</td>
-                    <td>${material.materialUnitPrice}</td>
-                    <td>${material.minQuantity}</td>
-                    <td>${material.stockManagementItem ? '예' : '아니오'}</td>
-                    <td>${material.companyName}</td>
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">현재 등록된 재료가 없습니다.</td></tr>';
+            } else {
+                data.forEach(material => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${material.companyCode}</td>
+                            <td>${material.companyName}</td>
+                            <td>${material.materialCode}</td>
+                            <td>${material.managerName}</td>
+                            <td>${material.materialUnit}</td>
+                            <td>${material.materialUnitPrice}</td>
+                            <td>${material.minQuantity}</td>
+                            <td>${material.stockManagementItem}</td>
                         `;
-                        tbody.appendChild(row);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("회사 목록을 불러오는 중 오류 발생:", error);
-            });
-    }
-
-    // 검색 함수
-    function fourSearch() {
-        const materialName = document.getElementById('threeMaterialNameSearch').value;
-
-        fetch(`/inventory_management/searchMaterial?materialName=${encodeURIComponent(materialName)}`)
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('newCompanyList');
-                tbody.innerHTML = ''; // 기존 행 제거
-
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7">현재 등록된 업체가 없습니다.</td></tr>';
-                } else {
-                    data.forEach(company => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${company.companyCode}</td>
-                            <td>${company.companyName}</td>
-                            <td>${company.companyNumber}</td>
-                            <td>${company.managerName}</td>
-                            <td>${company.managerNumber}</td>
-                            <td>${company.companyMemo}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            });
-    }
-
-// 재료 등록 이벤트 핸들러
-    document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
-        event.preventDefault();  // 기본 submit 동작 방지
-
-        const materialData = {
-            companyName: document.getElementById('threeCompanyName').value,
-            companyCode: document.getElementById('threeCompanyCode').value,
-            materialName: document.getElementById('threeMaterialName').value,
-            materialCode: document.getElementById('threeMaterialCode').value,
-            materialUnit: document.getElementById('materialUnit').value,
-            materialUnitPrice: document.getElementById('materialUnitPrice').value,
-            minQuantity: document.getElementById('minQuantity').value,
-            stockManagementItem: document.getElementById('threeStockManagementItem').value
-        };
-
-        fetch('/inventory_management/addMaterial', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(materialData)
+                    tbody.appendChild(row);
+                });
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('재료가 저장되었습니다.');
-                    // form 입력값 리셋
-                    document.getElementById('materialform').reset();  // 입력 폼 리셋 (올바르게 선택)
-                    searchMaterialCompany();  // 저장 후 테이블 업데이트
-                } else {
-                    alert(data.message);  // 오류 메시지 출력
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        searchMaterialCompany();
-    });
+        .catch(error => {
+            console.error("회사 목록을 불러오는 중 오류 발생:", error);
+        });
+}
 
-// 검색된 재료 목록 업데이트
-    function updateMaterialList() {
-        fetch('/inventory_management/searchMaterial')
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('materialCompanyList');
-                tbody.innerHTML = '';  // 테이블 초기화
+loadMaterialList();
 
-                const materials = Array.isArray(data) ? data.reverse() : data.materials.reverse();
 
-                if (materials && materials.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7">현재 등록된 업체가 없습니다.</td></tr>';
-                } else {
-                    materials.forEach(material => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                    <td>${material.materialCode}</td>
-                    <td>${material.materialName}</td>
-                    <td>${material.materialUnit}</td>
-                    <td>${material.materialUnitPrice}</td>
-                    <td>${material.minQuantity}</td>
-                    <td>${material.stockManagementItem ? '예' : '아니오'}</td>
-                    <td>${material.companyName}</td>
-                `;
-                        tbody.appendChild(row);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching material list:', error);
-            });
-    }
-    updateMaterialList();
-})
+// 업체 등록 버튼 클릭 시 데이터 전송
+document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
+    event.preventDefault();  // 기본 submit 동작 방지
+    event.stopPropagation();
+
+    const materialData = {
+        companyCode: document.getElementById('threeCompanyCode').value,
+        companyName: document.getElementById('threeCompanyName').value,
+        materialName: document.getElementById('threeMaterialName').value,
+        materialCode: document.getElementById('threeMaterialCode').value,
+        materialUnit: document.getElementById('materialUnit').value,
+        materialUnitPrice: document.getElementById('materialUnitPrice').value,
+        minQuantity: document.getElementById('minQuantity').value,
+        stockManagementItem: document.getElementById('threeStockManagementItem').value
+    };
+
+    fetch('/inventory_management/addMaterial', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(materialData)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);  // 서버 응답 확인
+
+            if (data.success) {
+                alert("재료가 저장되었습니다.");
+
+                // 폼 리셋
+                document.getElementById('materialForm').reset();
+
+                // 전체 데이터 다시 불러오기
+                loadMaterialList();
+            } else {
+                alert(data.message || "재료 등록에 실패했습니다.");  // 서버에서 전달된 메시지 출력
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert(`서버와의 통신 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
+        });
+});
+
+
+// 재료 검색 함수
+function threeSearch() {
+    const materialName = document.getElementById('threeMaterialNameSearch').value;
+
+    fetch(`/inventory_management/searchMaterial?materialName=${encodeURIComponent(materialName)}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('newMaterialList');
+            tbody.innerHTML = ''; // 기존 행 제거
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">현재 등록된 재료가 없습니다.</td></tr>';
+            } else {
+                data.forEach(material => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${material.companyCode}</td>
+                            <td>${material.companyName}</td>
+                            <td>${material.materialCode}</td>
+                            <td>${material.managerName}</td>
+                            <td>${material.materialUnit}</td>
+                            <td>${material.materialUnitPrice}</td>
+                            <td>${material.minQuantity}</td>
+                            <td>${material.stockManagementItem}</td>
+                      
+                        `;
+                    tbody.appendChild(row);
+                });
+            }
+        });
+}
+
+
+
+
+

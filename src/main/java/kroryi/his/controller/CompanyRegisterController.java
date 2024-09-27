@@ -26,6 +26,37 @@ import java.util.Map;
 public class CompanyRegisterController {
     private final CompanyRegisterService companyRegisterService;
 
+    // 업체 등록
+    @ApiOperation(value = "회사등록 POST", notes = "POST 방식으로 회사 등록")
+    @PostMapping(value = "/addCompany", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> register(@Valid @RequestBody CompanyDTO companyDTO,
+                                        BindingResult bindingResult) throws BindException {
+        log.info("CompanyDTO->{}", companyDTO);
+
+        if (bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 회사 등록
+            CompanyRegister companyRegister = companyRegisterService.register(companyDTO);
+            log.info("CompanyRegister->{}", companyRegister);
+
+            // 성공 응답
+            result.put("success", true);
+            result.put("companyRegister", companyRegister);
+        } catch (IllegalArgumentException e) {
+            // 중복된 경우 예외 처리 및 실패 응답
+            log.warn("회사 등록 실패: {}", e.getMessage());
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+
+        return result;
+    }
+
     @GetMapping("/searchCompany")
     public List<CompanyRegister> searchCompanies(@RequestParam(value = "companyName", required = false) String companyName) {
         if (companyName == null || companyName.isEmpty()) {
@@ -35,28 +66,11 @@ public class CompanyRegisterController {
     }
 
 
-    @ApiOperation(value = "회사등록 POST", notes = "POST 방식으로 회사 등록")
-    @PostMapping(value = "/addCompany", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, CompanyRegister> register(@Valid @RequestBody CompanyDTO companyDTO,
-                                                 BindingResult bindingResult) throws BindException {
-        log.info("CompanyDTO->{}", companyDTO);
-
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
-
-        Map<String, CompanyRegister> result = new HashMap<>();
-        CompanyRegister companyRegister = companyRegisterService.register(companyDTO);
-        log.info("CompanyRegister->{}", companyRegister);
-        result.put("companyRegister", companyRegister);
-        return result;
-    }
-
     // 업체 삭제
     @DeleteMapping("/deleteCompany")
     public ResponseEntity<String> deleteCompany(@RequestParam String companyCode) {
         // 회사 삭제 로직
         companyRegisterService.deleteCompany(companyCode);
-        return ResponseEntity.ok("업체가 삭제되었습니다.");
+        return ResponseEntity.ok("업체가 성공적으로 삭제되었습니다.");
     }
 }
