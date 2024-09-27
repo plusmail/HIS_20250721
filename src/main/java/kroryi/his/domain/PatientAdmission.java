@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -29,7 +29,7 @@ public class PatientAdmission {
     private LocalDateTime receptionTime;
 
     @Column(name = "ap_time")
-    private LocalDate appointmentTime;
+    private LocalDateTime appointmentTime;
 
     @Column(name = "ts_time")
     private LocalDateTime treatmentStartTime;

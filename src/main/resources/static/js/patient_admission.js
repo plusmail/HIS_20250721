@@ -17,8 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (retrievedPatient) {
             const table = document.querySelector("#waitingPatientsTable tbody");
             const newRow = table.insertRow();
+
             const receptionTime = new Date().toLocaleString(); // 전체 년월일시간
             const onlyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // 시간만 추출
+
+            const waitingTime = "대기시간"; // 대기 시간
 
             const doctorDropdown = `
                 <select class="doctor-dropdown">
@@ -35,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${doctorDropdown}</td> <!-- 의사 선택 드롭다운 -->
                 <td>${retrievedPatient.appointmentTime || ''}</td> <!-- 예약시간 비워둠 -->
                 <td>${onlyTime}</td> <!-- 시간만 표시 (접수 시간) -->
+                <td>${waitingTime}</td>
             `;
 
             // 새 행에 컨텍스트 메뉴 이벤트 리스너 추가
@@ -152,6 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // 진료 중 테이블로 행을 이동하는 함수
     function moveToInTreatmentTable(row) {
         const inTreatmentTable = document.querySelector("#treatmentPatientsTable tbody");
+
+        // 진료 중 테이블로 이동 시 필요한 정보 설정
         const treatmentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // 진료 시작 시간
         const receptionTimeCell = row.cells[5].textContent; // 대기 테이블에서 접수 시간 가져오기
 
@@ -175,17 +181,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // 진료 완료 테이블로 행을 이동하는 함수
     function moveToCompletedTable(row) {
         const completedTable = document.querySelector("#completedPatientsTable tbody");
+
+        // 진료 완료 테이블로 이동 시 필요한 정보 설정
         const completionTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // 완료 시간
         const receptionTimeCell = row.cells[5].textContent; // 접수 시간 (진료 중 테이블에서 가져오기)
 
+        // 진료 중 테이블에서 의사 이름 가져오기
         const doctorNameCell = row.cells[3].textContent; // 진료 중 테이블에서 의사 이름 가져오기
 
+        // 새 행 생성
         const newRow = completedTable.insertRow();
         newRow.innerHTML = `
             <td>${completedTable.rows.length}</td> <!-- 행 번호 -->
             <td>${row.cells[1].textContent}</td> <!-- 차트 번호 -->
             <td>${row.cells[2].textContent}</td> <!-- 환자 이름 -->
             <td>${doctorNameCell}</td> <!-- 의사 이름 -->
+            <td>${"대기"}</td> <!-- 대기 시간 비워둠 -->
             <td>${receptionTimeCell}</td> <!-- 접수 시간 -->
             <td>${completionTime}</td> <!-- 완료 시간 (현재 시간) -->
         `;
@@ -206,9 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // 문서 클릭 시 컨텍스트 메뉴 제거
     document.addEventListener("click", removeContextMenu);
 });
-
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().substring(0, 10);
