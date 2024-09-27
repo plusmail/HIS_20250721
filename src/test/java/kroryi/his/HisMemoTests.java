@@ -28,7 +28,7 @@ public class HisMemoTests {
     public void testMemoList(){
         List<PatientRegisterMemo> patientMemoDTO = patientMemoRepository.findAll();
         for (PatientRegisterMemo memo : patientMemoDTO) {
-            log.info(memo.toString());
+            log.info("memo---->{}",memo.toString());
         }
 
     }
@@ -36,7 +36,7 @@ public class HisMemoTests {
     @Test
     public void testSearchName(){
 
-        List<PatientRegister> registers = patientRegisterService.searchName("이재준");
+        List<PatientRegister> registers = patientRegisterService.searchNameByKeyword("이재준");
         for (PatientRegister register : registers) {
             log.info(register.toString());
         }

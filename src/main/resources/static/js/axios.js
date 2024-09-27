@@ -1,5 +1,3 @@
-console.log("reply 시작")
-
 async function addReply(patientObj) {
     const response = await axios.post(`/patient_register/`, patientObj)
     console.log(response)
@@ -11,4 +9,3 @@ async function patientSearch(keyword) {
     console.log(response)
     return response.data.result;
 }
-

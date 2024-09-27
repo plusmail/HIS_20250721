@@ -28,7 +28,7 @@ public class PatientDTO{
     private String defaultAddress;
     private String detailedAddress;
     private String mainDoc;
-    private String dentalHygienist;
+//    private String dentalHygienist;
     private String visitPath;
     private String category;
     private String tendency;

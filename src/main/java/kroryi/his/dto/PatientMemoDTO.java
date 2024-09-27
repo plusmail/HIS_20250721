@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -26,7 +27,7 @@ public class PatientMemoDTO {
 
     // 등록 날짜
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime regDate;
+    private LocalDate regDate;
 
 
 }
