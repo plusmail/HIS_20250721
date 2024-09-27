@@ -78,9 +78,9 @@ public class PatientRegister {
     @Column(name = "main_doc")
     private String mainDoc;
 
-    //치위생사
+    /*//치위생사
     @Column(name = "dental_hygienist")
-    private String dentalHygienist;
+    private String dentalHygienist;*/
 
     //내원유형
     @Column(name = "visit_path")

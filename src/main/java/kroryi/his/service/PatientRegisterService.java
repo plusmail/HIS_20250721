@@ -13,5 +13,7 @@ public interface PatientRegisterService {
     PatientRegister register(PatientDTO patientDTO);
 
 //    Long register(PatientDTO patientDTO);
-    List<PatientRegister> searchName(String keyword);
+//    List<PatientRegister> searchName(String keyword);
+
+    List<PatientRegister> searchNameByKeyword(String keyword);
 }

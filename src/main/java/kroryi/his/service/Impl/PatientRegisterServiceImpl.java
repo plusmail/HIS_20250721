@@ -71,7 +71,7 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
         return patientRegisterRepository.save(patientRegister);
     }
 
-    @Override
+    /*@Override
     public List<PatientRegister> searchName(String keyword) {
 
         log.info("searchName:{}", keyword);
@@ -80,6 +80,11 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
         log.info("searchName:{}", registers);
 
         return registers;
+    }*/
+
+    @Override
+    public List<PatientRegister> searchNameByKeyword(String keyword) {
+        return patientRegisterRepository.findByNameContainingIgnoreCase(keyword);
     }
 
 

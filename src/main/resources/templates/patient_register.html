@@ -96,13 +96,12 @@
                                     <span class="input-group-text">-</span>
                                     <input type="text" class="form-control" id="homeNum3" autocomplete="off" maxlength="4" placeholder="5678">
                                 </div>
+                                <!-- E-mail -->
                                 <div class="input-group mb-3 col">
-                                    <span class="input-group-text" style="width: 6rem;">치과위생사</span>
-                                    <select class="form-select" name="dentalHygienist" id="dentalHygienist">
-                                        <option selected value="">치과위생사</option>
-                                        <option value="m">남</option>
-                                        <option value="w">여</option>
-                                    </select>
+                                    <span class="input-group-text" style="width: 6rem;">E-mail</span>
+                                    <input type="text" class="form-control" id="emailLocal" aria-label="Username" placeholder="user">
+                                    <span class="input-group-text">@</span>
+                                    <input type="text" class="form-control" id="emailDomain" aria-label="Server" placeholder="example.com">
                                 </div>
                             </div>
                             <div class="row">
@@ -115,13 +114,6 @@
                                         <input type="text" class="form-control" id="phoneNum2" autocomplete="off" maxlength="4" placeholder="1234">
                                         <span class="input-group-text">-</span>
                                         <input type="text" class="form-control" id="phoneNum3" autocomplete="off" maxlength="4" placeholder="5678">
-                                    </div>
-                                    <!-- E-mail -->
-                                    <div class="input-group mb-2 col">
-                                        <span class="input-group-text" style="width: 6rem;">E-mail</span>
-                                        <input type="text" class="form-control" id="emailLocal" aria-label="Username" placeholder="user">
-                                        <span class="input-group-text">@</span>
-                                        <input type="text" class="form-control" id="emailDomain" aria-label="Server" placeholder="example.com">
                                     </div>
                                     <div class="col">
                                         <label for="zipp_btn" class="form-label">■ 주소 *</label><br/>
@@ -150,33 +142,37 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
+<!--                                                    오게된 경로-->
                                                     <span class="input-group-text" style="width: 6rem;">내원유형</span>
                                                     <select class="form-select" name="visitPath" id="visitPath">
                                                         <option selected value="">내원유형</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
+                                                        <option value="m">인터넷</option>
+                                                        <option value="m">지인추천</option>
+                                                        <option value="m">간판</option>
+                                                        <option value="m">광고</option>
+                                                        <option value="w">기타</option>
                                                     </select>
                                                 </div>
                                                 <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">성향</span>
-                                                    <select class="form-select" name="tendency" id="tendency">
-                                                        <option selected value="">성향</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
+                                                    <!--                                                    진료과 분류-->
+                                                    <span class="input-group-text" style="width: 6rem;">고객분류</span>
+                                                    <select class="form-select" name="category" id="category">
+                                                        <option selected value="">고객분류</option>
+                                                        <option value="m">임플란트</option>
+                                                        <option value="m">틀니</option>
+                                                        <option value="m">교정</option>
+                                                        <option value="m">심미보철</option>
+                                                        <option value="m">일반</option>
+                                                        <option value="w">기타</option>
                                                     </select>
+
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
-                                                    <span class="input-group-text" style="width: 6rem;">고객분류</span>
-                                                    <select class="form-select" name="category" id="category">
-                                                        <option selected value="">고객분류</option>
-                                                        <option value="m">남</option>
-                                                        <option value="w">여</option>
-                                                    </select>
-                                                </div>
-                                                <div class="input-group mb-3 col">
-
+                                                    <!--                                                    환자 성격-->
+                                                    <span class="input-group-text" id="tendency" style="width: 6rem;">성향</span>
+                                                    <input type="text" class="form-control"></input>
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -198,50 +194,44 @@
                         </div>
                         <!--                    <button type="submit" class="btn btn-dark m-2">등록</button>-->
                         <div class="col-4">
-                            <ul class="nav nav-tabs" role="tablist">
+                            <ul class="nav nav-tabs d-flex justify-content-between align-items-center" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link active" data-bs-toggle="tab" href="#home" aria-selected="true"
-                                       role="tab">Memo</a>
+                                       role="tab">메모</a>
                                 </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link disabled" data-bs-toggle="tab" href="#profile"
-                                       aria-selected="false"
-                                       tabindex="-1" role="tab">Profile</a>
-                                </li>
+                                <button class="btn btn-success mb-1">등록</button>
                             </ul>
                             <div id="myTabContent1" class="tab-content">
                                 <div class="tab-pane fade show active" id="home" role="tabpanel">
                                     <div class="container mt-2">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <div></div> <!-- 왼쪽에 아무것도 없으면 비워둠 -->
+                                            <div>
+                                            </div> <!-- 왼쪽에 아무것도 없으면 비워둠 -->
                                             <h6 onclick="addRow()">+ 새 메모 추가</h6>
                                         </div>
+                                        <div style="max-height: 450px; overflow-y: auto;">
                                         <table class="table table-bordered" id="memoTable">
                                             <thead>
                                             <tr>
-                                                <th>날짜</th>
-                                                <th>내용</th>
-                                                <th>삭제</th>
+                                                <th scope="col">날짜</th>
+                                                <th scope="col">내용</th>
+                                                <th scope="col">삭제</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <tr>
-                                                <td><input type="date" class="form-control"></td>
+                                                <td><input type="date" class="form-control" id="memo_date"></td>
                                                 <td>
-                                                    <textarea class="form-control"></textarea>
+                                                    <textarea class="form-control" id="memo_textarea"></textarea>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-primary mb-1" onclick="deleteRow(this)">등록
-                                                    </button>
                                                     <button class="btn btn-danger" onclick="deleteRow(this)">삭제</button>
                                                 </td>
                                             </tr>
                                             </tbody>
                                         </table>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="tab-pane fade" id="profile" role="tabpanel">
-                                    <p>Food truck fixie locavore, assumenda labore aesthetic magna delectus mollit.</p>
                                 </div>
                             </div>
                         </div>
@@ -257,214 +247,8 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </div>
 
 
-<script layout:fragment="patientscript" th:inline="javascript">
-    const patient_register = document.getElementById("patient_reg")
-    const name = document.getElementById("name")
-    const firstPaResidentNum = document.getElementById("firstPaResidentNum")
-    const lastPaResidentNum = document.getElementById("lastPaResidentNum")
-    const birthDate = document.getElementById("birthDate")
-    const gender = document.getElementById("gender")
-    const defaultAddress = document.getElementById("defaultAddress")
-    const detailedAddress = document.getElementById("detailedAddress")
-    const mainDoc = document.getElementById("mainDoc")
-    const dentalHygienist = document.getElementById("dentalHygienist")
-    const visitPath = document.getElementById("visitPath")
-    const category = document.getElementById("category")
-    const tendency = document.getElementById("tendency")
-    const firstVisit = document.getElementById("firstVisit")
-    const lastVisit = document.getElementById("lastVisit")
-    const chartNum = document.querySelector("#chartNum")
-
-    const homeNum1 = document.getElementById("homeNum");
-    const homeNum2 = document.getElementById("homeNum2");
-    const homeNum3 = document.getElementById("homeNum3");
-    const phoneNum1 = document.getElementById("phoneNum");
-    const phoneNum2 = document.getElementById("phoneNum2");
-    const phoneNum3 = document.getElementById("phoneNum3");
-    const emailLocal = document.getElementById("emailLocal");
-    const emailDomain = document.getElementById("emailDomain");
-
-    patient_register.addEventListener("click", (e) => {
-        const patientObj = {
-            name: name.value,
-            firstPaResidentNum: firstPaResidentNum.value,
-            lastPaResidentNum: lastPaResidentNum.value,
-            birthDate: birthDate.value,
-            gender: gender.value,
-            homeNum: `${homeNum1.value}-${homeNum2.value}-${homeNum3.value}`,
-            phoneNum: `${phoneNum1.value}-${phoneNum2.value}-${phoneNum3.value}`,
-            email: `${emailLocal.value}@${emailDomain.value}`,
-            defaultAddress: defaultAddress.value,
-            detailedAddress: detailedAddress.value,
-            mainDoc: mainDoc.value,
-            dentalHygienist: dentalHygienist.value,
-            visitPath: visitPath.value,
-            category: category.value,
-            tendency: tendency.value,
-            firstVisit: firstVisit.value,
-            lastVisit: lastVisit.value
-        };
-        console.log(patientObj)
-        addReply(patientObj).then(result => {
-            console.log("Received result:", result);
-            // 단일 필드 값 설정
-            name.value = result.name || '';
-            chartNum.value = result.chartNum || '';
-            firstPaResidentNum.value = result.firstPaResidentNum || '';
-            lastPaResidentNum.value = result.lastPaResidentNum || '';
-            birthDate.value = result.birthDate || '';
-            gender.value = result.gender || '';
-            defaultAddress.value = result.defaultAddress || '';
-            dentalHygienist.value = result.dentalHygienist || '';
-            mainDoc.value = result.mainDoc || '';
-            visitPath.value = result.visitPath || '';
-            category.value = result.category || '';
-            tendency.value = result.tendency || '';
-            firstVisit.value = result.firstVisit || '';
-            lastVisit.value = result.lastVisit || '';
-
-            // 자택전화 나누기
-            const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
-            document.getElementById("homeNum").value = homeNum1 || '';
-            document.getElementById("homeNum2").value = homeNum2 || '';
-            document.getElementById("homeNum3").value = homeNum3 || '';
-
-            // 휴대전화 나누기
-            const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
-            document.getElementById("phoneNum").value = phoneNum1 || '';
-            document.getElementById("phoneNum2").value = phoneNum2 || '';
-            document.getElementById("phoneNum3").value = phoneNum3 || '';
-
-            // 이메일 나누기
-            const [emailLocalPart, emailDomainPart] = result.email.split('@');
-            document.getElementById("emailLocal").value = emailLocalPart || '';
-            document.getElementById("emailDomain").value = emailDomainPart || '';
-        }).catch(e => {
-            alert("Exception....")
-            console.log(e)
-        })
-    }, false)
-
-    // 주소등록
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: function (data) {
-                // 팝업을 통한 검색 결과 항목 클릭 시 실행
-                var addr = ''; // 주소_결과값이 없을 경우 공백
-                var extraAddr = ''; // 참고항목
-
-                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                if (data.userSelectedType === 'R') { // 도로명 주소를 선택
-                    addr = data.roadAddress;
-                } else { // 지번 주소를 선택
-                    addr = data.jibunAddress;
-                }
-
-                if (data.userSelectedType === 'R') {
-                    if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                        extraAddr += data.bname;
-                    }
-                    if (data.buildingName !== '' && data.apartment === 'Y') {
-                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                    }
-                    if (extraAddr !== '') {
-                        extraAddr = ' (' + extraAddr + ')';
-                    }
-                } else {
-                    document.getElementById("defaultAddress").value = '';
-                }
-
-                // 선택된 우편번호와 주소 정보를 input 박스에 넣는다.
-                document.getElementById('zipp_code_id').value = data.zonecode;
-                document.getElementById("defaultAddress").value = addr;
-                document.getElementById("defaultAddress").value += extraAddr;
-                document.getElementById("detailedAddress").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
-            }
-        }).open();
-    }
-
-    // 테이블 기능-------------------------------------------------------------------------------
-    // 새 행 추가 함수
-    function addRow() {
-        const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
-
-        // 날짜 입력란
-        const dateCell = newRow.insertCell(0);
-        const dateInput = document.createElement('input');
-        dateInput.type = 'date';
-        dateInput.className = 'form-control';
-        dateCell.appendChild(dateInput);
-
-        // 내용 입력란
-        const memoCell = newRow.insertCell(1);
-        const memoInput = document.createElement('textarea');
-        memoInput.className = 'form-control';
-        memoCell.appendChild(memoInput);
-
-        // 삭제 버튼
-        const deleteCell = newRow.insertCell(2);
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'btn btn-danger';
-        deleteButton.innerText = '삭제';
-        deleteButton.onclick = function () {
-            deleteRow(this);
-        };
-        deleteCell.appendChild(deleteButton);
-    }
-    // 행 삭제 함수
-    function deleteRow(button) {
-        const row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-    }
-    // 테이블 기능-----------------------------------------------------------------------------
-
-    // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
-    const birthDateInput = document.getElementById('birthDate');
-    const ageInput = document.getElementById('age');
-
-    function calculateAge(birthDate) {
-        const today = new Date();
-        const birthDateObj = new Date(birthDate);
-        let age = today.getFullYear() - birthDateObj.getFullYear();
-        const monthDifference = today.getMonth() - birthDateObj.getMonth();
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
-            age--;
-        }
-        return age;
-    }
-
-    birthDateInput.addEventListener('change', () => {
-        const birthDate = birthDateInput.value;
-        if (birthDate) {
-            const age = calculateAge(birthDate);
-            ageInput.value = age;
-        } else {
-            ageInput.value = '';
-        }
-    });
-    // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
-
-
-    /*function splitPhoneNumbers(homeNum, phoneNum, email) {
-        // 자택전화
-        const [homeNum1, homeNum2, homeNum3] = homeNum.split('-');
-        document.getElementById('homeNum').value = homeNum1 || '';
-        document.getElementById('homeNum2').value = homeNum2 || '';
-        document.getElementById('homeNum3').value = homeNum3 || '';
-
-        // 휴대전화
-        const [phoneNum1, phoneNum2, phoneNum3] = phoneNum.split('-');
-        document.getElementById('phoneNum').value = phoneNum1 || '';
-        document.getElementById('phoneNum2').value = phoneNum2 || '';
-        document.getElementById('phoneNum3').value = phoneNum3 || '';
-
-        // E-mail
-        const [emailLocal, emailDomain] = email.split('@');
-        document.getElementById('emailLocal').value = emailLocal || '';
-        document.getElementById('emailDomain').value = emailDomain || '';
-    }*/
-</script>
+<script layout:fragment="patientscript" th:inline="javascript" src="/js/patient_register.js"></script>
