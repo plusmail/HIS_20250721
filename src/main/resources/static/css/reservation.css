@@ -1,0 +1,44 @@
+.calendar {
+    width: 100%;
+
+    padding: 5px;
+}
+
+.calendar-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.calendar-header button {
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+table {
+    padding: 3px;
+    width: 100%;
+    border-collapse: collapse;
+
+}
+
+th, td {
+    width: 14%;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.con {
+    width: 100%;
+    padding: 5px;
+}
+
+.con2 {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
