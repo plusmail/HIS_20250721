@@ -50,10 +50,9 @@ document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
                 searchModal.show();
             }
         });
-/*
         if (!found) {
             alert("환자가 존재하지 않습니다.");
-        }*/
+        }
     }).catch(error => {
         console.error("환자 데이터 가져오기 오류:", error);
     });
@@ -79,46 +78,46 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
 
 
         const ageInput = document.getElementById('age');
+        if (window.location.href.includes("/patient_register")) {
+            patientData.forEach((patient, index) => {
+                if (menu_chartNum === patient.chartNum) {
+                    selectedMemos = patient.memos;
+                    test(selectedMemos);
+                    name.value = patient.name || '';
+                    firstPaResidentNum.value = patient.firstPaResidentNum || '';
+                    lastPaResidentNum.value = patient.lastPaResidentNum || '';
+                    birthDate.value = patient.birthDate || '';
+                    gender.value = patient.gender || '';
+                    defaultAddress.value = patient.defaultAddress || '';
+                    detailedAddress.value = patient.detailedAddress || '';
+                    mainDoc.value = patient.mainDoc || '';
+                    visitPath.value = patient.visitPath || '';
+                    category.value = patient.category || '';
+                    tendency.value = patient.tendency || '';
+                    firstVisit.value = patient.firstVisit || '';
+                    lastVisit.value = patient.lastVisit || '';
+                    chartNum.value = patient.chartNum;
+                    ageInput.value = menu_age;
 
-        patientData.forEach((patient, index) => {
-            if (menu_chartNum === patient.chartNum) {
-                selectedMemos = patient.memos;
-                test(selectedMemos);
-                name.value = patient.name || '';
-                firstPaResidentNum.value = patient.firstPaResidentNum || '';
-                lastPaResidentNum.value = patient.lastPaResidentNum || '';
-                birthDate.value = patient.birthDate || '';
-                gender.value = patient.gender || '';
-                defaultAddress.value = patient.defaultAddress || '';
-                detailedAddress.value = patient.detailedAddress || '';
-                mainDoc.value = patient.mainDoc || '';
-                visitPath.value = patient.visitPath || '';
-                category.value = patient.category || '';
-                tendency.value = patient.tendency || '';
-                firstVisit.value = patient.firstVisit || '';
-                lastVisit.value = patient.lastVisit || '';
-                chartNum.value = patient.chartNum;
+                    // 자택전화 나누기
+                    const [home_Num1, home_Num2, home_Num3] = patient.homeNum.split('-');
+                    homeNum1.value = home_Num1 || '';
+                    homeNum2.value = home_Num2 || '';
+                    homeNum3.value = home_Num3 || '';
 
-                ageInput.value = menu_age;
+                    // 휴대전화 나누기
+                    const [phone_Num1, phone_Num2, phone_Num3] = patient.phoneNum.split('-');
+                    phoneNum1.value = phone_Num1 || '';
+                    phoneNum2.value = phone_Num2 || '';
+                    phoneNum3.value = phone_Num3 || '';
 
-                // 자택전화 나누기
-                const [home_Num1, home_Num2, home_Num3] = patient.homeNum.split('-');
-                homeNum1.value = home_Num1 || '';
-                homeNum2.value = home_Num2 || '';
-                homeNum3.value = home_Num3 || '';
-
-                // 휴대전화 나누기
-                const [phone_Num1, phone_Num2, phone_Num3] = patient.phoneNum.split('-');
-                phoneNum1.value = phone_Num1 || '';
-                phoneNum2.value = phone_Num2 || '';
-                phoneNum3.value = phone_Num3 || '';
-
-                // 이메일 나누기
-                const [emailLocalPart, emailDomainPart] = patient.email.split('@');
-                emailLocal.value = emailLocalPart || '';
-                emailDomain.value = emailDomainPart || '';
-            }
-        });
+                    // 이메일 나누기
+                    const [emailLocalPart, emailDomainPart] = patient.email.split('@');
+                    emailLocal.value = emailLocalPart || '';
+                    emailDomain.value = emailDomainPart || '';
+                }
+            })
+        }
 
 
         // 세션 저장
