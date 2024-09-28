@@ -9,6 +9,19 @@ let patientData = null; // 전역 변수 선언
 
 let selectedMemos = null;
 
+let patientInfo = sessionStorage.getItem('selectedPatient');
+// 세션에 값이 있으면 세션 데이터를 사용
+if (patientInfo) {
+    patientInfo = JSON.parse(patientInfo);
+    document.querySelector("#patientInfo").innerHTML = `
+            <div class="text-center row">
+                <label>이름: ${patientInfo.name} (${patientInfo.age}, ${patientInfo.gender})</label>
+                <label>차트번호: ${patientInfo.chartNum}</label>
+                <label>생일: ${patientInfo.birthDate || '-'}</label>
+            </div>
+        `;
+}
+
 document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
     const keyword = {
         "keyword": patient_name_keyword.value
