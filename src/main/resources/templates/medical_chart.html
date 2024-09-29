@@ -1,5 +1,6 @@
 <!--진료차트-->
 <!DOCTYPE html>
+
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -95,7 +96,7 @@
 
 </style>
 <div layout:fragment="medical_chart">진료차트 페이지
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <div class="container-fluid">
         <div class="row vh-100">
             <!-- Left Panel: Display the chart -->
@@ -534,7 +535,7 @@
 
                                 <!-- 중간 텍스트 입력 영역 -->
                                 <div class="col-6 p-0">
-                                        <textarea class="form-control h-100" rows="5"
+                                        <textarea class="form-control h-100 memo" rows="5"
                                                   placeholder="메모를 입력하세요"></textarea>
                                 </div>
 
@@ -547,15 +548,19 @@
                         <table class="table mt-3">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
                                 <th scope="col">치식</th>
+                                <th scope="col">Present illness</th>
                                 <th scope="col">메모</th>
-                                <th scope="col">작업</th>
+                                <th scope="col">삭제</th>
                             </tr>
                             </thead>
                             <tbody id="teethTable">
+                            <tr id="nested-items-list">
+                                <!-- AJAX를 통해 동적으로 아이템을 추가할 예정 -->
+                            </tr>
                             </tbody>
                         </table>
+
                         pi 최하단부
                     </div>
 
@@ -1016,35 +1021,78 @@
     const tooth = document.querySelector(".tooth-container")
     //pi 증상 선택
     const symptom = document.querySelector(".pi-symptom")
-    //선택된 치아값을 저장하기위한 변수
-    let toothValue = {}
+    //memo 선택
+    const memo = document.querySelector(".memo")
+    // 치아 동적 배열 선언
+    let toothList=[]
     //선택된 pi 증상을 저장하기위한 변수
     let symptomValue
-
-
-    // JavaScript 동적 배열 선언
+    // 증상 동적 배열 선언
     let symptomsList = [];
+    // memo 동적 배열 선언
+    let memoList = [];
 
-    // 증상을 배열에 추가하고 콘솔에 출력하는 함수
-    function addSymptom() {
-        // 입력한 증상 값 가져오기
-        let symptomInput = document.querySelector('.pi-symptom').value;
 
-        // 입력값이 비어 있지 않다면 배열에 추가
-        if (symptomInput) {
-            symptomsList.push(symptomInput);
-
-            // 배열 내용을 콘솔에 출력
-            console.log(symptomsList);
-
-            // // 입력 필드 초기화
-            // document.getElementById('symptom').value = '';
-        } else {
-            console.log('Please enter a symptom.');
-        }
+    //세션 시작
+    // 세션 데이터 가져오기
+    function fetchSessionItems() {
+        $.ajax({
+            url: '/his/get-session-items',
+            method: 'GET',
+            success: function(response) {
+                console.log("------------ response ->"+response)
+                renderItems(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to fetch session items:', error);
+            }
+        });
     }
 
 
+    function addToSubList(subListIndex, newValue) {
+        $.ajax({
+            url: '/his/add-to-sublist',
+            method: 'POST',
+            data: {
+                subListIndex : subListIndex,
+                newValue : newValue
+            },
+            success: function(response) {
+                console.log("addToSubList ->"+response);
+                fetchSessionItems(); // 변경된 세션 데이터를 가져와 화면에 갱신
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to add to sublist:', error);
+            }
+        });
+    }
+
+
+    // HTML에 데이터 렌더링
+    function renderItems(itemsArray) {
+        var itemList = $('#nested-items-list');
+        itemList.empty(); // 기존 내용 지우기
+
+        itemsArray.forEach(function(subList) {
+            var subListItem = $('<th scope="col">').text(subList.join(','));
+            itemList.append(subListItem);
+        });
+    }
+
+
+    //창이 열릴때 session값을 갱신.
+    $(document).ready(function() {
+
+
+
+        fetchSessionItems();
+
+        // 예시: 주기적으로 데이터 갱신 (5초마다)
+        // setInterval(renderingItems, 5000);
+    });
+
+    //세션구문 끝
 
 
 
@@ -1052,31 +1100,31 @@
 
 
 
-
-
-
-    // 치아 선택 시 해당 value값을 가지고옴.
+    // 치아 클릭 시 선택된 치아 value 값을 session에 저장.
     tooth.addEventListener("click", e => {
         // e.preventDefault()
         // e.stopPropagation()
-        if (e.target.tagName === "BUTTON") {
-            if (toothValue == null) {
-                toothValue = e.target.value;
-            } else {
-                toothValue += "," + e.target.value;
-            }
 
-            console.log(toothValue)
+        if (e.target.tagName === "BUTTON") {
+
+                // toothValue += "," + e.target.value;
+                let toothValue = e.target.value;
+                addToSubList(0,toothValue);
+                // addItemToSubList(0,toothValue)
+                toothList.push(e.target.value)
+                console.log(toothList)
+
+
+            // console.log(toothList)
         }
     })
 
+    //증상 데이터를 저장.
     symptom.addEventListener("click", e => {
         if (e.target.tagName === "INPUT") {
-            if(symptomValue== null){
                 symptomValue = e.target.value;
-            } else{
-                symptomValue +=","+ e.target.value;
-            }
+
+            addToSubList(1,symptomValue);
 
             console.log(symptomValue)
         }
