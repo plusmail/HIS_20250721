@@ -26,6 +26,9 @@ public class PatientAdmission {
     private String mainDoc;
 
     @Column(name = "rv_time")
+    private LocalDateTime rvTime;
+
+    @Column(name = "reception_time")
     private LocalDateTime receptionTime;
 
     @Column(name = "ap_time")
@@ -35,6 +38,9 @@ public class PatientAdmission {
     private LocalDateTime treatmentStartTime;
 
     @Column(name = "vi_time")
+    private LocalDateTime viTime;
+
+    @Column(name = "cp_time")
     private LocalDateTime completionTime;
 
     @Column(name = "treat_status", length = 100)
