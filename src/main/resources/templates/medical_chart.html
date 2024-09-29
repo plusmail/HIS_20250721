@@ -1,5 +1,6 @@
 <!--진료차트-->
 <!DOCTYPE html>
+
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -95,7 +96,7 @@
 
 </style>
 <div layout:fragment="medical_chart">진료차트 페이지
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <div class="container-fluid">
         <div class="row vh-100">
             <!-- Left Panel: Display the chart -->
@@ -534,7 +535,7 @@
 
                                 <!-- 중간 텍스트 입력 영역 -->
                                 <div class="col-6 p-0">
-                                        <textarea class="form-control h-100" rows="5"
+                                        <textarea class="form-control h-100 memo" rows="5"
                                                   placeholder="메모를 입력하세요"></textarea>
                                 </div>
 
@@ -547,15 +548,19 @@
                         <table class="table mt-3">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
                                 <th scope="col">치식</th>
+                                <th scope="col">Present illness</th>
                                 <th scope="col">메모</th>
-                                <th scope="col">작업</th>
+                                <th scope="col">삭제</th>
                             </tr>
                             </thead>
                             <tbody id="teethTable">
+                            <tr id="nested-items-list">
+                                <!-- AJAX를 통해 동적으로 아이템을 추가할 예정 -->
+                            </tr>
                             </tbody>
                         </table>
+
                         pi 최하단부
                     </div>
 
@@ -1016,14 +1021,18 @@
     const tooth = document.querySelector(".tooth-container")
     //pi 증상 선택
     const symptom = document.querySelector(".pi-symptom")
-    //선택된 치아값을 저장하기위한 변수
-    let toothValue = {}
+    //memo 선택
+    const memo = document.querySelector(".memo")
+    // 치아 동적 배열 선언
+    let toothList=[]
     //선택된 pi 증상을 저장하기위한 변수
     let symptomValue
-
-
-    // JavaScript 동적 배열 선언
+    // 증상 동적 배열 선언
     let symptomsList = [];
+    // memo 동적 배열 선언
+    let memoList = [];
+
+
 
     // 증상을 배열에 추가하고 콘솔에 출력하는 함수
     function addSymptom() {
@@ -1044,6 +1053,161 @@
         }
     }
 
+    //선택 치아 데이터를 session에 전송하는 함수.
+    function addToSessionArrayPi() {
+
+        // AJAX 요청으로 클릭된 아이템 값을 서버로 전송
+        $.ajax({
+            url: '/his/add-to-session', // Spring 컨트롤러의 매핑 URL
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(toothList),
+            success: function(response) {
+                console.log(response);
+                renderingItems();
+            },
+            error: function() {
+                alert('Failed to add item to session.');
+            }
+        });
+    }
+
+    // 메모 데이터를 세션에 전송.
+    function addToSessionArrayMemo() {
+
+        // AJAX 요청으로 클릭된 아이템 값을 서버로 전송
+        $.ajax({
+            url: '/his/add-to-session', // Spring 컨트롤러의 매핑 URL
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(memoList),
+            success: function(response) {
+                console.log(response);
+                renderingItems();
+            },
+            error: function() {
+                alert('Failed to add item to session.');
+            }
+        });
+    }
+
+    // 세션 데이터 가져오기
+    function fetchSessionItems() {
+        $.ajax({
+            url: '/his/get-session-items',
+            method: 'GET',
+            success: function(response) {
+                renderItems(response);
+                // renderingItems();
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to fetch session items:', error);
+            }
+        });
+    }
+
+    // 특정 아이템에 값을 추가하는 함수
+    function addItemToSubList(targetItem, newItem) {
+        $.ajax({
+            url: '/his/get-session-items',
+            method: 'GET',
+            success: function(response) {
+                // 특정 아이템 찾기 및 수정
+                response.forEach(function(subList) {
+                    if (subList[0] === targetItem) { // item1의 첫 번째 값을 찾음
+                        subList.push(newItem); // 새로운 값 추가
+                    }
+                });
+
+                // 서버에 수정된 데이터 저장
+                saveArrayToSession(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to fetch session items:', error);
+            }
+        });
+    }
+
+    // 세션에 배열 저장하기
+    function saveArrayToSession(itemsArray) {
+        $.ajax({
+            url: '/his/save-to-session',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(itemsArray),
+            success: function(response) {
+                console.log(response);
+                fetchSessionItems(); // 저장 후 세션 데이터 가져오기
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to save array to session:', error);
+            }
+        });
+    }
+
+    // HTML에 데이터 렌더링
+    function renderItems(itemsArray) {
+        var itemList = $('#nested-items-list');
+        itemList.empty(); // 기존 내용 지우기
+
+        itemsArray.forEach(function(subList) {
+            var subListItem = $('<th scope="col">').text(subList.join(', '));
+            itemList.append(subListItem);
+        });
+    }
+
+
+    // 증상 데이터를 세션에 전송.
+    function addToSessionArraySymptom() {
+
+        // AJAX 요청으로 클릭된 아이템 값을 서버로 전송
+        $.ajax({
+            url: '/his/add-to-session', // Spring 컨트롤러의 매핑 URL
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(symptomsList),
+            success: function(response) {
+                console.log(response);
+                renderingItems();
+            },
+            error: function() {
+                alert('Failed to add item to session.');
+            }
+        });
+    }
+
+
+    //session에 저장된 값들을 화면에 출력.
+    function renderingItems() {
+        $.ajax({
+            url: '/his/get-session-items',
+            method: 'GET',
+            success: function(response) {
+                console.log('Nested List:', response);
+                var itemList = $('#nested-items-list');
+                itemList.empty(); // 기존 목록 지우기
+                response.forEach(function(subList) {
+                    var subListItem = $('<th scope="col">').text(subList.join(', ')); // 이중 배열의 리스트를 표시
+                    itemList.append(subListItem);
+
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to fetch nested items:', error);
+            }
+        });
+    }
+
+    //창이 열릴때 session값을 갱신.
+    $(document).ready(function() {
+
+
+
+        renderingItems();
+
+        // 예시: 주기적으로 데이터 갱신 (5초마다)
+        // setInterval(renderingItems, 5000);
+    });
 
 
 
@@ -1053,23 +1217,28 @@
 
 
 
-
-
-    // 치아 선택 시 해당 value값을 가지고옴.
+    // 치아 클릭 시 선택된 치아 value 값을 session에 저장.
     tooth.addEventListener("click", e => {
         // e.preventDefault()
         // e.stopPropagation()
+
         if (e.target.tagName === "BUTTON") {
-            if (toothValue == null) {
-                toothValue = e.target.value;
+            if (toothList == null) {
+                // toothValue = e.target.value;
+                toothList.push(e.target.value)
             } else {
-                toothValue += "," + e.target.value;
+                // toothValue += "," + e.target.value;
+
+                let toothValue = e.target.value;
+                addItemToSubList(toothList,toothValue)
+                toothList.push(e.target.value)
             }
 
-            console.log(toothValue)
+            console.log(toothList)
         }
     })
 
+    //증상 데이터를 저장.
     symptom.addEventListener("click", e => {
         if (e.target.tagName === "INPUT") {
             if(symptomValue== null){
