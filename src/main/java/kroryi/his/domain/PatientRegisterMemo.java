@@ -1,9 +1,11 @@
 package kroryi.his.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,12 +26,13 @@ public class PatientRegisterMemo {
 
     // 차트번호 (PatientRegister와 연결)
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "memo_chartnum", referencedColumnName = "chart_num", nullable = false)
     private PatientRegister patientRegister;
 
     // 등록 날짜
     @Column(name = "reg_date")
-    private LocalDateTime regDate;
+    private LocalDate regDate;
 
     // 내용
     @Column(name = "content", length = 1000)

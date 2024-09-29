@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/reservation.css">
 
 <body>
 <!--네비바-->
@@ -44,21 +45,16 @@
         <div class="col d-flex justify-content-center">
             <!-- 첫 번째 박스 -->
             <div class="row d-flex flex-fill">
-                <div class="col">
-                    <div class="text-center row">
-                        <label>이름: ${name}(나이,성별)</label>
-                        <label>차트번호: 20201105001</label>
-                        <label>생일: 1996-09-13</label>
-                    </div>
+                <div id="patientInfo" class="col">
                 </div>
                 <div class="col d-flex align-self-center">
                     <div class="row mb-2">
                         <div class="col">
-                            <input type="text" class="form-control" placeholder="환자성명 입력">
+                            <input type="text" class="form-control" id="patient_name_keyword" placeholder="환자성명 입력">
                         </div>
                         <div class="col">
-                            <button type="button" class="btn btn-primary addReplyBtn">
-                                <i class="bi bi-search addReplyBtn" style="padding: 0.5rem;"></i>
+                            <button type="button" class="btn btn-primary" id="addReplyBtn">
+                                <i class="bi bi-search" style="padding: 0.5rem;"></i>
                             </button>
                         </div>
                     </div>
@@ -90,8 +86,9 @@
             </div>
         </div>
     </div>
+
 </div>
-<div class="modal registerModal" tabindex="-1">
+<div class="modal SearchModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -99,7 +96,7 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <table class="table table-hover">
+                <table id="patientTable" class="table table-hover">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -111,40 +108,14 @@
                         <th scope="col">휴대전화</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        <td>Otto</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                        <td>@fat</td>
-                        <td>@fat</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td colspan="2">Larry the Bird</td>
-                        <td>@twitter</td>
-                        <td>@twitter</td>
-                        <td>@twitter</td>
-                        <td>@twitter</td>
-                    </tr>
+                    <tbody id="patientTableBody">
+                    <!-- Rows will be dynamically inserted here -->
                     </tbody>
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary registerBtn">등록</button>
-                <button type="button" class="btn btn-outline-dark closeRegisterBtn">닫기</button>
+                <button type="button" class="btn btn-primary SearchBtn">확인</button>
+                <button type="button" class="btn btn-outline-dark closeBtn">닫기</button>
             </div>
         </div>
     </div>
@@ -165,10 +136,12 @@
 <div layout:fragment="inventory_management" style="width: 100%"></div>
 
 <script layout:fragment="patientscript" th:inline="javascript"></script>
+<script layout:fragment="axios" th:inline="javascript"></script>
+<script layout:fragment="reservationscript" th:inline="javascript"></script>
 
 <script layout:fragment="chartscript" th:inline="javascript"></script>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="/js/layout.js">
-</script>
+<script src="/js/layout.js"></script>
+<script src="/js/axios.js"></script>
 </html>

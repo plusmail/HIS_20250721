@@ -1,5 +1,6 @@
 package kroryi.his.service.Impl;
 
+import com.querydsl.core.BooleanBuilder;
 import kroryi.his.domain.PatientRegister;
 import kroryi.his.dto.PatientDTO;
 import kroryi.his.repository.PatientRegisterRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -68,4 +70,22 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
 
         return patientRegisterRepository.save(patientRegister);
     }
+
+    /*@Override
+    public List<PatientRegister> searchName(String keyword) {
+
+        log.info("searchName:{}", keyword);
+
+        List<PatientRegister> registers = patientRegisterRepository.findByName(keyword);
+        log.info("searchName:{}", registers);
+
+        return registers;
+    }*/
+
+    @Override
+    public List<PatientRegister> searchNameByKeyword(String keyword) {
+        return patientRegisterRepository.findByNameContainingIgnoreCase(keyword);
+    }
+
+
 }

@@ -1,8 +1,47 @@
-<!--재고관리-->
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
 
-<div  layout:fragment="inventory_management">재고관리 페이지</div>
+<div layout:fragment="inventory_management" style="padding: 10px">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-bs-toggle="tab" href="#material_status" aria-selected="true"
+               role="tab" onclick="loadContent('/material_status')">재료현황보기</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#material_transaction" aria-selected="false"
+               role="tab" onclick="loadContent('/material_transaction')">재료출납관리</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#material_register" aria-selected="false"
+               role="tab" onclick="loadContent('/material_register')">재료등록</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#company_management" aria-selected="false"
+               role="tab" onclick="loadContent('/company_register')">재료사관리</a>
+        </li>
+    </ul>
+
+    <div id="myTabContent" class="tab-content mt-3">
+        <div id="body" class="tab-pane fade show active" role="tabpanel"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        function loadContent(page) {
+            $("#body").load(page, function(response, status, xhr) {
+                // console.log(response)
+                if (status === "error") {
+                    $("#body").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
+                }
+                $("#body").html(response)
+            });
+        }
+
+        $(document).ready(function(){
+            loadContent('/material_status');
+        });
+    </script>
+</div>

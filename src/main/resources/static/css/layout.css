@@ -39,7 +39,11 @@ td, th {
     overflow-y: auto; /* 수직 스크롤 가능 */
 }
 
-/* 테이블 헤더 및 바디를 정의 */
-.table-hover thead th {
-    background-color: #f8f9fa; /* 헤더 배경색 */
+.table {
+    --bs-table-bg: var(--body-background-color) /* 기본 배경색을 투명으로 설정 */
+}
+
+/* 선택된 행의 배경색 */
+#patientTable tbody tr.selected {
+    background-color: #afefeb !important; /* 선택된 행의 배경색 */
 }

@@ -5,5 +5,139 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
 
+<div layout:fragment="reservation">
+    <div class="row d-flex justify-content-center">
+        <div class="col-4">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button onclick="prevMonth()">이전</button>
+                    <span id="monthYear"></span>
+                    <button onclick="nextMonth()">다음</button>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>일</th>
+                        <th>월</th>
+                        <th>화</th>
+                        <th>수</th>
+                        <th>목</th>
+                        <th>금</th>
+                        <th>토</th>
+                    </tr>
+                    </thead>
+                    <tbody id="calendar-body">
 
-<div  layout:fragment="reservation">진료예약 페이지</div>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="con">
+                <button type="submit">예약 목록</button>
+                <button type="submit">개인 예약 현황</button>
+                <table id="reservationTable" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>시간</th>
+                        <th>환자이름</th>
+                        <th>내용</th>
+                    </tr>
+                    </thead>
+                    <tbody id="reservation-body">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <div class="con2">
+                    <h1>예약</h1>
+
+                    <form id="reservationForm">
+                        <label for="name">이름:</label>
+                        <input type="text" id="name" required><br>
+
+                        <label for="date">날짜:</label>
+                        <input type="date" id="date" required><br>
+
+                        <label for="time">시간:</label>
+                        <input type="time" id="time" required><br>
+
+                        <button type="submit">예약 추가</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <div class="con2">
+                    <h1>예약</h1>
+
+                    <form id="reservationForm">
+                        <label for="name">이름:</label>
+                        <input type="text" id="name" required><br>
+
+                        <label for="date">날짜:</label>
+                        <input type="date" id="date" required><br>
+
+                        <label for="time">시간:</label>
+                        <input type="time" id="time" required><br>
+
+                        <button type="submit">예약 추가</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="reservationscript" th:inline="javascript">
+    const monthYear = document.getElementById('monthYear');
+    const calendarBody = document.getElementById('calendar-body');
+    let currentDate = new Date();
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        monthYear.innerText = `${year}년 ${month + 1}월`;
+
+        calendarBody.innerHTML = '';
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement('tr');
+
+            for (let j = 0; j < 7; j++) {
+                const cell = document.createElement('td');
+                if (i === 0 && j < firstDay) {
+                    cell.innerHTML = '';
+                } else if (date > lastDate) {
+                    break;
+                } else {
+                    cell.innerHTML = date;
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+
+            calendarBody.appendChild(row);
+        }
+    }
+
+    function prevMonth() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    }
+
+    function nextMonth() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    }
+
+    renderCalendar();
+</script>
