@@ -1,3 +1,14 @@
+function populateMaterialForm(material) {
+    document.getElementById('materialCode').value = material.materialCode;
+    document.getElementById('materialName').value = material.materialName;
+    document.getElementById('unit').value = material.unit;
+    document.getElementById('unitPrice').value = material.unitPrice;
+    document.getElementById('minQuantity').value = material.minQuantity;
+    document.getElementById('stockManagement').value = material.stockManagement;
+    document.getElementById('materialMemo').value = material.materialMemo;
+}
+
+// 재료 목록 로딩 함수
 function loadMaterialList() {
     fetch('/inventory_management/searchMaterial?materialName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
         .then(response => response.json())
@@ -19,6 +30,7 @@ function loadMaterialList() {
                         <td>${material.stockManagementItem}</td>
                         <td>${material.companyName}</td>
                     `;
+                    row.addEventListener('dblclick', () => populateMaterialForm(material));
                     tbody.appendChild(row);
                 });
             }
@@ -27,6 +39,9 @@ function loadMaterialList() {
             console.error("재료 목록을 불러오는 중 오류 발생:", error);
         });
 }
+
+// 페이지 로드 시 재료 목록을 불러오는 함수 호출
+loadMaterialList(); // 추가
 
 
 
@@ -93,7 +108,7 @@ function threeSearch() {
     fetch(`/inventory_management/searchMaterial?materialName=${encodeURIComponent(materialName)}`)
         .then(response => response.json())
         .then(data => {
-            const tbody = document.getElementById('newMaterialList');
+            const tbody = document.getElementById('materialCompanyList');
             tbody.innerHTML = ''; // 기존 행 제거
 
             if (data.length === 0) {
@@ -102,14 +117,13 @@ function threeSearch() {
                 data.forEach(material => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                            <td>${material.companyCode}</td>
-                            <td>${material.companyName}</td>
-                            <td>${material.materialCode}</td>
-                            <td>${material.managerName}</td>
-                            <td>${material.materialUnit}</td>
-                            <td>${material.materialUnitPrice}</td>
-                            <td>${material.minQuantity}</td>
-                            <td>${material.stockManagementItem}</td>
+                           <td>${material.materialCode}</td>
+                        <td>${material.materialName}</td>
+                        <td>${material.materialUnit}</td>
+                        <td>${material.materialUnitPrice}</td>
+                        <td>${material.minQuantity}</td>
+                        <td>${material.stockManagementItem}</td>
+                        <td>${material.companyName}</td>
                       
                         `;
                     tbody.appendChild(row);
@@ -172,6 +186,36 @@ document.getElementById('companySearchIcon').addEventListener('click', function(
 
 
 
+// 재료 삭제 버튼 클릭 시 데이터 전송
+document.getElementById('deleteMaterialBtn').addEventListener('click', function() {
+    const materialCode = document.getElementById('materialCode').value;
 
+    if (!materialCode) {
+        alert("삭제할 재료 코드를 입력하세요.");
+        return;
+    }
+
+    if (confirm("정말로 이 재료를 삭제하시겠습니까?")) {
+        fetch(`/inventory_management/deleteMaterial?materialCode=${encodeURIComponent(materialCode)}`, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert(data);  // 서버로부터 삭제 성공 메시지 받음
+                // 폼 초기화 및 목록 새로고침
+                document.getElementById('materialForm').reset();
+                loadMaterialList();
+            })
+            .catch(error => {
+                console.error("삭제 요청 중 오류 발생:", error);
+                alert("재료 삭제에 실패했습니다. 다시 시도해주세요.");
+            });
+    }
+});
 
 

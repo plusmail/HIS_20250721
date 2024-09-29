@@ -72,7 +72,7 @@ public class MaterialRegisterController {
     public ResponseEntity<String> deleteMaterial(@RequestParam String materialCode) {
         // 재료 삭제 로직
         materialRegisterService.deleteMaterial(materialCode);
-        return ResponseEntity.ok("재료가 삭제되었습니다.");
+        return ResponseEntity.ok("재료가 성공적으로 삭제되었습니다.");
     }
 
     @GetMapping("/searchCompanies")
