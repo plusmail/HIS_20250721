@@ -3,6 +3,7 @@ package kroryi.his.service.Impl;
 import kroryi.his.domain.CompanyRegister;
 import kroryi.his.domain.MaterialRegister;
 import kroryi.his.dto.MaterialDTO;
+import kroryi.his.repository.CompanyRegisterRepository;
 import kroryi.his.repository.MaterialRegisterRepository;
 import kroryi.his.service.MaterialRegisterService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class MaterialRegisterImpl implements MaterialRegisterService {
 
     private final MaterialRegisterRepository materialRepository;
+    private final CompanyRegisterRepository companyRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -32,7 +34,19 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
 
     @Override
     public MaterialRegister register(MaterialDTO materialDTO) {
+        // CompanyRegister 조회
+        CompanyRegister companyRegister = companyRepository.findByCompanyCode(materialDTO.getCompanyCode());
+
+        // CompanyRegister가 존재하지 않으면 예외 처리 (optional)
+        if (companyRegister == null) {
+            throw new IllegalArgumentException("Company with code " + materialDTO.getCompanyCode() + " does not exist.");
+        }
+
+        // MaterialDTO를 MaterialRegister로 변환
         MaterialRegister materialRegister = modelMapper.map(materialDTO, MaterialRegister.class);
+
+        // CompanyRegister 설정
+        materialRegister.setCompanyRegister(companyRegister);
 
         return materialRepository.save(materialRegister);
     }

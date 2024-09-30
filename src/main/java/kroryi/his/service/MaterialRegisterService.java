@@ -1,5 +1,6 @@
 package kroryi.his.service;
 
+import kroryi.his.domain.CompanyRegister;
 import kroryi.his.domain.MaterialRegister;
 import kroryi.his.dto.MaterialDTO;
 
@@ -15,5 +16,4 @@ public interface MaterialRegisterService {
     List<MaterialRegister> searchByName(String materialName);
 
     void deleteMaterial(String materialCode);
-
 }

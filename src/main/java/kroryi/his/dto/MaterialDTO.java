@@ -34,4 +34,10 @@ public class MaterialDTO {
     //최초등록일
     private LocalDate firstRegisterDate;
 
+    //업체코드
+    private String companyCode;
+
+    //업체명
+    private String companyName;
+
 }

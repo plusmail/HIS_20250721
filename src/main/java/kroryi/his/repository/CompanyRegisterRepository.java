@@ -9,4 +9,6 @@ public interface CompanyRegisterRepository extends JpaRepository<CompanyRegister
     List<CompanyRegister> findByCompanyNameContainingIgnoreCase(String companyName);
 
     boolean existsByCompanyCode(String companyCode);
+
+    CompanyRegister findByCompanyCode(String companyCode);
 }

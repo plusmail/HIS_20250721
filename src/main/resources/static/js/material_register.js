@@ -1,11 +1,13 @@
 function populateMaterialForm(material) {
-    document.getElementById('materialCode').value = material.materialCode;
-    document.getElementById('materialName').value = material.materialName;
-    document.getElementById('unit').value = material.unit;
-    document.getElementById('unitPrice').value = material.unitPrice;
+    document.getElementById('threeMaterialCode').value = material.materialCode;
+    document.getElementById('threeMaterialName').value = material.materialName;
+    document.getElementById('materialUnit').value = material.materialUnit;
+    document.getElementById('materialUnitPrice').value = material.materialUnitPrice;
     document.getElementById('minQuantity').value = material.minQuantity;
-    document.getElementById('stockManagement').value = material.stockManagement;
-    document.getElementById('materialMemo').value = material.materialMemo;
+    document.getElementById('threeStockManagementItem').value = material.stockManagementItem;
+    document.getElementById('threeCompanyName').value = material.companyName;
+    document.getElementById('threeCompanyCode').value = material.companyCode;
+    console.log(material)
 }
 
 // 재료 목록 로딩 함수
@@ -29,6 +31,7 @@ function loadMaterialList() {
                         <td>${material.minQuantity}</td>
                         <td>${material.stockManagementItem}</td>
                         <td>${material.companyName}</td>
+                        <td>${material.companyCode}</td> 
                     `;
                     row.addEventListener('dblclick', () => populateMaterialForm(material));
                     tbody.appendChild(row);
@@ -54,14 +57,15 @@ document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
     const stockManagementItem = stockManagementItemValue === 'y'; // 'y'는 true, 'n'은 false로 변환
 
     const materialData = {
-        companyCode: document.getElementById('threeCompanyCode').value,
-        companyName: document.getElementById('threeCompanyName').value,
-        materialName: document.getElementById('threeMaterialName').value,
+
         materialCode: document.getElementById('threeMaterialCode').value,
+        materialName: document.getElementById('threeMaterialName').value,
         materialUnit: document.getElementById('materialUnit').value,
         materialUnitPrice: document.getElementById('materialUnitPrice').value,
         minQuantity: document.getElementById('minQuantity').value,
-        stockManagementItem: stockManagementItem // boolean 값으로 변환된 값
+        stockManagementItem: stockManagementItem,
+        companyName: document.getElementById('threeCompanyName').value,
+        companyCode: document.getElementById('threeCompanyCode').value// boolean 값으로 변환된 값
     };
 
     fetch('/inventory_management/addMaterial', {
@@ -117,13 +121,14 @@ function threeSearch() {
                 data.forEach(material => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                           <td>${material.materialCode}</td>
+                        <td>${material.materialCode}</td>
                         <td>${material.materialName}</td>
                         <td>${material.materialUnit}</td>
                         <td>${material.materialUnitPrice}</td>
                         <td>${material.minQuantity}</td>
                         <td>${material.stockManagementItem}</td>
                         <td>${material.companyName}</td>
+                        <td>${material.companyCode}</td>
                       
                         `;
                     tbody.appendChild(row);

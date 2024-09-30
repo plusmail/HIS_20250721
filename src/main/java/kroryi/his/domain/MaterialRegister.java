@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+//@ToString
 @Builder
 @Getter
 @Setter
@@ -21,7 +21,7 @@ public class MaterialRegister {
     //company의 업체코드와 join. 무한참조 방지
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "company_Code")
+    @JoinColumn(name = "company_code")
     private CompanyRegister companyRegister;
 
     //Transaction과 조인
