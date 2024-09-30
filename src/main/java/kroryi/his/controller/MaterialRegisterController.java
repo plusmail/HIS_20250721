@@ -30,7 +30,7 @@ import java.util.Map;
 public class MaterialRegisterController {
     private final MaterialRegisterService materialRegisterService;
 
-    // 재료 등록
+    // 재료등록
     @ApiOperation(value = "회사등록 POST", notes = "POST 방식으로 회사 등록")
     @PostMapping(value = "/addMaterial", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> register(@Valid @RequestBody MaterialDTO materialDTO,
