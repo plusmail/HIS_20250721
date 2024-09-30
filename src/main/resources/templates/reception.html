@@ -64,6 +64,8 @@
 
         <button id="completeTreatmentButton">진료완료</button>
 
+        <button id="cancelReceptionButton" class="btn btn-warning">접수 취소</button>
+
     </div>
     <div style="display: flex;">
         <!-- 진료대기테이블 -->
@@ -132,6 +134,29 @@
             </tbody>
         </table>
     </div>
+
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">접수 취소</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>선택한 환자의 접수를 취소하시겠습니까?</p>
+                    <p id="patientName"></p> <!-- 환자 이름 표시 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="confirmCancelBtn">예</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">아니오</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <div th:fragment="reception_js">
         <script th:src="@{/js/patient_admission.js}"></script>
