@@ -29,7 +29,7 @@ public class PatientAdmissionController {
         // DB에 저장
         patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 
-        return ResponseEntity.ok("환자가 대기 상태로 등록되었습니다.");
+        return ResponseEntity.ok("{\"message\": \"환자가 대기 상태로 등록되었습니다.\"}");
     }
 
     // 대기 환자 목록 반환
