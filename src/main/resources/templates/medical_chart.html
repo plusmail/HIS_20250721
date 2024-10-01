@@ -93,8 +93,37 @@
     }
 
 
+    /* 모달 크기 조절 */
+    .modal-dialog {
+        max-width: 600px; /* 모달의 최대 너비 */
+    }
+
+    .table th, .table td {
+        text-align: center; /* 텍스트 중앙 정렬 */
+        font-weight: bold; /* 글자 굵게 */
+    }
+
+    /* 첫 번째 열의 너비를 줄이고 두 번째 열을 확장 */
+    .table th:first-child, .table td:first-child {
+        width: 10%; /* 첫 번째 열의 너비 */
+    }
+
+    .table th:last-child, .table td:last-child {
+        width: 90%; /* 두 번째 열의 너비 */
+    }
+
+    /* 모달 헤더의 닫기 버튼을 오른쪽 끝으로 이동 */
+    .modal-header .close {
+        margin: -1rem -1rem -1rem auto;
+    }
+
 </style>
+
 <div layout:fragment="medical_chart">진료차트 페이지
+
+    <link rel="stylesheet" th:href="@{/css/medical_chart.css}"/>
+
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <div class="container-fluid">
         <div class="row vh-100">
@@ -155,108 +184,168 @@
                                     </button>
                                     <button class="btn btn-danger tooth-btn up-tooth" type="button" value="14">14
                                     </button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="13">13</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="12">12</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="11">11</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="21">21</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="22">22</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="23">23</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="24">24</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="25">25</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="26">26</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="27">27</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="28">28</button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="13">13
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="12">12
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="11">11
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="21">21
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="22">22
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="23">23
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="24">24
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="25">25
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="26">26
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="27">27
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn up-tooth" type="button" value="28">28
+                                    </button>
                                 </div>
 
                                 <!-- 메뉴바 (상악 하악 사이) -->
                                 <div class="menu-section" style="display: flex">
                                     <!-- 왼쪽: 영구치 메뉴 -->
                                     <div class="menu-column">
-                                        <button class="btn btn-secondary control-btn up-control" type="button">영구치 상악
+                                        <button class="btn btn-secondary control-btn up-control" id="upTooth"
+                                                type="button">영구치 상악
                                         </button>
-                                        <button class="btn btn-secondary control-btn" type="button">전체선택</button>
-                                        <button class="btn btn-secondary control-btn" type="button">영구치 하악</button>
+                                        <button class="btn btn-secondary control-btn all-control" id="allTooth"
+                                                type="button">전체선택
+                                        </button>
+                                        <button class="btn btn-secondary control-btn down-control" id="downTooth"
+                                                type="button">영구치
+                                            하악
+                                        </button>
                                     </div>
 
                                     <!-- 55번부터 85번까지의 치아 (작은 버튼) -->
                                     <div class="container mt-4">
                                         <!-- 상악 (윗줄) -->
                                         <div class="tooth-row">
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="55">55
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="55">55
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="54">54
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="54">54
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="53">53
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="53">53
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="52">52
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="52">52
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="51">51
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="51">51
                                             </button>
                                             <span class="upper-gap"></span>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="61">61
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="61">61
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="62">62
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="62">62
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="63">63
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="63">63
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="64">64
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="64">64
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="65">65
+                                            <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                                    value="65">65
                                             </button>
                                         </div>
 
                                         <!-- 하악 (아랫줄) -->
                                         <div class="tooth-row">
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="85">85
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="85">85
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="84">84
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="84">84
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="83">83
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="83">83
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="82">82
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="82">82
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="81">81
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="81">81
                                             </button>
                                             <span class="lower-gap"></span>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="71">71
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="71">71
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="72">72
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="72">72
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="73">73
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="73">73
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="74">74
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="74">74
                                             </button>
-                                            <button class="btn btn-light small-tooth-btn" type="button" value="75">75
+                                            <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                                    value="75">75
                                             </button>
                                         </div>
                                     </div>
 
                                     <!-- 오른쪽: 유치 상악/하악 메뉴 -->
                                     <div class="menu-column flex-column">
-                                        <button class="btn btn-secondary control-btn" type="button">유치 상악</button>
-                                        <button class="btn btn-secondary control-btn" type="button">선택해제</button>
-                                        <button class="btn btn-secondary control-btn" type="button">유치 하악</button>
+                                        <button class="btn btn-secondary control-btn y-up-control" id="upToothY"
+                                                type="button">유치 상악
+                                        </button>
+                                        <button class="btn btn-secondary control-btn y-all-control" id="allToothY"
+                                                type="button">선택해제
+                                        </button>
+                                        <button class="btn btn-secondary control-btn y-down-control" id="downToothY"
+                                                type="button">유치
+                                            하악
+                                        </button>
                                     </div>
                                 </div>
 
                                 <!-- 하악 (아랫니) -->
                                 <div class="tooth-row">
-                                    <button class="btn btn-danger tooth-btn" type="button" value="48">48</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="47">47</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="46">46</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="45">45</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="44">44</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="43">43</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="42">42</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="41">41</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="31">31</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="32">32</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="33">33</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="34">34</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="35">35</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="36">36</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="37">37</button>
-                                    <button class="btn btn-danger tooth-btn" type="button" value="38">38</button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="48">48
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="47">47
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="46">46
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="45">45
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="44">44
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="43">43
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="42">42
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="41">41
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="31">31
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="32">32
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="33">33
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="34">34
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="35">35
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="36">36
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="37">37
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn down-tooth" type="button" value="38">38
+                                    </button>
                                 </div>
                             </div>
 
@@ -534,7 +623,9 @@
                                 <div class="col-3 border-end text-center py-3 d-flex flex-column justify-content-center">
                                     <p class="mb-1">직접작성<br>(메모)</p>
                                     <p class="text-muted mb-2" style="font-size: 12px;">자주쓰는 문구</p>
-                                    <button class="btn btn-outline-secondary btn-sm">기존입력</button>
+                                    <button class="btn btn-outline-secondary btn-sm btn-modal" data-toggle="modal"
+                                            data-target="#myModal" type="button">기존입력
+                                    </button>
                                 </div>
 
                                 <!-- 중간 텍스트 입력 영역 -->
@@ -1016,6 +1107,72 @@
 
 
     </div>
+    <!--    pi 자주쓰는문구 모달-->
+
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">자주쓰는 문구</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 300px;">
+                    <!-- 테이블 내용 -->
+                    <table class="table table-bordered ">
+                        <thead>
+                        <tr class="modal-th">
+                            <th>#</th>
+                            <th>내용</th>
+                        </tr>
+                        </thead>
+                        <tbody class="overflow-auto">
+                        <tr class="modal-tr">
+                            <td>1</td>
+                            <td>잠이온다</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>2</td>
+                            <td>피곤하다</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>3</td>
+                            <td>자고싶다</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>5</td>
+                            <td>잠이온다</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>6</td>
+                            <td>언제하지</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>7</td>
+                            <td>피곤</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>8</td>
+                            <td>집에가자</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        <tr class="modal-tr">
+                            <td>9</td>
+                            <td>가서자아지</td><!-- 내용 채울 부분 -->
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary modal-in-memo">메모에 넣기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1029,12 +1186,31 @@
     const memo = document.querySelector(".memo")
     // 메모 저장버튼 선택
     const saveMemo = document.querySelector(".save-memo")
-    // 성인 윗니 모두 선택
+    // 성인 윗니 모두 선택할 수 있는 btn
     const upTooth = document.querySelector(".up-control")
+    // 상악 치아 모두 선택
+    const upToothValues = document.querySelectorAll(".up-tooth")
+    // 성인 아랫니 모두 선택하는 btn
+    const downTooth = document.querySelector(".down-control")
+    // 성인 하악 모두 선택
+    const downToothValues = document.querySelectorAll(".down-tooth")
+    // 성인 치아 모두 선택하는 btn
+    const allTooth = document.querySelector(".all-control")
+    // 유치 상악 모두 선택 할 수 있는 btn
+    const upToothY = document.querySelector(".y-up-control")
+    // 유치 하악 모두 선택 할 수 있는 btn
+    const downToothY = document.querySelector(".y-down-control")
+    // 유치 상하악 모두 선택 할 수 있는 btn
+    const allToothY = document.querySelector(".y-all-control")
+    // 유치 상악 모두 선택
+    const yUpToothValues = document.querySelectorAll(".y-up-tooth")
+    // 유치 하악 모두 선택
+    const yDownToothValues = document.querySelectorAll(".y-down-tooth")
+    // 모달 데이터 선택
+    const modalData = document.querySelectorAll(".modal-tr")
+    // 모달 메모 데이터 전송 btn
+    const modalInMemo = document.querySelector(".modal-in-memo")
 
-    const upToothValue = document.querySelectorAll(".up-tooth")
-
-    const symptomCheck = document.querySelectorAll(".form-check-input")
 
     // 치아 동적 배열 선언
     let toothList = []
@@ -1042,8 +1218,9 @@
     let symptomValue
     // memo 데이터 저장을 위한 선언
     let memoValue;
+    // 의사의 자주쓰는 멘트 저장을 위한 동적 배열 선언
+    let frequentlyUsedPhrases = [];
 
-    let toothNum = []
 
     //세션 시작
     // 세션 데이터 가져오기
@@ -1061,7 +1238,7 @@
         });
     }
 
-
+    // 데이터 값을 세션에 등록.
     function addToSubList(subListIndex, newValue) {
         $.ajax({
             url: '/his/add-to-sublist',
@@ -1080,7 +1257,31 @@
         });
     }
 
-    function changeToSubList(subListIndex, newValue) {
+
+    // 데이터 배열을 세션에 등록.
+    function addsToSubList(subListIndex, newValue) {
+        $.ajax({
+            url: '/his/adds-to-sublist',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                subListIndex: subListIndex,
+                newValue: newValue
+            }),
+            success: function (response) {
+                console.log("전송성공")
+                console.log("addsToSubList ->" + response);
+                fetchSessionItems(); // 변경된 세션 데이터를 가져와 화면에 갱신
+            },
+            error: function (xhr, status, error) {
+                console.log("fail")
+                console.error('Failed to add to sublist:', error);
+            }
+        });
+    }
+
+    // 세션에 저장된 특정값을 삭제
+    function deleteToSubList(subListIndex, newValue) {
         $.ajax({
             url: '/his/change-to-sublist',
             method: 'POST',
@@ -1093,6 +1294,26 @@
                 fetchSessionItems(); // 변경된 세션 데이터를 가져와 화면에 갱신
             },
             error: function (xhr, status, error) {
+                console.error('Failed to add to sublist:', error);
+            }
+        });
+    }
+
+    function deletesToSubList(subListIndex, newValue) {
+        $.ajax({
+            url: '/his/deletes-to-sublist',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                subListIndex: subListIndex,
+                newValue: newValue
+            }),
+            success: function (response) {
+                console.log("addsToSubList ->" + response);
+                fetchSessionItems(); // 변경된 세션 데이터를 가져와 화면에 갱신
+            },
+            error: function (xhr, status, error) {
+                console.log("fail")
                 console.error('Failed to add to sublist:', error);
             }
         });
@@ -1134,20 +1355,19 @@
     // 데이터 받아서 세션으로 전송하는 구문 시작
     // 치아 클릭 시 선택된 치아 value 값을 session에 저장.
     tooth.addEventListener("click", e => {
-        // e.preventDefault()
-        // e.stopPropagation()
-
-        if (e.target.tagName === "BUTTON") {
-
-            // toothValue += "," + e.target.value;
-            let toothValue = e.target.value;
-            addToSubList(0, toothValue);
-            // addItemToSubList(0,toothValue)
-            toothList.push(e.target.value)
-            console.log(toothList)
-
-
-            // console.log(toothList)
+        let toothValue = e.target.value;
+        if (e.target.tagName === "BUTTON" && e.target.id === '') {
+            if (e.target.classList.contains("opacity-50")) {
+                deleteToSubList(0, toothValue)
+                e.target.classList.remove("opacity-50")
+            } else {
+                addToSubList(0, toothValue);
+                e.target.classList.add("opacity-50")
+            }
+        } else {
+            if (e.target.tagName === "BUTTON") {
+                toothTerminal(e.target.id)
+            }
         }
     })
 
@@ -1155,10 +1375,12 @@
     symptom.addEventListener("click", e => {
         if (e.target.tagName === "INPUT") {
             symptomValue = e.target.value;
-            console.log("11111",this.checked)
-            addToSubList(1, symptomValue);
-
-            console.log(symptomValue)
+            if (e.target.checked) {
+                addToSubList(1, symptomValue);
+                console.log(symptomValue)
+            } else {
+                deleteToSubList(1, symptomValue);
+            }
         }
 
     })
@@ -1173,11 +1395,139 @@
 
     })
 
-    upTooth.addEventListener("click", e => {
-        for (let i = 0; i < upToothValue.length; i++) {
-            console.log(upToothValue[i].value)
-            addToSubList(0, upToothValue[i].value)
+    function toothTerminal(id) {
+        toothList = []
+        switch (id) {
+            case "upTooth":
+                for (i = 0; i < upToothValues.length; i++) {
+                    toothList[i] = upToothValues[i].value;
+                }
+                if (upTooth.classList.contains("opacity-50")) {
+                    deletesToSubList(0, toothList)
+                    upTooth.classList.remove("opacity-50")
+                    upToothValues.forEach(upToothValue =>
+                        upToothValue.classList.remove("opacity-50"))
+                } else {
+                    addsToSubList(0, toothList)
+                    upTooth.classList.add("opacity-50")
+                    upToothValues.forEach(upToothValue =>
+                        upToothValue.classList.add("opacity-50"))
+                }
+                console.log("상악")
+
+                break;
+            case "allTooth":
+                for (i = 0; i < upToothValues.length; i++) {
+                    toothList.push(upToothValues[i].value)
+                    toothList.push(downToothValues[i].value)
+                }
+                if (allTooth.classList.contains("opacity-50")) {
+                    deletesToSubList(0, toothList)
+                    allTooth.classList.remove("opacity-50")
+                    upToothValues.forEach(upToothValue =>
+                        upToothValue.classList.remove("opacity-50"))
+                    downToothValues.forEach(downToothValue =>
+                        downToothValue.classList.remove("opacity-50"))
+                } else {
+                    addsToSubList(0, toothList)
+                    allTooth.classList.add("opacity-50")
+                    downToothValues.forEach(downToothValue =>
+                        downToothValue.classList.add("opacity-50"))
+                    upToothValues.forEach(upToothValue =>
+                        upToothValue.classList.add("opacity-50"))
+                }
+                console.log("전부")
+                break;
+            case "downTooth":
+                for (i = 0; i < downToothValues.length; i++) {
+                    toothList[i] = downToothValues[i].value;
+                }
+                if (downTooth.classList.contains("opacity-50")) {
+                    deletesToSubList(0, toothList)
+                    downTooth.classList.remove("opacity-50")
+                    downToothValues.forEach(downToothValue =>
+                        downToothValue.classList.remove("opacity-50"))
+                } else {
+                    addsToSubList(0, toothList)
+                    downTooth.classList.add("opacity-50")
+                    downToothValues.forEach(downToothValue =>
+                        downToothValue.classList.add("opacity-50"))
+                }
+                console.log("하악")
+                break;
+            case "upToothY":
+                for (i = 0; i < yUpToothValues.length; i++) {
+                    toothList[i] = yUpToothValues[i].value;
+                }
+                if (upToothY.classList.contains("opacity-50")) {
+                    deletesToSubList(0, toothList)
+                    upToothY.classList.remove("opacity-50")
+                    yUpToothValues.forEach(yUpToothValue =>
+                        yUpToothValue.classList.remove("opacity-50"))
+                } else {
+                    addsToSubList(0, toothList)
+                    upToothY.classList.add("opacity-50")
+                    yUpToothValues.forEach(yUpToothValue =>
+                        yUpToothValue.classList.add("opacity-50"))
+                }
+                console.log("유치상악")
+                break;
+            case "allToothY":
+
+                console.log("유치전부")
+                break;
+            case "downToothY":
+                for (i = 0; i < yDownToothValues.length; i++) {
+                    toothList[i] = yDownToothValues[i].value;
+                }
+                if (downToothY.classList.contains("opacity-50")) {
+                    deletesToSubList(0, toothList)
+                    downToothY.classList.remove("opacity-50")
+                    yDownToothValues.forEach(yDownToothValue =>
+                        yDownToothValue.classList.remove("opacity-50"))
+                } else {
+                    addsToSubList(0, toothList)
+                    downToothY.classList.add("opacity-50")
+                    yDownToothValues.forEach(yDownToothValue =>
+                        yDownToothValue.classList.add("opacity-50"))
+                }
+                console.log("유치하악")
+                break;
+            default:
+                console.log("올바르지 않은 버튼을 선택하였습니다.")
+                alert("올바르지 않은 버튼은을 선택하였습니다.")
+                break;
         }
+    }
+
+    // 모달 테이블 행에 클릭 이벤트 추가
+    modalData.forEach(function (row) {
+        row.addEventListener('click', function () {
+            if (this.classList.contains("selected-row")) {
+                this.classList.remove("selected-row")
+                this.querySelectorAll("td").forEach(function (cell,index){
+                    if(index===1) {
+                        frequentlyUsedPhrases = frequentlyUsedPhrases.filter(item => item !== cell.textContent)
+                    }
+                })
+                console.log(frequentlyUsedPhrases)
+            } else {
+                // 현재 클릭된 행에 클래스 추가
+                this.classList.add('selected-row');
+                this.querySelectorAll("td").forEach(function (cell,index){
+                    if(index===1) {
+                        frequentlyUsedPhrases.push(cell.textContent)
+                    }
+                })
+                console.log(frequentlyUsedPhrases)
+            }
+        });
+    });
+
+    modalInMemo.addEventListener("click", e =>{
+        memo.textContent=frequentlyUsedPhrases
+
+
     })
 
 </script>
