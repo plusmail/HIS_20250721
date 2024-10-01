@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -56,10 +57,15 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
         return materialRepository.findByMaterialNameContainingIgnoreCase(materialName);
     }
 
+
     // 재료 삭제
     @Override
-    public void deleteMaterial(String materialCode) {
-        materialRepository.deleteById(materialCode);
+    @Transactional
+    public void customDeleteByMaterialCode(String materialCode) {
+        if (!materialRepository.existsByMaterialCode(materialCode)) {
+            throw new IllegalArgumentException("존재하지 않는 재료 코드입니다: " + materialCode);
+        }
+        materialRepository.customDeleteByMaterialCode(materialCode);
     }
 
 }

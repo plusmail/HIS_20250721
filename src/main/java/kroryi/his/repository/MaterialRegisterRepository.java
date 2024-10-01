@@ -3,8 +3,10 @@ package kroryi.his.repository;
 import kroryi.his.domain.CompanyRegister;
 import kroryi.his.domain.MaterialRegister;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,5 +15,10 @@ public interface MaterialRegisterRepository extends JpaRepository<MaterialRegist
     List<MaterialRegister> findByMaterialNameContainingIgnoreCase(String materialName);
 
     boolean existsByMaterialCode(String materialCode);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM MaterialRegister m WHERE m.materialCode = :materialCode")
+    void customDeleteByMaterialCode(@Param("materialCode") String materialCode);
 
 }

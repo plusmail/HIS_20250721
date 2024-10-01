@@ -204,12 +204,7 @@ document.getElementById('companySearchIcon').addEventListener('click', function(
 
 // 재료 삭제 버튼 클릭 시 데이터 전송
 document.getElementById('deleteMaterialBtn').addEventListener('click', function() {
-    const materialCode = document.getElementById('materialCode').value;
-
-    if (!materialCode) {
-        alert("삭제할 재료 코드를 입력하세요.");
-        return;
-    }
+    const materialCode = document.getElementById('threeMaterialCode').value;
 
     if (confirm("정말로 이 재료를 삭제하시겠습니까?")) {
         fetch(`/inventory_management/deleteMaterial?materialCode=${encodeURIComponent(materialCode)}`, {

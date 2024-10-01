@@ -14,5 +14,5 @@ public interface MaterialRegisterService {
 
     List<MaterialRegister> searchByName(String materialName);
 
-    void deleteMaterial(String materialCode);
+    void customDeleteByMaterialCode(String materialCode);
 }
