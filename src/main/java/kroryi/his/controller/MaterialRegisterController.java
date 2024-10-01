@@ -33,7 +33,6 @@ public class MaterialRegisterController {
     @PostMapping(value = "/addMaterial", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> register(@Valid @RequestBody MaterialDTO materialDTO,
                                         BindingResult bindingResult) throws BindException {
-        log.info("MaterialDTO->{}", materialDTO);
 
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
@@ -44,7 +43,6 @@ public class MaterialRegisterController {
         try {
             // 재료 등록
             MaterialRegister materialRegister = materialRegisterService.register(materialDTO);
-            log.info("MaterialRegister->{}", materialRegister);
 
             // 성공 응답
             result.put("success", true);

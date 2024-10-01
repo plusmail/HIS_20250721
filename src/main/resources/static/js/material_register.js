@@ -7,7 +7,7 @@ function populateMaterialForm(material) {
 
     // 재고관리여부 설정
     const stockManagementItemElement = document.getElementById('threeStockManagementItem');
-    if(material.stockManagementItem == true){
+    if(material.stockManagementItem === true){
         stockManagementItemElement.selectedIndex = 1;
     }else{
         stockManagementItemElement.selectedIndex = 2;
@@ -90,7 +90,6 @@ document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
             return response.json();
         })
         .then(data => {
-            console.log(data);  // 서버 응답 확인
 
             if (data.success) {
                 alert("재료가 저장되었습니다.");
