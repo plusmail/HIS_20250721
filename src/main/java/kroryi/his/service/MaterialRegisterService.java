@@ -1,6 +1,5 @@
 package kroryi.his.service;
 
-import kroryi.his.domain.CompanyRegister;
 import kroryi.his.domain.MaterialRegister;
 import kroryi.his.dto.MaterialDTO;
 

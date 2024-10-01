@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/inventory_management")
@@ -59,12 +60,22 @@ public class MaterialRegisterController {
     }
 
     @GetMapping("/searchMaterial")
-    public List<MaterialRegister> searchMaterial(@RequestParam(value = "materialName", required = false) String materialName) {
+    public List<MaterialDTO> searchMaterial(@RequestParam(value = "materialName", required = false) String materialName) {
+        List<MaterialRegister> materials;
+
         if (materialName == null || materialName.isEmpty()) {
-            return materialRegisterService.getAllMaterial();  // 검색어가 없을 때 전체 업체 반환
+            materials = materialRegisterService.getAllMaterial();  // 검색어가 없을 때 전체 재료 반환
+        } else {
+            materials = materialRegisterService.searchByName(materialName);  // 검색어에 따른 재료 반환
         }
-        return materialRegisterService.searchByName(materialName);  // 검색어에 따른 업체 반환
+
+        // MaterialRegister 리스트를 DTO 리스트로 변환
+        return materials.stream()
+                .map(MaterialDTO::new)  // MaterialDTO의 생성자를 활용
+                .collect(Collectors.toList());
     }
+
+
 
 
     // 재료 삭제

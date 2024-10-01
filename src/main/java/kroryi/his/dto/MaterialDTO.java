@@ -1,5 +1,6 @@
 package kroryi.his.dto;
 
+import kroryi.his.domain.MaterialRegister;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,4 +41,14 @@ public class MaterialDTO {
     //업체명
     private String companyName;
 
+    public MaterialDTO(MaterialRegister materialRegister) {
+        this.materialCode = materialRegister.getMaterialCode();
+        this.materialName = materialRegister.getMaterialName();
+        this.materialUnit = materialRegister.getMaterialUnit();
+        this.materialUnitPrice = materialRegister.getMaterialUnitPrice();
+        this.minQuantity = materialRegister.getMinQuantity();
+        this.stockManagementItem = materialRegister.isStockManagementItem();
+        this.companyName = materialRegister.getCompanyRegister().getCompanyName();
+        this.companyCode = materialRegister.getCompanyRegister().getCompanyCode();
+    }
 }

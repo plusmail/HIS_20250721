@@ -4,11 +4,19 @@ function populateMaterialForm(material) {
     document.getElementById('materialUnit').value = material.materialUnit;
     document.getElementById('materialUnitPrice').value = material.materialUnitPrice;
     document.getElementById('minQuantity').value = material.minQuantity;
-    document.getElementById('threeStockManagementItem').value = material.stockManagementItem;
+
+    // 재고관리여부 설정
+    const stockManagementItemElement = document.getElementById('threeStockManagementItem');
+    if(material.stockManagementItem == true){
+        stockManagementItemElement.selectedIndex = 1;
+    }else{
+        stockManagementItemElement.selectedIndex = 2;
+    }
+
     document.getElementById('threeCompanyName').value = material.companyName;
     document.getElementById('threeCompanyCode').value = material.companyCode;
-    console.log(material)
 }
+
 
 // 재료 목록 로딩 함수
 function loadMaterialList() {
@@ -29,7 +37,7 @@ function loadMaterialList() {
                         <td>${material.materialUnit}</td>
                         <td>${material.materialUnitPrice}</td>
                         <td>${material.minQuantity}</td>
-                        <td>${material.stockManagementItem}</td>
+                        <td>${material.stockManagementItem ? "예" : "아니오"}</td>
                         <td>${material.companyName}</td>
                         <td>${material.companyCode}</td> 
                     `;
@@ -55,9 +63,7 @@ document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
 
     const stockManagementItemValue = document.getElementById('threeStockManagementItem').value;
     const stockManagementItem = stockManagementItemValue === 'y'; // 'y'는 true, 'n'은 false로 변환
-
     const materialData = {
-
         materialCode: document.getElementById('threeMaterialCode').value,
         materialName: document.getElementById('threeMaterialName').value,
         materialUnit: document.getElementById('materialUnit').value,
@@ -67,6 +73,7 @@ document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
         companyName: document.getElementById('threeCompanyName').value,
         companyCode: document.getElementById('threeCompanyCode').value// boolean 값으로 변환된 값
     };
+
 
     fetch('/inventory_management/addMaterial', {
         method: "POST",
@@ -126,16 +133,19 @@ function threeSearch() {
                         <td>${material.materialUnit}</td>
                         <td>${material.materialUnitPrice}</td>
                         <td>${material.minQuantity}</td>
-                        <td>${material.stockManagementItem}</td>
+                        <td>${material.stockManagementItem ? "예" : "아니오"}</td>
                         <td>${material.companyName}</td>
                         <td>${material.companyCode}</td>
-                      
-                        `;
+                    `;
                     tbody.appendChild(row);
                 });
             }
+        })
+        .catch(error => {
+            console.error("검색 중 오류 발생:", error);
         });
 }
+
 
 // 업체 목록을 더블클릭했을 때 선택된 업체 정보를 input 필드에 채우는 함수
 function selectCompany(companyCode, companyName) {
