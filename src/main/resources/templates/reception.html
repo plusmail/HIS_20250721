@@ -156,6 +156,30 @@
         </div>
     </div>
 
+    <!-- 진료 중 모달 -->
+    <div class="modal fade" id="treatmentModal" tabindex="-1" role="dialog" aria-labelledby="treatmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="treatmentModalLabel">진료 중 이동</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="treatmentPatientInfo"></p>
+                    <p>진료 중으로 이동하시겠습니까?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="confirmTreatmentBtn">예</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">아니요</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
     <div th:fragment="reception_js">

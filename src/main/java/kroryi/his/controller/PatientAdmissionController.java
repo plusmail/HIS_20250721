@@ -62,6 +62,25 @@ public class PatientAdmissionController {
     }
 
 //    진료완료
+    @PostMapping("/completed/start")
+    public ResponseEntity<String> completed(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
+    System.out.println("진료 완료 요청 수신: " + patientAdmissionDTO);
 
+
+    patientAdmissionDTO.setCompletionTime(LocalDateTime.now());
+    patientAdmissionDTO.setTreatStatus("3"); //
+
+
+    patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+
+    return ResponseEntity.ok("환자가 진료 완료 상태로 등록되었습니다.");
+}
+
+    // 진료 중 대기 환자 목록 반환
+    @GetMapping("/completed/waiting")
+    public ResponseEntity<List<PatientAdmission>> getWaitingPatientsForCompleted() {
+        List<PatientAdmission> waitingPatients = patientAdmissionService.getWaitingPatients();
+        return ResponseEntity.ok(waitingPatients);
+    }
 
 }

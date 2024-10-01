@@ -31,12 +31,6 @@ public class PatientAdmission {
     @Column(name = "reception_time")
     private LocalDateTime receptionTime;
 
-    @Column(name = "ap_time")
-    private LocalDateTime appointmentTime;
-
-    @Column(name = "ts_time")
-    private LocalDateTime treatmentStartTime;
-
     @Column(name = "vi_time")
     private LocalDateTime viTime;
 
