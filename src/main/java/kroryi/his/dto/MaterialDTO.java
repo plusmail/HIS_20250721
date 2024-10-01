@@ -1,15 +1,14 @@
 package kroryi.his.dto;
 
 import kroryi.his.domain.MaterialRegister;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Builder
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class MaterialDTO {

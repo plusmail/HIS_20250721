@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MaterialRegisterRepository extends JpaRepository<MaterialRegister, String> {
     @Query("SELECT m FROM MaterialRegister m JOIN FETCH m.companyRegister")
@@ -20,5 +21,16 @@ public interface MaterialRegisterRepository extends JpaRepository<MaterialRegist
     @Transactional
     @Query("DELETE FROM MaterialRegister m WHERE m.materialCode = :materialCode")
     void customDeleteByMaterialCode(@Param("materialCode") String materialCode);
+
+    // 업체명으로 검색
+    List<MaterialRegister> findByCompanyRegisterCompanyNameContaining(String companyName);
+
+    // 재료명으로 검색
+    List<MaterialRegister> findByMaterialNameContaining(String materialName);
+
+    // 업체명과 재료명으로 검색
+    List<MaterialRegister> findByCompanyRegisterCompanyNameContainingAndMaterialNameContaining(String companyName, String materialName);
+
+    Optional<MaterialRegister> findByMaterialCode(String materialCode);
 
 }

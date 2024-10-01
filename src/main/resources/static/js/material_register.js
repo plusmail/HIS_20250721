@@ -1,5 +1,7 @@
+// 재료 정보를 폼에 채우는 함수 (수정 모드)
 function populateMaterialForm(material) {
     document.getElementById('threeMaterialCode').value = material.materialCode;
+    document.getElementById('threeMaterialCode').readOnly = true;  // materialCode는 수정할 수 없도록 설정
     document.getElementById('threeMaterialName').value = material.materialName;
     document.getElementById('materialUnit').value = material.materialUnit;
     document.getElementById('materialUnitPrice').value = material.materialUnitPrice;
@@ -7,16 +9,81 @@ function populateMaterialForm(material) {
 
     // 재고관리여부 설정
     const stockManagementItemElement = document.getElementById('threeStockManagementItem');
-    if(material.stockManagementItem === true){
-        stockManagementItemElement.selectedIndex = 1;
-    }else{
-        stockManagementItemElement.selectedIndex = 2;
-    }
+    stockManagementItemElement.selectedIndex = material.stockManagementItem ? 1 : 2;
 
     document.getElementById('threeCompanyName').value = material.companyName;
     document.getElementById('threeCompanyCode').value = material.companyCode;
 }
 
+// 수동으로 폼 리셋 함수 (저장 후 폼 초기화)
+function resetMaterialForm() {
+    document.getElementById('threeMaterialCode').value = '';  // materialCode 필드를 비움
+    document.getElementById('threeMaterialCode').readOnly = false;  // materialCode 수정 가능하게 변경
+    document.getElementById('threeMaterialName').value = '';  // 재료명 필드를 비움
+    document.getElementById('materialUnit').value = '';  // 단위 필드를 비움
+    document.getElementById('materialUnitPrice').value = '';  // 단가 필드를 비움
+    document.getElementById('minQuantity').value = '';  // 최소 수량 필드를 비움
+    document.getElementById('threeStockManagementItem').selectedIndex = 0;  // 재고관리 여부 초기화
+    document.getElementById('threeCompanyName').value = '';  // 업체명 필드를 비움
+    document.getElementById('threeCompanyCode').value = '';  // 업체코드 필드를 비움
+}
+
+// 재료 추가 또는 수정 버튼 클릭 이벤트 핸들러
+document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
+    event.preventDefault();  // 기본 폼 제출 동작을 막음
+    event.stopPropagation();  // 이벤트 전파 방지
+
+    const materialCode = document.getElementById('threeMaterialCode').value;
+
+    // POST 또는 PUT 요청을 보낼지 결정
+    let url, method;
+    if (materialCode) {
+        url = `/inventory_management/updateMaterial`;  // 수정 API
+        method = "PUT";  // PUT 메서드 사용
+    } else {
+        url = `/inventory_management/addMaterial`;  // 저장 API
+        method = "POST";  // POST 메서드 사용
+    }
+
+    const materialData = {
+        materialCode: materialCode,
+        materialName: document.getElementById('threeMaterialName').value,
+        materialUnit: document.getElementById('materialUnit').value,
+        materialUnitPrice: parseFloat(document.getElementById('materialUnitPrice').value),
+        minQuantity: parseInt(document.getElementById('minQuantity').value, 10),
+        stockManagementItem: document.getElementById('threeStockManagementItem').value === 'y',
+        companyName: document.getElementById('threeCompanyName').value,
+        companyCode: document.getElementById('threeCompanyCode').value
+    };
+
+    // 서버로 데이터 전송
+    fetch(url, {
+        method: method,  // 요청 메서드 설정
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(materialData)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(materialCode ? "재료가 수정되었습니다." : "재료가 등록되었습니다.");
+                resetMaterialForm();  // 폼 리셋
+                loadMaterialList();  // 목록 다시 로딩
+            } else {
+                alert(data.message || "재료 등록/수정에 실패했습니다.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert(`서버와의 통신 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
+        });
+});
 
 // 재료 목록 로딩 함수
 function loadMaterialList() {
@@ -24,7 +91,7 @@ function loadMaterialList() {
         .then(response => response.json())
         .then(data => {
             const tbody = document.getElementById('materialCompanyList');
-            tbody.innerHTML = '';
+            tbody.innerHTML = '';  // 기존 행 제거
 
             if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7">현재 등록된 재료가 없습니다.</td></tr>';
@@ -40,7 +107,6 @@ function loadMaterialList() {
                         <td>${material.materialUnitPrice}</td>
                         <td>${material.minQuantity}</td>
                         <td>${material.stockManagementItem ? "예" : "아니오"}</td>
-                      
                     `;
                     row.addEventListener('dblclick', () => populateMaterialForm(material));
                     tbody.appendChild(row);
@@ -52,71 +118,16 @@ function loadMaterialList() {
         });
 }
 
-// 페이지 로드 시 재료 목록을 불러오는 함수 호출
-loadMaterialList(); // 추가
-
-
-
-// 업체 등록 버튼 클릭 시 데이터 전송
-document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
-    event.preventDefault();  // 기본 submit 동작 방지
-    event.stopPropagation();
-
-    const stockManagementItemValue = document.getElementById('threeStockManagementItem').value;
-    const stockManagementItem = stockManagementItemValue === 'y'; // 'y'는 true, 'n'은 false로 변환
-    const materialData = {
-        materialCode: document.getElementById('threeMaterialCode').value,
-        materialName: document.getElementById('threeMaterialName').value,
-        materialUnit: document.getElementById('materialUnit').value,
-        materialUnitPrice: document.getElementById('materialUnitPrice').value,
-        minQuantity: document.getElementById('minQuantity').value,
-        stockManagementItem: stockManagementItem,
-        companyName: document.getElementById('threeCompanyName').value,
-        companyCode: document.getElementById('threeCompanyCode').value// boolean 값으로 변환된 값
-    };
-
-
-    fetch('/inventory_management/addMaterial', {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(materialData)
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-
-            if (data.success) {
-                alert("재료가 저장되었습니다.");
-
-                // 폼 리셋
-                document.getElementById('materialForm').reset();
-
-                // 전체 데이터 다시 불러오기
-                loadMaterialList();
-            } else {
-                alert(data.message || "재료 등록에 실패했습니다.");  // 서버에서 전달된 메시지 출력
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert(`서버와의 통신 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
-        });
-});
-
-
-
-
 // 재료 검색 함수
 function threeSearch() {
+    const companyName = document.getElementById('threeCompanyNameSearch').value;
     const materialName = document.getElementById('threeMaterialNameSearch').value;
 
-    fetch(`/inventory_management/searchMaterial?materialName=${encodeURIComponent(materialName)}`)
+    let url = `/inventory_management/searchMaterial?`;
+    if (companyName) url += `companyName=${encodeURIComponent(companyName)}&`;
+    if (materialName) url += `materialName=${encodeURIComponent(materialName)}`;
+
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             const tbody = document.getElementById('materialCompanyList');
@@ -145,6 +156,46 @@ function threeSearch() {
             console.error("검색 중 오류 발생:", error);
         });
 }
+
+// 초기화 버튼 클릭 시 호출되는 함수
+function resetSearch() {
+    // 검색어 초기화
+    document.getElementById('threeCompanyNameSearch').value = '';
+    document.getElementById('threeMaterialNameSearch').value = '';
+
+    // 전체 데이터를 불러오는 요청
+    fetch('/inventory_management/searchMaterial')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('materialCompanyList');
+            tbody.innerHTML = '';  // 기존 행 제거
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">현재 등록된 재료가 없습니다.</td></tr>';
+            } else {
+                data.forEach(material => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${material.companyName}</td>
+                        <td>${material.companyCode}</td>
+                        <td>${material.materialName}</td>
+                        <td>${material.materialCode}</td>
+                        <td>${material.materialUnit}</td>
+                        <td>${material.materialUnitPrice}</td>
+                        <td>${material.minQuantity}</td>
+                        <td>${material.stockManagementItem ? "예" : "아니오"}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        })
+        .catch(error => {
+            console.error("재료 목록을 불러오는 중 오류 발생:", error);
+        });
+}
+
+// 페이지 로드 시 재료 목록을 불러오는 함수 호출
+loadMaterialList();  // 초기 데이터 로딩
 
 
 // 업체 목록을 더블클릭했을 때 선택된 업체 정보를 input 필드에 채우는 함수
@@ -228,4 +279,7 @@ document.getElementById('deleteMaterialBtn').addEventListener('click', function(
     }
 });
 
-
+// **초기화 버튼 클릭 이벤트 핸들러 추가**
+document.getElementById('threeSearchReset').addEventListener('click', function() {
+    resetSearch();  // 검색 필드 초기화 및 전체 목록 로드
+});

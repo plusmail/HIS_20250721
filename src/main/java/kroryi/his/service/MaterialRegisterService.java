@@ -15,4 +15,16 @@ public interface MaterialRegisterService {
     List<MaterialRegister> searchByName(String materialName);
 
     void customDeleteByMaterialCode(String materialCode);
+
+    List<MaterialRegister> searchByCompanyName(String companyName);
+
+    List<MaterialRegister> searchByMaterialName(String materialName);
+
+    List<MaterialRegister> searchByCompanyNameAndMaterialName(String companyName, String materialName);
+
+    List<MaterialRegister> getAllMaterials();
+
+    List<MaterialRegister> searchByParams(String materialName, String companyName);
+
+    void updateMaterial(MaterialDTO materialDTO);
 }
