@@ -25,6 +25,7 @@ function loadCompanyList() {
                     row.innerHTML = `
                             <td>${company.companyCode}</td>
                             <td>${company.companyName}</td>
+                            <td>${company.businessNumber}</td>
                             <td>${company.companyNumber}</td>
                             <td>${company.managerName}</td>
                             <td>${company.managerNumber}</td>
@@ -111,6 +112,7 @@ function fourSearch() {
                     row.innerHTML = `
                             <td>${company.companyCode}</td>
                             <td>${company.companyName}</td>
+                            <td>${company.businessNumber}</td>
                             <td>${company.companyNumber}</td>
                             <td>${company.managerName}</td>
                             <td>${company.managerNumber}</td>

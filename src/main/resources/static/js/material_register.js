@@ -32,14 +32,15 @@ function loadMaterialList() {
                 data.forEach(material => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${material.materialCode}</td>
+                        <td>${material.companyName}</td>
+                        <td>${material.companyCode}</td> 
                         <td>${material.materialName}</td>
+                        <td>${material.materialCode}</td>
                         <td>${material.materialUnit}</td>
                         <td>${material.materialUnitPrice}</td>
                         <td>${material.minQuantity}</td>
                         <td>${material.stockManagementItem ? "예" : "아니오"}</td>
-                        <td>${material.companyName}</td>
-                        <td>${material.companyCode}</td> 
+                      
                     `;
                     row.addEventListener('dblclick', () => populateMaterialForm(material));
                     tbody.appendChild(row);
@@ -128,14 +129,14 @@ function threeSearch() {
                 data.forEach(material => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${material.materialCode}</td>
+                        <td>${material.companyName}</td>
+                        <td>${material.companyCode}</td>
                         <td>${material.materialName}</td>
+                        <td>${material.materialCode}</td>
                         <td>${material.materialUnit}</td>
                         <td>${material.materialUnitPrice}</td>
                         <td>${material.minQuantity}</td>
                         <td>${material.stockManagementItem ? "예" : "아니오"}</td>
-                        <td>${material.companyName}</td>
-                        <td>${material.companyCode}</td>
                     `;
                     tbody.appendChild(row);
                 });
