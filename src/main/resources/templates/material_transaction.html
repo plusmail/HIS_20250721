@@ -48,12 +48,11 @@
           <thead>
           <tr>
             <th>입출일자</th>
-            <th>재료코드</th>
+            <th>업체명</th>
             <th>재료명</th>
+            <th>재료코드</th>
             <th>입고량</th>
             <th>출고량</th>
-            <th>잔량</th>
-            <th>업체명</th>
             <th>담당자 연락처</th>
           </tr>
           </thead>
@@ -81,14 +80,14 @@
                      placeholder="업체명 입력">
             </div>
             <div class="col-md-2 mb-3">
-              <label for="twoMaterialCode" class="form-label">재료코드</label>
-              <input type="text" name="materialCode" class="form-control" id="twoMaterialCode"
-                     placeholder="재료코드 입력">
-            </div>
-            <div class="col-md-2 mb-3">
               <label for="twoMaterialName" class="form-label">재료명</label>
               <input type="text" name="materialName" class="form-control" id="twoMaterialName"
                      placeholder="재료명 입력">
+            </div>
+            <div class="col-md-2 mb-3">
+              <label for="twoMaterialCode" class="form-label">재료코드</label>
+              <input type="text" name="materialCode" class="form-control" id="twoMaterialCode"
+                     placeholder="재료코드 입력">
             </div>
             <div class="col-md-2 mb-3">
               <label for="stockIn" class="form-label">입고량</label>
@@ -106,6 +105,7 @@
               </button>
               <button type="reset" class="btn btn-secondary mt-4 ms-2" id="resetTransaction">취소
               </button>
+              <button type="button" class="btn btn-danger mt-4 ms-2" id="deleteTransactionBtn">삭제</button>
             </div>
           </div>
         </form>
