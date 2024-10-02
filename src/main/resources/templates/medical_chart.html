@@ -1,5 +1,6 @@
 <!--진료차트-->
 <!DOCTYPE html>
+
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -93,32 +94,7 @@
     }
 
 
-    /* 모달 크기 조절 */
-    .modal-dialog {
-        max-width: 600px; /* 모달의 최대 너비 */
-    }
-
-    .table th, .table td {
-        text-align: center; /* 텍스트 중앙 정렬 */
-        font-weight: bold; /* 글자 굵게 */
-    }
-
-    /* 첫 번째 열의 너비를 줄이고 두 번째 열을 확장 */
-    .table th:first-child, .table td:first-child {
-        width: 10%; /* 첫 번째 열의 너비 */
-    }
-
-    .table th:last-child, .table td:last-child {
-        width: 90%; /* 두 번째 열의 너비 */
-    }
-
-    /* 모달 헤더의 닫기 버튼을 오른쪽 끝으로 이동 */
-    .modal-header .close {
-        margin: -1rem -1rem -1rem auto;
-    }
-
 </style>
-
 <div layout:fragment="medical_chart">진료차트 페이지
 
     <link rel="stylesheet" th:href="@{/css/medical_chart.css}"/>

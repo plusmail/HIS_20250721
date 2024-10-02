@@ -21,6 +21,7 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 @Controller
+@RestController
 public class ChartController {
     private final ChartService chartService;
 }
