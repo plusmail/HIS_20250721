@@ -18,12 +18,13 @@ import java.util.List;
 public class CompanyRegister {
 
     //material 테이블과 일대다 관계 (FK = companyCode)
-    @OneToMany(mappedBy = "companyRegister",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "companyRegister",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ToString.Exclude
     private List<MaterialRegister> materialList = new ArrayList<>();
 
     //업체코드
     @Id
-    @Column(name = "company_Code", nullable = false, length = 30)
+    @Column(name = "company_code", nullable = false, length = 30)
     private String companyCode;
 
     //업체명

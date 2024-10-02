@@ -1,3 +1,14 @@
+// 목록에서 업체 더블클릭시 폼에 회사 정보 채우기
+function populateCompanyForm(company) {
+    document.getElementById('fourCompanyCode').value = company.companyCode;
+    document.getElementById('fourCompanyName').value = company.companyName;
+    document.getElementById('businessNumber').value = company.businessNumber;
+    document.getElementById('companyNumber').value = company.companyNumber;
+    document.getElementById('managerName').value = company.managerName;
+    document.getElementById('managerNumber').value = company.managerNumber;
+    document.getElementById('companyMemo').value = company.companyMemo;
+}
+
 //업체 목록 로딩 함수
 function loadCompanyList() {
     fetch('/inventory_management/searchCompany?companyName=')  // 검색어를 빈 문자열로 전달해서 전체 목록 조회
@@ -14,11 +25,13 @@ function loadCompanyList() {
                     row.innerHTML = `
                             <td>${company.companyCode}</td>
                             <td>${company.companyName}</td>
+                            <td>${company.businessNumber}</td>
                             <td>${company.companyNumber}</td>
                             <td>${company.managerName}</td>
                             <td>${company.managerNumber}</td>
                             <td>${company.companyMemo}</td>
                         `;
+                    row.addEventListener('dblclick', () => populateCompanyForm(company));
                     tbody.appendChild(row);
                 });
             }
@@ -99,6 +112,7 @@ function fourSearch() {
                     row.innerHTML = `
                             <td>${company.companyCode}</td>
                             <td>${company.companyName}</td>
+                            <td>${company.businessNumber}</td>
                             <td>${company.companyNumber}</td>
                             <td>${company.managerName}</td>
                             <td>${company.managerNumber}</td>
@@ -109,6 +123,41 @@ function fourSearch() {
             }
         });
 }
+
+
+
+
+// 업체 삭제 버튼 클릭 시 데이터 전송
+document.getElementById('deleteCompanyBtn').addEventListener('click', function() {
+    const companyCode = document.getElementById('fourCompanyCode').value;
+
+    if (!companyCode) {
+        alert("삭제할 업체 코드를 입력하세요.");
+        return;
+    }
+
+    if (confirm("정말로 이 업체를 삭제하시겠습니까?")) {
+        fetch(`/inventory_management/deleteCompany?companyCode=${encodeURIComponent(companyCode)}`, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert(data);  // 서버로부터 삭제 성공 메시지 받음
+                // 폼 초기화 및 목록 새로고침
+                document.getElementById('companyForm').reset();
+                loadCompanyList();
+            })
+            .catch(error => {
+                console.error("삭제 요청 중 오류 발생:", error);
+                alert("업체 삭제에 실패했습니다. 다시 시도해주세요.");
+            });
+    }
+});
 
 
 
