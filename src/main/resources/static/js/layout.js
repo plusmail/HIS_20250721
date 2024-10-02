@@ -9,6 +9,7 @@ let patientData = null; // 전역 변수 선언
 
 let selectedMemos = null;
 
+// 세션 데이터 get
 let patientInfo = sessionStorage.getItem('selectedPatient');
 // 세션에 값이 있으면 세션 데이터를 사용
 if (patientInfo) {
