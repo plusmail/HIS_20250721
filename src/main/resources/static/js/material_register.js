@@ -55,10 +55,9 @@ document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
         companyName: document.getElementById('threeCompanyName').value,
         companyCode: document.getElementById('threeCompanyCode').value
     };
-
     // 서버로 데이터 전송
     fetch(url, {
-        method: method,  // 요청 메서드 설정
+        method: method,
         headers: {
             "Content-Type": "application/json"
         },
@@ -71,19 +70,17 @@ document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
             return response.json();
         })
         .then(data => {
-            if (data.success) {
-                alert(materialCode ? "재료가 수정되었습니다." : "재료가 등록되었습니다.");
-                resetMaterialForm();  // 폼 리셋
-                loadMaterialList();  // 목록 다시 로딩
-            } else {
-                alert(data.message || "재료 등록/수정에 실패했습니다.");
-            }
+            alert(data.message);  // 서버에서 받은 메시지를 alert에 출력
+            resetMaterialForm();  // 폼 리셋
+            loadMaterialList();  // 목록 다시 로딩
         })
         .catch(error => {
             console.error("Error:", error);
             alert(`서버와의 통신 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
         });
+
 });
+
 
 // 재료 목록 로딩 함수
 function loadMaterialList() {

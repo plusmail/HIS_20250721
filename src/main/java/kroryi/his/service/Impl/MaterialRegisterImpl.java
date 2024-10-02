@@ -31,36 +31,19 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
     }
 
     @Override
-    public boolean isMaterialCodeDuplicate(String materialCode) {
-        return materialRepository.existsByMaterialCode(materialCode);
-    }
-
-    @Override
     public MaterialRegister register(MaterialDTO materialDTO) {
         // CompanyRegister 조회
-        CompanyRegister companyRegister = companyRepository.findByCompanyCode(materialDTO.getCompanyCode());
+        CompanyRegister companyRegister = companyRepository.findOptionalByCompanyCode(materialDTO.getCompanyCode())
+                .orElseThrow(() -> new IllegalArgumentException("해당 회사 정보를 찾을 수 없습니다: " + materialDTO.getCompanyCode()));
 
-        // CompanyRegister가 존재하지 않으면 예외 처리 (optional)
-        if (companyRegister == null) {
-            throw new IllegalArgumentException("Company with code " + materialDTO.getCompanyCode() + " does not exist.");
-        }
-
-        // 중복된 재료 코드가 있으면 예외 처리
-        if (materialRepository.existsByMaterialCode(materialDTO.getMaterialCode())) {
-            throw new IllegalArgumentException("Material with code " + materialDTO.getMaterialCode() + " already exists.");
-        }
-
-        // MaterialDTO를 MaterialRegister로 변환하여 신규 등록
+        // MaterialDTO를 MaterialRegister로 변환
         MaterialRegister materialRegister = modelMapper.map(materialDTO, MaterialRegister.class);
+
+        // CompanyRegister 설정
         materialRegister.setCompanyRegister(companyRegister);
 
-        return materialRepository.save(materialRegister);  // 새로운 재료 등록
-    }
-
-
-    @Override
-    public List<MaterialRegister> searchByName(String materialName) {
-        return materialRepository.findByMaterialNameContainingIgnoreCase(materialName);
+        // 재료 저장
+        return materialRepository.save(materialRegister);
     }
 
 
@@ -90,46 +73,28 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
         return materialRepository.findByCompanyRegisterCompanyNameContainingAndMaterialNameContaining(companyName, materialName);
     }
 
-    public List<MaterialRegister> getAllMaterials() {
-        return materialRepository.findAll();
+    public boolean isNewMaterial(String materialCode) {
+        return !materialRepository.existsByMaterialCode(materialCode);
     }
 
-    @Override
-    public List<MaterialRegister> searchByParams(String materialName, String companyName) {
-        // 업체명과 재료명이 모두 주어진 경우
-        if (materialName != null && !materialName.isEmpty() && companyName != null && !companyName.isEmpty()) {
-            return materialRepository.findByCompanyRegisterCompanyNameContainingAndMaterialNameContaining(companyName, materialName);
-        }
-
-        // 업체명만 주어진 경우
-        if (companyName != null && !companyName.isEmpty()) {
-            return materialRepository.findByCompanyRegisterCompanyNameContaining(companyName);
-        }
-
-        // 재료명만 주어진 경우
-        if (materialName != null && !materialName.isEmpty()) {
-            return materialRepository.findByMaterialNameContaining(materialName);
-        }
-
-        // 기본적으로 빈 리스트 반환
-        return Collections.emptyList();
-    }
 
     @Override
     public void updateMaterial(MaterialDTO materialDTO) {
         Optional<MaterialRegister> optionalMaterial = materialRepository.findByMaterialCode(materialDTO.getMaterialCode());
 
         MaterialRegister materialRegister;
+        boolean isNewMaterial = false;  // 새로운 재료 여부
 
         if (optionalMaterial.isPresent()) {
             // 기존 재료가 있을 경우 수정
             materialRegister = optionalMaterial.get();
             log.info("기존 재료를 수정합니다: {}", materialRegister);
         } else {
-            // 새로운 재료를 등록 (수정 요청이지만 기존 재료가 없을 때)
+            // 새로운 재료를 등록
             log.info("재료가 없으므로 새로 등록합니다: {}", materialDTO.getMaterialCode());
             materialRegister = new MaterialRegister();  // 새로운 객체 생성
             materialRegister.setMaterialCode(materialDTO.getMaterialCode());  // 새 재료의 코드 설정
+            isNewMaterial = true;  // 새로운 재료 등록
         }
 
         // 공통적으로 재료 정보 수정/등록
@@ -145,10 +110,16 @@ public class MaterialRegisterImpl implements MaterialRegisterService {
 
         // 최종적으로 재료 정보 저장
         materialRepository.save(materialRegister);
+
+        // 새로 등록되었는지, 수정되었는지에 따라 다른 메시지를 반환
+        if (isNewMaterial) {
+            log.info("새로운 재료가 등록되었습니다: {}", materialDTO.getMaterialCode());
+        } else {
+            log.info("재료가 수정되었습니다: {}", materialDTO.getMaterialCode());
+        }
+
+
     }
-
-
-
 
 }
 

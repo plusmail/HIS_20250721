@@ -34,17 +34,25 @@ public class MaterialRegisterController {
     private final CompanyRegisterService companyRegisterService;
 
     // 재료 등록 (POST 요청)
-    @ApiOperation(value = "재료 등록 또는 수정", notes = "재료를 등록하거나 수정합니다.")
-    @PostMapping("/addMaterial")
+    @ApiOperation(value = "재료 등록", notes = "POST 방식으로 재료를 등록합니다.")
+    @PostMapping(value = "/addMaterial", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerMaterial(@Valid @RequestBody MaterialDTO materialDTO, BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
+
         try {
+            // 재료 등록
             MaterialRegister materialRegister = materialRegisterService.register(materialDTO);
-            return ResponseEntity.ok(Map.of("success", true, "materialRegister", materialRegister));
+            return ResponseEntity.ok(Map.of("success", true, "message", "재료가 등록되었습니다.", "materialRegister", materialRegister));
         } catch (IllegalArgumentException e) {
+            // 중복된 경우 예외 처리
+            log.warn("재료 등록 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            // 기타 예외 처리
+            log.error("재료 등록 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 
@@ -53,15 +61,14 @@ public class MaterialRegisterController {
     // 재료 수정 (PUT 요청)
     @ApiOperation(value = "재료 수정", notes = "PUT 방식으로 재료 정보를 수정합니다.")
     @PutMapping("/updateMaterial")
-    public ResponseEntity<?> updateMaterial(@Valid @RequestBody MaterialDTO materialDTO, BindingResult bindingResult) throws BindException {
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
-        try {
-            materialRegisterService.updateMaterial(materialDTO);
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", e.getMessage()));
+    public ResponseEntity<?> updateMaterial(@RequestBody MaterialDTO materialDTO) {
+        boolean isNewMaterial = materialRegisterService.isNewMaterial(materialDTO.getMaterialCode());
+        materialRegisterService.updateMaterial(materialDTO);
+
+        if (isNewMaterial) {
+            return ResponseEntity.ok(Map.of("success", true, "message", "재료가 등록되었습니다."));
+        } else {
+            return ResponseEntity.ok(Map.of("success", true, "message", "재료가 수정되었습니다."));
         }
     }
 
