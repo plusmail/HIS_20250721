@@ -6,6 +6,8 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,11 +26,18 @@ public class PatientRegister {
     private String chartNum;
 
     @OneToMany(mappedBy = "patientRegister",
-            cascade = {CascadeType.ALL},
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
+            cascade = {CascadeType.ALL}
     )
-    private Set<PatientRegisterMemo> memos;
+    private List<PatientRegisterMemo> memos =new ArrayList<>();
+
+    public PatientRegister(String chartNum) {
+        this.chartNum = chartNum;
+    }
+
+    public void addMemos(PatientRegisterMemo patientRegisterMemo){
+        this.memos.add(patientRegisterMemo);
+        patientRegisterMemo.upDatePatientRegister(this);
+    }
     // 환자이름
 //    @NotNull
     @Column(name = "pa_name", length = 100)
