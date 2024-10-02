@@ -73,6 +73,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const treatmentModal = new bootstrap.Modal(document.getElementById('treatmentModal'));
     const treatmentPatientInfo = document.getElementById("treatmentPatientInfo");
 
+    // 접수 시간을 포맷하는 함수 정의
+    const formatReceptionTime = (dateTimeString) => {
+        if (!dateTimeString) return 'N/A'; // 유효하지 않은 시간 문자열 처리
+        const date = new Date(dateTimeString);
+        const formatCurrentTime = (date) => {
+            let hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const amPm = hours >= 12 ? '오후' : '오전';
+            hours = hours % 12 || 12; // 12시간 형식으로 변환
+            return `${amPm} ${hours.toString().padStart(2, '0')}:${minutes}`;
+        };
+        return isNaN(date.getTime()) ? 'N/A' : formatCurrentTime(date); // NaN 체크 추가
+    };
+
+// 진료 시작 버튼 클릭 이벤트
     startTreatmentButton.addEventListener("click", function () {
         const selectedRow = waitingPatientsTable.querySelector('tr.selected');
 
@@ -80,6 +95,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const chartNum = selectedRow.cells[1].textContent;
             const paName = selectedRow.cells[2].textContent;
             const receptionTime = selectedRow.cells[5].textContent; // 대기 중 테이블에서 접수 시간 가져오기
+            console.log('Adding patient to treatment table:', {
+                chartNum: chartNum,
+                paName: paName,
+                receptionTime: receptionTime // 여기에서 접수 시간을 가져옴
+
+            });
             const selectedDoctor = selectedRow.querySelector('select').value; // 선택한 의사 정보 가져오기
 
             // 모달에 환자 정보 설정
@@ -92,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const confirmTreatmentBtn = document.getElementById("confirmTreatmentBtn");
             confirmTreatmentBtn.onclick = function () {
                 // 접수 시간을 ISO 형식으로 변환하는 함수
-                const formatReceptionTime = (timeString) => {
+                const formatReceptionTimeForDB = (timeString) => {
                     if (!timeString) return null; // 유효하지 않은 시간 문자열 처리
 
                     const [amPm, time] = timeString.split(' '); // "오후"와 시간 분리
@@ -103,17 +124,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // 현재 날짜와 시간을 사용하여 ISO 형식으로 변환
                     const now = new Date();
-                    now.setHours(hoursIn24Format, minutes, 0, 0); // 초와 밀리초는 0으로 설정
+                    now.setHours(hoursIn24Format + 9, minutes); // 9시간 더하기
                     return now.toISOString(); // ISO 형식으로 변환
                 };
 
-                const formattedReceptionTime = formatReceptionTime(receptionTime); // 변환된 접수 시간
+                // 포맷된 접수 시간 생성
+                const formattedReceptionTime = formatReceptionTime(receptionTime); // 접수 시간을 포맷
+                const formattedReceptionTimeForDB = formatReceptionTimeForDB(receptionTime); // DB에 저장될 변환된 접수 시간
 
                 const patientData = {
                     chartNum: chartNum,
                     paName: paName,
                     treatStatus: "2", // 진료중 상태
-                    receptionTime: formattedReceptionTime, // ISO 형식의 접수 시간 추가
+                    receptionTime: formattedReceptionTimeForDB, // ISO 형식의 접수 시간 추가 (DB 저장용)
                     mainDoc: selectedDoctor // 의사 정보 추가
                 };
 
@@ -136,17 +159,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         addPatientToTreatmentTable({
                             chartNum: chartNum,
                             paName: paName,
-                            receptionTime: formattedReceptionTime, // 변환된 ISO 형식의 접수 시간 저장
+                            receptionTime: receptionTime, // 포맷된 접수 시간 (변환된 값)
                             selectedDoctor: selectedDoctor // 선택한 의사 정보 저장
                         });
 
                         // 대기 중 환자 테이블에서 해당 환자 제거
-                        console.log("삭제 전 대기 환자 수:", waitingPatientsTable.rows.length);
-
-                        // 대기 환자 테이블에서 선택된 행 삭제
                         const rowIndex = Array.from(waitingPatientsTable.rows).indexOf(selectedRow);
                         deletePatientFromWaitingTable(rowIndex); // 선택된 행의 인덱스 계산
-                        console.log("삭제 후 대기 환자 수:", waitingPatientsTable.rows.length);
 
                         // 대기 환자 수 업데이트
                         updateWaitingPatientCount();
@@ -166,6 +185,9 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("진료를 시작할 환자를 선택해 주세요."); // 사용자 안내 메시지
         }
     });
+
+
+
 
 
 // 대기 중 테이블에서 환자 삭제
@@ -213,8 +235,10 @@ document.addEventListener("DOMContentLoaded", function () {
         updateWaitingPatientCount();
     }
 
-    // 진료 중 테이블에 환자 추가
+    // 진료 중 환자 테이블에 추가하는 함수 정의
     function addPatientToTreatmentTable(patient) {
+        console.log('Adding patient to treatment table:', patient); // 데이터 확인
+
         const row = treatmentPatientsTable.insertRow(); // 진료 중 테이블에 새 행 추가
         treatmentPatientCount++; // 진료 중 환자 수 증가
 
@@ -227,14 +251,42 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         const formatReceptionTime = (dateTimeString) => {
-            if (!dateTimeString) return 'N/A'; // 유효하지 않은 시간 문자열 처리
-            const date = new Date(dateTimeString);
-            return isNaN(date.getTime()) ? 'N/A' : formatCurrentTime(date); // NaN 체크 추가
+            if (!dateTimeString || dateTimeString === 'N/A') return 'N/A'; // 유효하지 않은 시간 문자열 처리
+            console.log('Input to formatReceptionTime:', dateTimeString); // 입력 확인
+
+            const [period, time] = dateTimeString.split(' '); // period와 time 분리
+            console.log('Period:', period, 'Time:', time); // 분리된 값 확인
+
+            // 시간과 분 파싱
+            let [hours, minutes] = time.split(':').map(Number); // 시간과 분을 숫자로 변환
+            console.log('Parsed hours:', hours, 'Parsed minutes:', minutes); // 파싱된 값 확인
+
+            // 유효성 검사
+            if (isNaN(hours) || isNaN(minutes)) {
+                console.error('Invalid hours or minutes:', hours, minutes);
+                return 'N/A'; // 유효하지 않은 경우 N/A 반환
+            }
+
+            // 오전/오후에 따른 12시간 형식 변환
+            if (period === '오후' && hours < 12) {
+                hours += 12; // 오후일 때 12를 더함
+            } else if (period === '오전' && hours === 12) {
+                hours = 0; // 오전 12시는 0으로 변환
+            }
+
+            // 날짜 객체 생성
+            const date = new Date();
+            date.setHours(hours, minutes);
+
+            return formatCurrentTime(date); // 포맷된 시간 반환
         };
 
-        const formattedCurrentTime = formatCurrentTime(new Date()); // 현재 시간을 포맷팅
-        const formattedReceptionTime = patient.receptionTime ? formatReceptionTime(patient.receptionTime) : 'N/A'; // 접수 시간을 포맷팅
 
+        const formattedCurrentTime = formatCurrentTime(new Date()); // 현재 시간을 포맷팅
+        const formattedReceptionTime = formatReceptionTime(patient.receptionTime); // 접수 시간을 포맷팅
+
+        console.log('Reception time input:', patient.receptionTime);
+        console.log('Formatted reception time:', formattedReceptionTime); // 포맷된 접수 시간 확인
 
         row.innerHTML = `
         <td>${treatmentPatientCount}</td> <!-- 여기에 treatmentPatientCount 사용 -->
@@ -246,9 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${formattedReceptionTime || 'N/A'}</td> <!-- 포맷된 접수 시간 -->
     `;
 
-
-
-       updateTreatmentPatientCount();
+        updateTreatmentPatientCount();
     }
 
 
@@ -323,9 +373,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 대기 환자 수 업데이트 함수
     function updateWaitingPatientCount() {
-        const count = waitingPatientsTable.rows.length - 1;
+        const count = waitingPatientsTable.rows.length ;
         const header = document.querySelector("#waitingPatientsTable th[colspan='6']");
-        header.textContent = `진료 대기 환자: ${count}명`;
+
+        const displayCount = Math.max(count, 0);
+        header.textContent = `진료 대기 환자: ${displayCount}명`;
     }
 
     // 대기 환자 테이블의 행 클릭 시 해당 행 선택

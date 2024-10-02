@@ -48,6 +48,8 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setViTime(LocalDateTime.now());
         patientAdmissionDTO.setTreatStatus("2"); // 진료중은 2
 
+
+
         // DB에 저장
         patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 

@@ -10,4 +10,5 @@ public interface PatientAdmissionService {
 
     List<PatientAdmission> getWaitingPatients();
 
+
 }
