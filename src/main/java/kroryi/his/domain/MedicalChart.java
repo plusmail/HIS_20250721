@@ -11,9 +11,13 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "medical_chart", schema = "project_db")
 public class MedicalChart {
-    @Id
+
     @Column(name = "chart_num", nullable = false)
     private Integer id;
+
+    @Id
+    @Column(name = "cnum", nullable = false)
+    private Integer cnum;
 
     @Column(name = "pa_name", nullable = false, length = 20)
     private String paName;

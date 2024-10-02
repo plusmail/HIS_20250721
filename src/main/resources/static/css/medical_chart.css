@@ -1,0 +1,40 @@
+/* 모달 크기 조절 */
+.modal-dialog {
+    max-width: 600px; /* 모달의 최대 너비 */
+    height: 200px;
+    max-height: 600px;
+}
+.table th, .table td {
+    text-align: center; /* 텍스트 중앙 정렬 */
+    font-weight: bold; /* 글자 굵게 */
+}
+/* 첫 번째 열의 너비를 줄이고 두 번째 열을 확장 */
+.modal-th th:first-child, .modal-tr td:first-child {
+    width: 50px; /* 첫 번째 열의 너비를 고정 */
+}
+.modal-th th:last-child, .modal-tr td:last-child {
+    width: auto; /* 두 번째 열의 너비를 자동으로 확장 */
+}
+/* 모달 헤더의 닫기 버튼을 오른쪽 끝에서 띄움 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header .close {
+    margin-right: 5px; /* 오른쪽 마진을 추가하여 버튼을 띄움 */
+}
+
+/* 커스텀 CSS를 이용한 스크롤 영역 설정 */
+.scrollable-content {
+    max-height: 400px; /* 최대 높이 설정 */
+    overflow-y: auto; /* 수직 스크롤 */
+}
+ .modal-tr:hover{
+    background-color: #d1ecf1; /* 선택된 행의 배경색 */
+}
+
+/* 선택된 행에 대한 커스텀 스타일을 원한다면 여기에 추가 */
+.selected-row {
+    background-color: #d1ecf1; /* 선택된 행의 배경색 */
+}
