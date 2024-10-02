@@ -24,7 +24,7 @@ public class PatientRegisterMemo {
 
     // 차트번호 (PatientRegister와 연결)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memo_chartnum", referencedColumnName = "chart_num", nullable = false)
+    @JoinColumn(name = "memo_chart_num", referencedColumnName = "chart_num", nullable = false)
     private PatientRegister patientRegister;
 
     // 등록 날짜
