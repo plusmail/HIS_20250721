@@ -7,7 +7,7 @@ let selectedRow = null; // 클릭된 행을 저장할 변수
 
 let patientData = null; // 전역 변수 선언
 
-let selectedMemos = null;
+let selectedMemos = [];
 
 // 세션 데이터 get
 let patientInfo = sessionStorage.getItem('selectedPatient');
@@ -171,8 +171,9 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
     document.querySelector("#patient_name_keyword").value = ""; // Clear the input field
 });
 
-function test() {
+function test(selectedMemos) {
     const rows = table.getElementsByClassName('new-row');
+
 
     // Loop backwards to avoid index issues when removing
     while (rows.length > 0) {

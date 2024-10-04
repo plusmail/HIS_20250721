@@ -45,10 +45,49 @@ patient_register.addEventListener("click", (e) => {
         lastVisit: lastVisit.value,
         memos: [] // 메모 데이터를 담을 배열
     };
-    console.log(patientObj)
-    if(chartNum.value){
-        alert("수정하시겠습니까?")
-    }else {
+
+    function setPatientFields(result) {
+        console.log("Received result:", result);
+
+        // 단일 필드 값 설정
+        name.value = result.name || '';
+        chartNum.value = result.chartNum || '';
+        firstPaResidentNum.value = result.firstPaResidentNum || '';
+        lastPaResidentNum.value = result.lastPaResidentNum || '';
+        birthDate.value = result.birthDate || '';
+        gender.value = result.gender || '';
+        defaultAddress.value = result.defaultAddress || '';
+        mainDoc.value = result.mainDoc || '';
+        visitPath.value = result.visitPath || '';
+        category.value = result.category || '';
+        tendency.value = result.tendency || '';
+        firstVisit.value = result.firstVisit || '';
+        lastVisit.value = result.lastVisit || '';
+
+        // 자택전화 나누기
+        const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
+        document.getElementById("homeNum").value = homeNum1 || '';
+        document.getElementById("homeNum2").value = homeNum2 || '';
+        document.getElementById("homeNum3").value = homeNum3 || '';
+
+        // 휴대전화 나누기
+        const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
+        document.getElementById("phoneNum").value = phoneNum1 || '';
+        document.getElementById("phoneNum2").value = phoneNum2 || '';
+        document.getElementById("phoneNum3").value = phoneNum3 || '';
+
+        // 이메일 나누기
+        const [emailLocalPart, emailDomainPart] = result.email.split('@');
+        document.getElementById("emailLocal").value = emailLocalPart || '';
+        document.getElementById("emailDomain").value = emailDomainPart || '';
+    }
+
+    if (chartNum.value) {
+        modifyPatient(patientObj, chartNum.value).then(setPatientFields).catch(e => {
+            alert("Exception....");
+            console.log(e);
+        });
+    } else {
         // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
         const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
         const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
@@ -66,46 +105,10 @@ patient_register.addEventListener("click", (e) => {
                 });
             }
         });
-
-        addReply(patientObj).then(result => {
-            console.log("Received result:", result);
-            // 단일 필드 값 설정
-            name.value = result.name || '';
-            chartNum.value = result.chartNum || '';
-            firstPaResidentNum.value = result.firstPaResidentNum || '';
-            lastPaResidentNum.value = result.lastPaResidentNum || '';
-            birthDate.value = result.birthDate || '';
-            gender.value = result.gender || '';
-            defaultAddress.value = result.defaultAddress || '';
-            mainDoc.value = result.mainDoc || '';
-            visitPath.value = result.visitPath || '';
-            category.value = result.category || '';
-            tendency.value = result.tendency || '';
-            firstVisit.value = result.firstVisit || '';
-            lastVisit.value = result.lastVisit || '';
-            // memoRegDate.value = result.memoRegDate || '';
-            // memoContent.value = result.memoContent || '';
-
-            // 자택전화 나누기
-            const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
-            document.getElementById("homeNum").value = homeNum1 || '';
-            document.getElementById("homeNum2").value = homeNum2 || '';
-            document.getElementById("homeNum3").value = homeNum3 || '';
-
-            // 휴대전화 나누기
-            const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
-            document.getElementById("phoneNum").value = phoneNum1 || '';
-            document.getElementById("phoneNum2").value = phoneNum2 || '';
-            document.getElementById("phoneNum3").value = phoneNum3 || '';
-
-            // 이메일 나누기
-            const [emailLocalPart, emailDomainPart] = result.email.split('@');
-            document.getElementById("emailLocal").value = emailLocalPart || '';
-            document.getElementById("emailDomain").value = emailDomainPart || '';
-        }).catch(e => {
-            alert("Exception....")
-            console.log(e)
-        })
+        addPatient(patientObj).then(setPatientFields).catch(e => {
+            alert("Exception....");
+            console.log(e);
+        });
     }
 
 }, false)
@@ -163,7 +166,7 @@ function addRow(date, content) {
     const newRow = document.createElement('tr') // 새 행 생성
     newRow.classList.add('new-row');
 // 테이블에 추가한 후에 해당 요소를 참조해야 함
-console.log(rowIndex)
+
     // 날짜 입력란 셀
     const dateCell = newRow.insertCell(0);
     const dateInput = document.createElement('input');
@@ -313,11 +316,37 @@ document.querySelector("#refreshBtn").addEventListener("click", () => {
 });
 
 
-document.querySelector("#patient_del").addEventListener("click", ()=>{
-    const chartnum = document.querySelector("#chartNum").value
-    console.log(chartnum)
-    removePatient(chartnum).then(result => {
-        console.log(result);
+document.querySelector("#patient_del").addEventListener("click", () => {
+    removePatient(chartNum.value).then(result => {
+        name.value = '';
+        chartNum.value = '';
+        firstPaResidentNum.value = '';
+        lastPaResidentNum.value = '';
+        birthDate.value = '';
+        gender.value = '';
+        defaultAddress.value = '';
+        mainDoc.value = '';
+        visitPath.value = '';
+        category.value = '';
+        tendency.value = '';
+        firstVisit.value = '';
+        lastVisit.value = '';
+
+        homeNum1.value = '';
+        homeNum2.value = '';
+        homeNum3.value = '';
+        phoneNum1.value = '';
+        phoneNum2.value = '';
+        phoneNum3.value = '';
+        emailLocal.value = '';
+        emailDomain.value = '';
+
+        const rows = table.getElementsByClassName('new-row');
+
+        // Loop backwards to avoid index issues when removing
+        while (rows.length > 0) {
+            rows[0].parentNode.removeChild(rows[0]);
+        }
     }).catch(e => {
         alert("Exception....")
         console.log(e)

@@ -56,4 +56,16 @@ public class PatientRegisterController {
 
         return resultMap;
     }
+
+    @ApiOperation(value = "Modify Patient", notes = "PUT 방식으로 수정")
+    @PutMapping(value = "/modify/{chartNum}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, PatientRegister> modify(@PathVariable String chartNum, @RequestBody PatientDTO patientDTO) {
+        patientDTO.setChartNum(chartNum);
+        log.info("patientRegisterService->{}",patientDTO.toString());
+        Map<String, PatientRegister> resultMap = new HashMap<>();
+        PatientRegister patientRegister = patientRegisterService.modify(patientDTO);
+        resultMap.put("patientRegister", patientRegister);
+
+        return resultMap;
+    }
 }
