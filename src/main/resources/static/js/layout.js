@@ -7,7 +7,7 @@ let selectedRow = null; // 클릭된 행을 저장할 변수
 
 let patientData = null; // 전역 변수 선언
 
-let selectedMemos = null;
+let selectedMemos = [];
 
 // 세션 데이터 get
 let patientInfo = sessionStorage.getItem('selectedPatient');
@@ -171,9 +171,17 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
     document.querySelector("#patient_name_keyword").value = ""; // Clear the input field
 });
 
-function test() {
+function test(selectedMemos) {
+    const rows = table.getElementsByClassName('new-row');
+
+
+    // Loop backwards to avoid index issues when removing
+    while (rows.length > 0) {
+        rows[0].parentNode.removeChild(rows[0]);
+    }
     if (selectedMemos.length > 0) {
         selectedMemos.forEach((memo) => {
+
             // 마지막 메모로 입력란을 채우고 싶다면
             // memo_date.value = memo.regDate;
             // memo_textarea.value = memo.content;

@@ -27,50 +27,26 @@ public class ChartSessionController {
     // List들의 종합적인 데이터 관리를 위한 2중List
     List<List<String>> piList = null;
     List<List<String>> nestedList;
+    final int plusNum = 3;
+    int controllerListIndex = 0;
 
 
     @PostMapping("/his/addDelete-to-subList")
-    private ResponseEntity<?> addDeleteToSubList(@RequestBody RequestData data, HttpSession session) {
+    private ResponseEntity<?> addDeleteToSubList(@RequestBody RequestData data) {
         List<String> newValues = data.getNewValues();
         int subListIndex = data.getSubListIndex();
-        boolean addDel = data.isAddOrDelete();
+        boolean addOrDelete = data.isAddOrDelete();
 
-        List<String> innerList = nestedList.get(subListIndex);
-
-        if (nestedList == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data found in session.");
+        if (data.getListIndex() != controllerListIndex) {
+            dataArray(newValues, subListIndex, data.getListIndex(), addOrDelete);
+            log.info("111111111");
+            return ResponseEntity.status(HttpStatus.CREATED).body("OK");
         }
-        if (addDel) {
-            for (int i = 0; i < newValues.size(); i++) {
-                boolean check = innerList.contains(newValues.get(i));
-                if (!check) {
 
-                    // 원하는 subList가 존재하는지 확인하고 값 추가
-                    if (subListIndex < nestedList.size() && nestedList.get(subListIndex) != null) {
-                        innerList.add(newValues.get(i)); // 값 추가 (push와 동일한 동작)
-                    } else {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sublist not found.");
-                    }
-                }
-            }
-            dataArray(innerList, subListIndex, data.getListIndex());
-//            session.setAttribute("nestedList", nestedList);
-            return ResponseEntity.ok(newValues);
-        } else {
+        dataArray(newValues, subListIndex, data.getListIndex(), addOrDelete);
+        return ResponseEntity.ok(newValues);
 
-            for (int i = 0; i < newValues.size(); i++) {
-                if (subListIndex < nestedList.size() && nestedList.get(subListIndex) != null) {
 
-                    int finalI = i;
-                    innerList.removeIf(item -> item.equals(newValues.get(finalI))); // 값 추가 (push와 동일한 동작)
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sublist not found.");
-                }
-            }
-            dataArray(innerList, subListIndex, data.getListIndex());
-//            session.setAttribute("nestedList", nestedList);
-            return ResponseEntity.ok(newValues);
-        }
     }
 
 
@@ -89,19 +65,23 @@ public class ChartSessionController {
         }
 
         if (piList == null) {
+//            piList = new ArrayList<>();
+//            for (int i = 0; i < 4; i++) {
+//                piList.add(new ArrayList<>());
+//            }
             piList = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                piList.add(new ArrayList<>());
-            }
         }
-        nestedList = piList;
 
+//        nestedList = piList;
+        log.info("piList get -----> {}", piList);
         return piList;
     }
 
 
-    private ResponseEntity<?> dataArray(List<String> subArrayList, int subListIndex, int listIndex) {
-        int listnum = listIndex + 3;
+    private ResponseEntity<?> dataArray(List<String> subArrayList, int subListIndex, int listIndex, boolean addOrDelete) {
+
+        int listNum = listIndex + 3;
+
         List<String> listIndexList = new ArrayList<>();
         listIndexList.add(String.valueOf(listIndex));
 
@@ -123,42 +103,81 @@ public class ChartSessionController {
             arrayList = new ArrayList<>();
             arrayList.add(new ArrayList<>());
         }
-        int piSize = toothList.size() + symptomList.size() + memoList.size() + arrayList.size();
+
         if (piList == null) {
             piList = new ArrayList<>();
-            for (int i = 0; i < piSize; i++) {
-                piList.add(new ArrayList<>());
+        }
+
+        if (listIndex != controllerListIndex) {
+            toothList.add(new ArrayList<>());
+            symptomList.add(new ArrayList<>());
+            memoList.add(new ArrayList<>());
+            arrayList.add(new ArrayList<>());
+            controllerListIndex++;
+        }
+
+        if (subArrayList != null) {
+            switch (subListIndex) {
+                case 0:
+                    toothList.set(listIndex, returnList(toothList.get(listIndex), subArrayList, addOrDelete));
+//                piList.set(listIndex, toothList.get(listIndex));
+                    arrayList.set(listIndex, listIndexList);
+//                piList.set(listNum, arrayList.get(listIndex));
+                    break;
+                case 1:
+//                symptomList.set(listIndex, subArrayList);
+                    symptomList.set(listIndex, returnList(symptomList.get(listIndex), subArrayList, addOrDelete));
+//                piList.set(subListIndex, symptomList.get(listIndex));
+                    arrayList.set(listIndex, listIndexList);
+//                piList.set(listNum, arrayList.get(listIndex));
+                    log.info("symptomList ----> {}", symptomList);
+                    break;
+                case 2:
+//                memoList.set(listIndex, subArrayList);
+                    memoList.set(listIndex, returnList(memoList.get(listIndex), subArrayList, addOrDelete));
+//                piList.set(subListIndex, memoList.get(listIndex));
+                    arrayList.set(listIndex, listIndexList);
+//                piList.set(listNum, arrayList.get(listIndex));
+                    log.info("memoList ----> {}", memoList);
+                    break;
+
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid subListIndex.");
             }
-            log.info("piList.size() ----->{}", piList.size());
         }
+        piList=new ArrayList<>();
+    for(int i = 0; i<toothList.size(); i++) {
+        piList.add(toothList.get(i));
+        piList.add(symptomList.get(i));
+        piList.add(memoList.get(i));
+    }
 
-        switch (subListIndex) {
-            case 0:
-                toothList.set(listIndex, subArrayList);
-                piList.set(listIndex, toothList.get(listIndex));
-                arrayList.set(listIndex, listIndexList);
-                piList.set(listnum, arrayList.get(listIndex));
-                break;
-            case 1:
-                symptomList.set(listIndex, subArrayList);
-                piList.set(subListIndex, symptomList.get(listIndex));
-                arrayList.set(listIndex, subArrayList);
-                piList.set(listnum, arrayList.get(listIndex));
-                break;
-            case 2:
-                memoList.set(listIndex, subArrayList);
-                piList.set(subListIndex, memoList.get(listIndex));
-                arrayList.set(listIndex, subArrayList);
-                piList.set(listnum, arrayList.get(listIndex));
-                break;
 
-            default:
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid subListIndex.");
-        }
+        log.info("toothList get -----> {}", toothList);
+        log.info("symptomList get -----> {}", symptomList);
+        log.info("memoList get -----> {}", memoList);
 
-        log.info("piList ------> {}", piList);
+        log.info("piList-set -----> {}", piList);
+
 
         return null;
+    }
+
+    private List<String> returnList(List<String> firstList, List<String> secondList, boolean addOrDelete) {
+        if (addOrDelete) {
+            secondList.forEach(item -> {
+                if (!firstList.contains(item)) {
+                    firstList.add(item);
+                }
+            });
+        } else {
+            secondList.forEach(item -> {
+                if (firstList.contains(item)) {
+                    firstList.remove(item);
+                }
+            });
+        }
+        return firstList;
     }
 
 }
