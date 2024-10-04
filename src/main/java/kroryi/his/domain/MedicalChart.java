@@ -12,6 +12,10 @@ import java.time.LocalDate;
 @Table(name = "medical_chart", schema = "project_db")
 public class MedicalChart {
     @Id
+    @Column(name = "cnum", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer cnum;
+
     @Column(name = "chart_num", nullable = false)
     private Integer id;
 
@@ -31,8 +35,6 @@ public class MedicalChart {
     @Column(name = "medical_content", nullable = false)
     private String medicalContent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "check_doc", nullable = false, referencedColumnName = "EmployeeID",foreignKey = @ForeignKey(name = "fk_medical_chart_employee"))
-    private Employee checkDoc;
-
+    @Column(name = "check_doc")
+    private String checkDoc;
 }

@@ -7,18 +7,17 @@ import java.util.List;
 
 
 public interface CompanyRegisterService {
+    //가짜데이터 등록 확인용
+    //CompanyRegister registerCompany();
+
+    List<CompanyRegister> getAllCompanies();
+
     CompanyRegister register(CompanyDTO companyDTO);
-
-    CompanyRegister registerCompany();
-
-    List<CompanyRegister> searchByName(String companyName);
 
     boolean isCompanyCodeDuplicate(String companyCode);
 
-    void addCompany(CompanyRegister company);
+    List<CompanyRegister> searchByName(String companyName);
 
     void deleteCompany(String companyCode);
-
-    List<CompanyRegister> getAllCompanies();
 
 }

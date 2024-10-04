@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Data
@@ -28,7 +29,7 @@ public class PatientDTO{
     private String defaultAddress;
     private String detailedAddress;
     private String mainDoc;
-    private String dentalHygienist;
+//    private String dentalHygienist;
     private String visitPath;
     private String category;
     private String tendency;
@@ -37,4 +38,5 @@ public class PatientDTO{
     private LocalDate firstVisit;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDate lastVisit;
+    private List<PatientMemoDTO> memos;
 }

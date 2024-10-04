@@ -29,11 +29,15 @@ public class PatientSearchController {
         log.info("keyword: {}", keyword);
         Map<String,Object> result = new HashMap<>();
 
-        List<PatientRegister> registers = patientRegisterService.searchName(keyword.getKeyword());
+        // 키워드로 환자 검색
+        List<PatientRegister> registers = patientRegisterService.searchNameByKeyword(keyword.getKeyword());
+
         for (PatientRegister register : registers) {
             log.info(register.toString());
         }
+
         result.put("result", registers);
         return result;
     }
+
 }
