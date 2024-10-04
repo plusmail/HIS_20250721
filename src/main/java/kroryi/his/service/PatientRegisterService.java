@@ -8,7 +8,7 @@ import java.util.List;
 public interface PatientRegisterService {
     String generateChartNum();
 
-    PatientRegister registerPatient();
+//    PatientRegister registerPatient();
 
     PatientRegister register(PatientDTO patientDTO);
 
@@ -16,4 +16,6 @@ public interface PatientRegisterService {
 //    List<PatientRegister> searchName(String keyword);
 
     List<PatientRegister> searchNameByKeyword(String keyword);
+
+    void remove(String chartNum);
 }

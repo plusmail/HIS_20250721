@@ -172,8 +172,15 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
 });
 
 function test() {
+    const rows = table.getElementsByClassName('new-row');
+
+    // Loop backwards to avoid index issues when removing
+    while (rows.length > 0) {
+        rows[0].parentNode.removeChild(rows[0]);
+    }
     if (selectedMemos.length > 0) {
         selectedMemos.forEach((memo) => {
+
             // 마지막 메모로 입력란을 채우고 싶다면
             // memo_date.value = memo.regDate;
             // memo_textarea.value = memo.content;

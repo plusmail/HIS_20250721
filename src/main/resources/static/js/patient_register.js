@@ -46,64 +46,68 @@ patient_register.addEventListener("click", (e) => {
         memos: [] // 메모 데이터를 담을 배열
     };
     console.log(patientObj)
+    if(chartNum.value){
+        alert("수정하시겠습니까?")
+    }else {
+        // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
+        const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+        const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
 
-    // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
-    const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-    const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
+        rows.forEach((row, index) => {
+            // 각 행의 메모 날짜와 내용을 추출
+            const memoRegDate = row.querySelector(`#memoRegDate_${index}`);
+            const memoContent = row.querySelector(`#memoContent_${index}`);
 
-    rows.forEach((row, index) => {
-        // 각 행의 메모 날짜와 내용을 추출
-        const memoRegDate = row.querySelector(`#memoRegDate_${index}`);
-        const memoContent = row.querySelector(`#memoContent_${index}`);
+            // 각 메모를 배열에 추가
+            if (memoRegDate && memoContent) {
+                patientObj.memos.push({
+                    regDate: memoRegDate.value,
+                    content: memoContent.value
+                });
+            }
+        });
 
-        // 각 메모를 배열에 추가
-        if (memoRegDate && memoContent) {
-            patientObj.memos.push({
-                regDate: memoRegDate.value,
-                content: memoContent.value
-            });
-        }
-    });
+        addReply(patientObj).then(result => {
+            console.log("Received result:", result);
+            // 단일 필드 값 설정
+            name.value = result.name || '';
+            chartNum.value = result.chartNum || '';
+            firstPaResidentNum.value = result.firstPaResidentNum || '';
+            lastPaResidentNum.value = result.lastPaResidentNum || '';
+            birthDate.value = result.birthDate || '';
+            gender.value = result.gender || '';
+            defaultAddress.value = result.defaultAddress || '';
+            mainDoc.value = result.mainDoc || '';
+            visitPath.value = result.visitPath || '';
+            category.value = result.category || '';
+            tendency.value = result.tendency || '';
+            firstVisit.value = result.firstVisit || '';
+            lastVisit.value = result.lastVisit || '';
+            // memoRegDate.value = result.memoRegDate || '';
+            // memoContent.value = result.memoContent || '';
 
-    addReply(patientObj).then(result => {
-        console.log("Received result:", result);
-        // 단일 필드 값 설정
-        name.value = result.name || '';
-        chartNum.value = result.chartNum || '';
-        firstPaResidentNum.value = result.firstPaResidentNum || '';
-        lastPaResidentNum.value = result.lastPaResidentNum || '';
-        birthDate.value = result.birthDate || '';
-        gender.value = result.gender || '';
-        defaultAddress.value = result.defaultAddress || '';
-        mainDoc.value = result.mainDoc || '';
-        visitPath.value = result.visitPath || '';
-        category.value = result.category || '';
-        tendency.value = result.tendency || '';
-        firstVisit.value = result.firstVisit || '';
-        lastVisit.value = result.lastVisit || '';
-        // memoRegDate.value = result.memoRegDate || '';
-        // memoContent.value = result.memoContent || '';
+            // 자택전화 나누기
+            const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
+            document.getElementById("homeNum").value = homeNum1 || '';
+            document.getElementById("homeNum2").value = homeNum2 || '';
+            document.getElementById("homeNum3").value = homeNum3 || '';
 
-        // 자택전화 나누기
-        const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
-        document.getElementById("homeNum").value = homeNum1 || '';
-        document.getElementById("homeNum2").value = homeNum2 || '';
-        document.getElementById("homeNum3").value = homeNum3 || '';
+            // 휴대전화 나누기
+            const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
+            document.getElementById("phoneNum").value = phoneNum1 || '';
+            document.getElementById("phoneNum2").value = phoneNum2 || '';
+            document.getElementById("phoneNum3").value = phoneNum3 || '';
 
-        // 휴대전화 나누기
-        const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
-        document.getElementById("phoneNum").value = phoneNum1 || '';
-        document.getElementById("phoneNum2").value = phoneNum2 || '';
-        document.getElementById("phoneNum3").value = phoneNum3 || '';
+            // 이메일 나누기
+            const [emailLocalPart, emailDomainPart] = result.email.split('@');
+            document.getElementById("emailLocal").value = emailLocalPart || '';
+            document.getElementById("emailDomain").value = emailDomainPart || '';
+        }).catch(e => {
+            alert("Exception....")
+            console.log(e)
+        })
+    }
 
-        // 이메일 나누기
-        const [emailLocalPart, emailDomainPart] = result.email.split('@');
-        document.getElementById("emailLocal").value = emailLocalPart || '';
-        document.getElementById("emailDomain").value = emailDomainPart || '';
-    }).catch(e => {
-        alert("Exception....")
-        console.log(e)
-    })
 }, false)
 
 // 주소등록
@@ -147,11 +151,19 @@ function execDaumPostcode() {
 
 // 테이블 기능-------------------------------------------------------------------------------
 // 새 행 추가 함수
-function addRow(date, content) {
-    const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-    const newRow = document.createElement('tr'); // 새 행 생성
-    const rowIndex = table.rows.length; // 현재 테이블의 행 개수를 이용해 고유한 인덱스 생성
 
+
+const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+
+
+function addRow(date, content) {
+    const rowIndex = table.rows.length; // 현재 테이블의 행 개수를 이용해 고유한 인덱스 생성
+    const memoRegDate = document.getElementById("memoRegDate_" + rowIndex);
+    const memoContent = document.getElementById("memoContent_" + rowIndex);
+    const newRow = document.createElement('tr') // 새 행 생성
+    newRow.classList.add('new-row');
+// 테이블에 추가한 후에 해당 요소를 참조해야 함
+console.log(rowIndex)
     // 날짜 입력란 셀
     const dateCell = newRow.insertCell(0);
     const dateInput = document.createElement('input');
@@ -195,9 +207,6 @@ function addRow(date, content) {
     // 새로운 행을 테이블에 추가
     table.appendChild(newRow);
 
-    // 테이블에 추가한 후에 해당 요소를 참조해야 함
-    const memoRegDate = document.getElementById("memoRegDate_" + rowIndex);
-    const memoContent = document.getElementById("memoContent_" + rowIndex);
 
     // 메모 저장 버튼 클릭 이벤트
     document.getElementById('memo_reg').addEventListener('click', (e) => {
@@ -269,7 +278,7 @@ birthDateInput.addEventListener('change', () => {
 });
 // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
 
-
+// 새로고침 버튼
 document.querySelector("#refreshBtn").addEventListener("click", () => {
     name.value = '';
     chartNum.value = '';
@@ -284,9 +293,6 @@ document.querySelector("#refreshBtn").addEventListener("click", () => {
     tendency.value = '';
     firstVisit.value = '';
     lastVisit.value = '';
-    // memoRegDate.value = result.memoRegDate || '';
-    // memoContent.value = result.memoContent || '';
-    // 자택전화 나누기
 
     homeNum1.value = '';
     homeNum2.value = '';
@@ -296,4 +302,25 @@ document.querySelector("#refreshBtn").addEventListener("click", () => {
     phoneNum3.value = '';
     emailLocal.value = '';
     emailDomain.value = '';
+
+    const rows = table.getElementsByClassName('new-row');
+
+    // Loop backwards to avoid index issues when removing
+    while (rows.length > 0) {
+        rows[0].parentNode.removeChild(rows[0]);
+    }
+
 });
+
+
+document.querySelector("#patient_del").addEventListener("click", ()=>{
+    const chartnum = document.querySelector("#chartNum").value
+    console.log(chartnum)
+    removePatient(chartnum).then(result => {
+        console.log(result);
+    }).catch(e => {
+        alert("Exception....")
+        console.log(e)
+    })
+
+}, false);
