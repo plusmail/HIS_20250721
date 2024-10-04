@@ -43,24 +43,6 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
         return currentDate + String.format("%03d", nextNumber);
     }
 
-   /* @Override
-    public PatientRegister registerPatient() {
-        // chart_num 생성
-        String chartNum = generateChartNum();
-
-        // 엔티티 생성
-        PatientRegister patient = PatientRegister.builder()
-                .chartNum(chartNum)
-                .name("이재준")
-                .email("sadasda")
-                .firstPaResidentNum("asdas")
-                .lastPaResidentNum("asdasda")
-                .build();
-
-        // 엔티티 저장
-        return patientRegisterRepository.save(patient);
-    }*/
-
     @Override
     public PatientRegister register(PatientDTO patientDTO) {
         // chart_num 생성
