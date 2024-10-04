@@ -33,22 +33,25 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="mb-1 text-end">
-                                <button type="button" class="btn btn-success" id="patient_reg">차트등록</button>
-                                <button type="button" class="btn btn-danger">차트삭제</button>
+                                <button type="button" class="btn btn-secondary" id="refreshBtn">
+                                    <i class="bi bi-arrow-clockwise" style="padding: 0.5rem;"></i>
+                                </button>
+                                <button type="button" class="btn btn-success" id="patient_reg">차트저장</button>
+                                <button type="button" class="btn btn-danger" id="patient_del">차트삭제</button>
                             </div>
                             <div class="row">
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">환자이름</span>
                                     <input type="text" name="name" class="form-control" id="name" placeholder="이름 입력"
                                            required>
-<!--                                    <button class="btn btn-outline-primary" type="button" disabled>변경</button>-->
+                                    <!--                                    <button class="btn btn-outline-primary" type="button" disabled>변경</button>-->
                                     <!--                                    disabled 사용 잠김-->
                                 </div>
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">차트번호</span>
                                     <input type="text" name="chartNum" class="form-control" id="chartNum"
                                            placeholder="차트번호(자동입력)" readonly>
-<!--                                    <button class="btn btn-outline-primary" type="button">변경</button>-->
+                                    <!--                                    <button class="btn btn-outline-primary" type="button">변경</button>-->
                                 </div>
                             </div>
                             <div class="row">
@@ -64,7 +67,8 @@
                                 </div>
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">나이(만)</span>
-                                    <input type="text" name="age" id="age" class="form-control" placeholder="나이(자동입력)" readonly>
+                                    <input type="text" name="age" id="age" class="form-control" placeholder="나이(자동입력)"
+                                           readonly>
                                     <select class="btn btn-outline-primary" name="gender" id="gender">
                                         <option selected value="">성별</option>
                                         <option value="m">남</option>
@@ -90,18 +94,23 @@
                                 <!-- 자택전화 -->
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">자택전화</span>
-                                    <input type="text" class="form-control" id="homeNum" autocomplete="off" maxlength="3" placeholder="010">
+                                    <input type="text" class="form-control" id="homeNum" autocomplete="off"
+                                           maxlength="3" placeholder="010">
                                     <span class="input-group-text">-</span>
-                                    <input type="text" class="form-control" id="homeNum2" autocomplete="off" maxlength="4" placeholder="1234">
+                                    <input type="text" class="form-control" id="homeNum2" autocomplete="off"
+                                           maxlength="4" placeholder="1234">
                                     <span class="input-group-text">-</span>
-                                    <input type="text" class="form-control" id="homeNum3" autocomplete="off" maxlength="4" placeholder="5678">
+                                    <input type="text" class="form-control" id="homeNum3" autocomplete="off"
+                                           maxlength="4" placeholder="5678">
                                 </div>
                                 <!-- E-mail -->
                                 <div class="input-group mb-3 col">
                                     <span class="input-group-text" style="width: 6rem;">E-mail</span>
-                                    <input type="text" class="form-control" id="emailLocal" aria-label="Username" placeholder="user">
+                                    <input type="text" class="form-control" id="emailLocal" aria-label="Username"
+                                           placeholder="user">
                                     <span class="input-group-text">@</span>
-                                    <input type="text" class="form-control" id="emailDomain" aria-label="Server" placeholder="example.com">
+                                    <input type="text" class="form-control" id="emailDomain" aria-label="Server"
+                                           placeholder="example.com">
                                 </div>
                             </div>
                             <div class="row">
@@ -109,11 +118,14 @@
                                     <!-- 휴대전화 -->
                                     <div class="input-group mb-3 col">
                                         <span class="input-group-text" style="width: 6rem;">휴대전화</span>
-                                        <input type="text" class="form-control" id="phoneNum" autocomplete="off" maxlength="3" placeholder="010">
+                                        <input type="text" class="form-control" id="phoneNum" autocomplete="off"
+                                               maxlength="3" placeholder="010">
                                         <span class="input-group-text">-</span>
-                                        <input type="text" class="form-control" id="phoneNum2" autocomplete="off" maxlength="4" placeholder="1234">
+                                        <input type="text" class="form-control" id="phoneNum2" autocomplete="off"
+                                               maxlength="4" placeholder="1234">
                                         <span class="input-group-text">-</span>
-                                        <input type="text" class="form-control" id="phoneNum3" autocomplete="off" maxlength="4" placeholder="5678">
+                                        <input type="text" class="form-control" id="phoneNum3" autocomplete="off"
+                                               maxlength="4" placeholder="5678">
                                     </div>
                                     <div class="col">
                                         <label for="zipp_btn" class="form-label">■ 주소 *</label><br/>
@@ -142,15 +154,15 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
-<!--                                                    오게된 경로-->
+                                                    <!--                                                    오게된 경로-->
                                                     <span class="input-group-text" style="width: 6rem;">내원유형</span>
                                                     <select class="form-select" name="visitPath" id="visitPath">
                                                         <option selected value="">내원유형</option>
-                                                        <option value="m">인터넷</option>
-                                                        <option value="m">지인추천</option>
-                                                        <option value="m">간판</option>
-                                                        <option value="m">광고</option>
-                                                        <option value="w">기타</option>
+                                                        <option value="인터넷">인터넷</option>
+                                                        <option value="지인추천">지인추천</option>
+                                                        <option value="간판">간판</option>
+                                                        <option value="광고">광고</option>
+                                                        <option value="기타">기타</option>
                                                     </select>
                                                 </div>
                                                 <div class="input-group mb-3 col">
@@ -158,12 +170,12 @@
                                                     <span class="input-group-text" style="width: 6rem;">고객분류</span>
                                                     <select class="form-select" name="category" id="category">
                                                         <option selected value="">고객분류</option>
-                                                        <option value="m">임플란트</option>
-                                                        <option value="m">틀니</option>
-                                                        <option value="m">교정</option>
-                                                        <option value="m">심미보철</option>
-                                                        <option value="m">일반</option>
-                                                        <option value="w">기타</option>
+                                                        <option value="임플란트">임플란트</option>
+                                                        <option value="틀니">틀니</option>
+                                                        <option value="교정">교정</option>
+                                                        <option value="심미보철">심미보철</option>
+                                                        <option value="일반">일반</option>
+                                                        <option value="기타">기타</option>
                                                     </select>
 
                                                 </div>
@@ -171,7 +183,8 @@
                                             <div class="row">
                                                 <div class="input-group mb-3 col">
                                                     <!--                                                    환자 성격-->
-                                                    <span class="input-group-text" id="tendency" style="width: 6rem;">성향</span>
+                                                    <span class="input-group-text" id="tendency"
+                                                          style="width: 6rem;">성향</span>
                                                     <input type="text" class="form-control"></input>
                                                 </div>
                                             </div>
@@ -199,7 +212,7 @@
                                     <a class="nav-link active" data-bs-toggle="tab" href="#home" aria-selected="true"
                                        role="tab">메모</a>
                                 </li>
-                                <button class="btn btn-success mb-1">등록</button>
+                                <button type="button" class="btn btn-success mb-1" id="memo_reg">등록</button>
                             </ul>
                             <div id="myTabContent1" class="tab-content">
                                 <div class="tab-pane fade show active" id="home" role="tabpanel">
@@ -210,26 +223,32 @@
                                             <h6 onclick="addRow()">+ 새 메모 추가</h6>
                                         </div>
                                         <div style="max-height: 450px; overflow-y: auto;">
-                                        <table class="table table-bordered" id="memoTable">
-                                            <thead>
-                                            <tr>
-                                                <th scope="col">날짜</th>
-                                                <th scope="col">내용</th>
-                                                <th scope="col">삭제</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td><input type="date" class="form-control" id="memo_date"></td>
-                                                <td>
-                                                    <textarea class="form-control" id="memo_textarea"></textarea>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-danger" onclick="deleteRow(this)">삭제</button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                            <table class="table table-bordered" id="memoTable">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col" style="width: 30%;">날짜</th>
+                                                    <th scope="col" style="width: 50%;">내용</th>
+                                                    <th scope="col" style="width: 20%;">Action</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <!--<tr>
+                                                    <td>
+                                                        <input type="date" class="form-control" id="memo_date"></td>
+                                                    <td>
+                                                        <textarea class="form-control" id="memo_textarea"></textarea>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-primary" onclick="editRow(this)">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger" onclick="deleteRow(this)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>-->
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>

@@ -49,13 +49,18 @@
                 </div>
                 <div class="col d-flex align-self-center">
                     <div class="row mb-2">
-                        <div class="col">
+                        <div class="input-group col">
                             <input type="text" class="form-control" id="patient_name_keyword" placeholder="환자성명 입력">
+                            <button type="button" class="btn btn-secondary" id="resetBtn">
+                            <i class="bi bi-x-circle" style="padding: 0.5rem;"></i>
+                        </button>
                         </div>
                         <div class="col">
-                            <button type="button" class="btn btn-primary" id="addReplyBtn">
+
+                            <button type="button" class="btn btn-primary" id="addReplyBtn" style="margin-left: 0.5rem;">
                                 <i class="bi bi-search" style="padding: 0.5rem;"></i>
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -121,7 +126,6 @@
     </div>
 </div><!--    register modal-->
 
-
 <!--사용자관리-->
 <div layout:fragment="admin_management" style="width: 100%"></div>
 <!--환자등록-->
@@ -139,9 +143,10 @@
 <script layout:fragment="axios" th:inline="javascript"></script>
 <script layout:fragment="reservationscript" th:inline="javascript"></script>
 
-
+<script layout:fragment="chartscript" th:inline="javascript"></script>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/layout.js"></script>
 <script src="/js/axios.js"></script>
+<div th:fragment="reception_js"></div>
 </html>

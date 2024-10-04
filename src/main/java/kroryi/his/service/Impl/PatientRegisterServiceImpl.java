@@ -1,8 +1,10 @@
 package kroryi.his.service.Impl;
 
-import com.querydsl.core.BooleanBuilder;
 import kroryi.his.domain.PatientRegister;
+import kroryi.his.domain.PatientRegisterMemo;
 import kroryi.his.dto.PatientDTO;
+import kroryi.his.dto.PatientMemoDTO;
+import kroryi.his.repository.PatientMemoRepository;
 import kroryi.his.repository.PatientRegisterRepository;
 import kroryi.his.service.PatientRegisterService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +23,7 @@ import java.util.List;
 public class PatientRegisterServiceImpl implements PatientRegisterService {
     private final PatientRegisterRepository patientRegisterRepository;
     private final ModelMapper modelMapper;
+    private final PatientMemoRepository patientMemoRepository;
 
     @Override
     public String generateChartNum() {
@@ -40,24 +44,6 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
     }
 
     @Override
-    public PatientRegister registerPatient() {
-        // chart_num 생성
-        String chartNum = generateChartNum();
-
-        // 엔티티 생성
-        PatientRegister patient = PatientRegister.builder()
-                .chartNum(chartNum)
-                .name("이재준")
-                .email("sadasda")
-                .firstPaResidentNum("asdas")
-                .lastPaResidentNum("asdasda")
-                .build();
-
-        // 엔티티 저장
-        return patientRegisterRepository.save(patient);
-    }
-
-    @Override
     public PatientRegister register(PatientDTO patientDTO) {
         // chart_num 생성
         String chartNum = generateChartNum();
@@ -65,26 +51,36 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
         PatientRegister patientRegister = modelMapper.map(patientDTO, PatientRegister.class);
 
         // chart_num 설정
+
         patientRegister.setChartNum(chartNum);
-        log.info("patientRegister:{}", patientRegister);
+
+
+        List<PatientRegisterMemo> memoList = new ArrayList<>();
+        if (patientDTO.getMemos() != null) {
+            for (PatientMemoDTO patientMemoDTO : patientDTO.getMemos()) {
+                PatientRegisterMemo memo = new PatientRegisterMemo();
+                memo.setRegDate(patientMemoDTO.getRegDate());
+                memo.setContent(patientMemoDTO.getContent());
+                memo.setMemoChartNum(chartNum);
+                memoList.add(memo);
+            }
+        }
+        patientRegister.setMemos(memoList);
+
+        log.info("patientRegister: {}", patientRegister);
 
         return patientRegisterRepository.save(patientRegister);
     }
 
-    /*@Override
-    public List<PatientRegister> searchName(String keyword) {
-
-        log.info("searchName:{}", keyword);
-
-        List<PatientRegister> registers = patientRegisterRepository.findByName(keyword);
-        log.info("searchName:{}", registers);
-
-        return registers;
-    }*/
-
     @Override
     public List<PatientRegister> searchNameByKeyword(String keyword) {
         return patientRegisterRepository.findByNameContainingIgnoreCase(keyword);
+    }
+
+    @Override
+    public void remove(String chartNum) {
+        log.info("remove: {}", chartNum);
+        patientRegisterRepository.deleteById(chartNum);
     }
 
 

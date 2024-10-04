@@ -41,4 +41,11 @@ public class HisMemoTests {
             log.info(register.toString());
         }
     }
+
+    @Test
+    public void testRemove() {
+        String chartNum = "241002007";
+        patientRegisterService.remove(chartNum);
+        log.info("remove->{}", chartNum);
+    }
 }

@@ -11,10 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +39,20 @@ public class PatientRegisterController {
         log.info("chartNum --{}",patientRegister);
 
         resultMap.put("patientRegister", patientRegister);
+
+        return resultMap;
+    }
+
+    @ApiOperation(value = "Delete Patient", notes = "DELETE 방식으로 삭제")
+    @DeleteMapping("/remove/{chartNum}")
+    public Map<String, String> delete(@PathVariable String chartNum) {
+        log.info("patientRegisterService->{}",chartNum);
+        patientRegisterService.remove(chartNum);
+
+        Map<String, String> resultMap = new HashMap<>();
+        resultMap.put("success_code", "4");
+        resultMap.put("msg", chartNum + "를 삭제했습니다.");
+        resultMap.put("rno", String.valueOf(chartNum));
 
         return resultMap;
     }

@@ -7,7 +7,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 public class PatientAdmission {
     @Id
     @Column(name = "chart_num", nullable = false)
-    private Integer id;
+    private Integer chartNum;
 
     @Column(name = "pa_name", nullable = false, length = 20)
     private String paName;
@@ -25,10 +26,16 @@ public class PatientAdmission {
     private String mainDoc;
 
     @Column(name = "rv_time")
-    private LocalDate rvTime;
+    private LocalDateTime rvTime;
+
+    @Column(name = "reception_time")
+    private LocalDateTime receptionTime;
 
     @Column(name = "vi_time")
-    private LocalDate viTime;
+    private LocalDateTime viTime;
+
+    @Column(name = "cp_time")
+    private LocalDateTime completionTime;
 
     @Column(name = "treat_status", length = 100)
     private String treatStatus;

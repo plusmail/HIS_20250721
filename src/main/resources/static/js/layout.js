@@ -33,9 +33,12 @@ document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
         const tableBody = document.querySelector("#patientTableBody");
         tableBody.innerHTML = "";  // 기존 행을 지웁니다
         patientData = result; // 검색된 환자 정보를 전역 변수에 저장
+        console.log(result);
 
         result.forEach((patient, index) => {
-            if (patient.name.includes(keyword.keyword)) {
+            if (patient.name==='' || patient.name.includes(keyword.keyword)) {
+                console.log(patient);
+
                 found = true;
 
                 // 새 행 생성
@@ -164,13 +167,23 @@ closeBtn.addEventListener("click", (e) => {
     searchModal.hide()
 }, false)
 
+document.querySelector("#resetBtn").addEventListener("click", () => {
+    document.querySelector("#patient_name_keyword").value = ""; // Clear the input field
+});
+
 function test() {
+    const rows = table.getElementsByClassName('new-row');
+
+    // Loop backwards to avoid index issues when removing
+    while (rows.length > 0) {
+        rows[0].parentNode.removeChild(rows[0]);
+    }
     if (selectedMemos.length > 0) {
         selectedMemos.forEach((memo) => {
-            console.log(memo.content);
+
             // 마지막 메모로 입력란을 채우고 싶다면
-            memo_date.value = memo.regDate;
-            memo_textarea.value = memo.content;
+            // memo_date.value = memo.regDate;
+            // memo_textarea.value = memo.content;
             addRow(memo.regDate, memo.content);
         });
     }

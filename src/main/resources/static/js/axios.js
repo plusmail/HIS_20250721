@@ -9,3 +9,10 @@ async function patientSearch(keyword) {
     console.log(response)
     return response.data.result;
 }
+
+async function removePatient(chartNum) {
+    console.log("222222->" + chartNum)
+    const response = await axios.delete(`/patient_register/remove/${chartNum}`)
+    console.log(response)
+    return response.data.result;
+}

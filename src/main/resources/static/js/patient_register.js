@@ -1,7 +1,3 @@
-console.log("reply 시작")
-
-
-
 const patient_register = document.getElementById("patient_reg")
 const name = document.getElementById("name")
 const firstPaResidentNum = document.getElementById("firstPaResidentNum")
@@ -17,9 +13,8 @@ const tendency = document.getElementById("tendency")
 const firstVisit = document.getElementById("firstVisit")
 const lastVisit = document.getElementById("lastVisit")
 const chartNum = document.querySelector("#chartNum")
-const memo_date = document.getElementById("memo_date")
-const memo_textarea = document.getElementById("memo_textarea")
-
+// const memoRegDate = document.getElementById("memoRegDate")
+// const memoContent = document.getElementById("memoContent")
 const homeNum1 = document.getElementById("homeNum");
 const homeNum2 = document.getElementById("homeNum2");
 const homeNum3 = document.getElementById("homeNum3");
@@ -30,6 +25,7 @@ const emailLocal = document.getElementById("emailLocal");
 const emailDomain = document.getElementById("emailDomain");
 
 patient_register.addEventListener("click", (e) => {
+    // 환자 정보를 담은 객체
     const patientObj = {
         name: name.value,
         firstPaResidentNum: firstPaResidentNum.value,
@@ -46,46 +42,72 @@ patient_register.addEventListener("click", (e) => {
         category: category.value,
         tendency: tendency.value,
         firstVisit: firstVisit.value,
-        lastVisit: lastVisit.value
+        lastVisit: lastVisit.value,
+        memos: [] // 메모 데이터를 담을 배열
     };
     console.log(patientObj)
-    addReply(patientObj).then(result => {
-        console.log("Received result:", result);
-        // 단일 필드 값 설정
-        name.value = result.name || '';
-        chartNum.value = result.chartNum || '';
-        firstPaResidentNum.value = result.firstPaResidentNum || '';
-        lastPaResidentNum.value = result.lastPaResidentNum || '';
-        birthDate.value = result.birthDate || '';
-        gender.value = result.gender || '';
-        defaultAddress.value = result.defaultAddress || '';
-        mainDoc.value = result.mainDoc || '';
-        visitPath.value = result.visitPath || '';
-        category.value = result.category || '';
-        tendency.value = result.tendency || '';
-        firstVisit.value = result.firstVisit || '';
-        lastVisit.value = result.lastVisit || '';
+    if(chartNum.value){
+        alert("수정하시겠습니까?")
+    }else {
+        // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
+        const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+        const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
 
-        // 자택전화 나누기
-        const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
-        document.getElementById("homeNum").value = homeNum1 || '';
-        document.getElementById("homeNum2").value = homeNum2 || '';
-        document.getElementById("homeNum3").value = homeNum3 || '';
+        rows.forEach((row, index) => {
+            // 각 행의 메모 날짜와 내용을 추출
+            const memoRegDate = row.querySelector(`#memoRegDate_${index}`);
+            const memoContent = row.querySelector(`#memoContent_${index}`);
 
-        // 휴대전화 나누기
-        const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
-        document.getElementById("phoneNum").value = phoneNum1 || '';
-        document.getElementById("phoneNum2").value = phoneNum2 || '';
-        document.getElementById("phoneNum3").value = phoneNum3 || '';
+            // 각 메모를 배열에 추가
+            if (memoRegDate && memoContent) {
+                patientObj.memos.push({
+                    regDate: memoRegDate.value,
+                    content: memoContent.value
+                });
+            }
+        });
 
-        // 이메일 나누기
-        const [emailLocalPart, emailDomainPart] = result.email.split('@');
-        document.getElementById("emailLocal").value = emailLocalPart || '';
-        document.getElementById("emailDomain").value = emailDomainPart || '';
-    }).catch(e => {
-        alert("Exception....")
-        console.log(e)
-    })
+        addReply(patientObj).then(result => {
+            console.log("Received result:", result);
+            // 단일 필드 값 설정
+            name.value = result.name || '';
+            chartNum.value = result.chartNum || '';
+            firstPaResidentNum.value = result.firstPaResidentNum || '';
+            lastPaResidentNum.value = result.lastPaResidentNum || '';
+            birthDate.value = result.birthDate || '';
+            gender.value = result.gender || '';
+            defaultAddress.value = result.defaultAddress || '';
+            mainDoc.value = result.mainDoc || '';
+            visitPath.value = result.visitPath || '';
+            category.value = result.category || '';
+            tendency.value = result.tendency || '';
+            firstVisit.value = result.firstVisit || '';
+            lastVisit.value = result.lastVisit || '';
+            // memoRegDate.value = result.memoRegDate || '';
+            // memoContent.value = result.memoContent || '';
+
+            // 자택전화 나누기
+            const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
+            document.getElementById("homeNum").value = homeNum1 || '';
+            document.getElementById("homeNum2").value = homeNum2 || '';
+            document.getElementById("homeNum3").value = homeNum3 || '';
+
+            // 휴대전화 나누기
+            const [phoneNum1, phoneNum2, phoneNum3] = result.phoneNum.split('-');
+            document.getElementById("phoneNum").value = phoneNum1 || '';
+            document.getElementById("phoneNum2").value = phoneNum2 || '';
+            document.getElementById("phoneNum3").value = phoneNum3 || '';
+
+            // 이메일 나누기
+            const [emailLocalPart, emailDomainPart] = result.email.split('@');
+            document.getElementById("emailLocal").value = emailLocalPart || '';
+            document.getElementById("emailDomain").value = emailDomainPart || '';
+        }).catch(e => {
+            alert("Exception....")
+            console.log(e)
+        })
+    }
+
 }, false)
 
 // 주소등록
@@ -126,17 +148,29 @@ function execDaumPostcode() {
     }).open();
 }
 
+
 // 테이블 기능-------------------------------------------------------------------------------
 // 새 행 추가 함수
-function addRow(date, content) {
-    const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-    const newRow = document.createElement('tr'); // 새 행 생성
 
+
+const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+
+
+function addRow(date, content) {
+    const rowIndex = table.rows.length; // 현재 테이블의 행 개수를 이용해 고유한 인덱스 생성
+    const memoRegDate = document.getElementById("memoRegDate_" + rowIndex);
+    const memoContent = document.getElementById("memoContent_" + rowIndex);
+    const newRow = document.createElement('tr') // 새 행 생성
+    newRow.classList.add('new-row');
+// 테이블에 추가한 후에 해당 요소를 참조해야 함
+console.log(rowIndex)
     // 날짜 입력란 셀
     const dateCell = newRow.insertCell(0);
     const dateInput = document.createElement('input');
     dateInput.type = 'date';
     dateInput.className = 'form-control';
+    dateInput.id = 'memoRegDate_' + rowIndex; // 고유 ID 부여
+    dateInput.name = 'memoRegDate';
     dateInput.value = date; // 메모의 값을 설정
     dateCell.appendChild(dateInput);
 
@@ -144,18 +178,44 @@ function addRow(date, content) {
     const memoCell = newRow.insertCell(1);
     const memoInput = document.createElement('textarea');
     memoInput.className = 'form-control';
-    memoInput.value = content; // 메모의 값을 설정
+    memoInput.id = 'memoContent_' + rowIndex; // 고유 ID 부여
+    memoInput.name = 'memoContent';
+    memoInput.value = content || ''; // 메모의 값을 설정
     memoCell.appendChild(memoInput);
 
-    // 삭제 버튼 셀
+    // 삭제 및 수정 버튼이 들어갈 셀
     const deleteCell = newRow.insertCell(2);
+
+    // 수정 버튼 생성 및 아이콘 추가
+    const editButton = document.createElement('button');
+    editButton.className = 'btn btn-primary m-1'; // 수정 버튼은 다른 색상을 사용
+    editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+    editButton.onclick = function () {
+        editRow(this); // 수정 기능을 처리하는 함수
+    };
+    deleteCell.appendChild(editButton);
+
+    // 삭제 버튼 생성 및 아이콘 추가
     const deleteButton = document.createElement('button');
     deleteButton.className = 'btn btn-danger';
-    deleteButton.innerText = '삭제';
+    deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
     deleteButton.onclick = function () {
         deleteRow(this);
     };
     deleteCell.appendChild(deleteButton);
+
+    // 새로운 행을 테이블에 추가
+    table.appendChild(newRow);
+
+
+    // 메모 저장 버튼 클릭 이벤트
+    document.getElementById('memo_reg').addEventListener('click', (e) => {
+        const memoObj = {
+            memo_date: memoRegDate.value,
+            memo_content: memoContent.value
+        };
+        console.log(memoObj);
+    });
 
     // 기존 행들을 배열에 담아 정렬
     const rows = Array.from(table.getElementsByTagName('tr'));
@@ -182,6 +242,7 @@ function addRow(date, content) {
     }
 }
 
+
 // 행 삭제 함수
 function deleteRow(button) {
     const row = button.parentNode.parentNode;
@@ -189,6 +250,7 @@ function deleteRow(button) {
 }
 
 // 테이블 기능-----------------------------------------------------------------------------
+
 
 // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
 const birthDateInput = document.getElementById('birthDate');
@@ -215,3 +277,50 @@ birthDateInput.addEventListener('change', () => {
     }
 });
 // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
+
+// 새로고침 버튼
+document.querySelector("#refreshBtn").addEventListener("click", () => {
+    name.value = '';
+    chartNum.value = '';
+    firstPaResidentNum.value = '';
+    lastPaResidentNum.value = '';
+    birthDate.value = '';
+    gender.value = '';
+    defaultAddress.value = '';
+    mainDoc.value = '';
+    visitPath.value = '';
+    category.value = '';
+    tendency.value = '';
+    firstVisit.value = '';
+    lastVisit.value = '';
+
+    homeNum1.value = '';
+    homeNum2.value = '';
+    homeNum3.value = '';
+    phoneNum1.value = '';
+    phoneNum2.value = '';
+    phoneNum3.value = '';
+    emailLocal.value = '';
+    emailDomain.value = '';
+
+    const rows = table.getElementsByClassName('new-row');
+
+    // Loop backwards to avoid index issues when removing
+    while (rows.length > 0) {
+        rows[0].parentNode.removeChild(rows[0]);
+    }
+
+});
+
+
+document.querySelector("#patient_del").addEventListener("click", ()=>{
+    const chartnum = document.querySelector("#chartNum").value
+    console.log(chartnum)
+    removePatient(chartnum).then(result => {
+        console.log(result);
+    }).catch(e => {
+        alert("Exception....")
+        console.log(e)
+    })
+
+}, false);
