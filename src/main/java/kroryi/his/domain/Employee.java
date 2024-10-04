@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "employees", schema = "project_db")
+@Table(name = "employees")
 public class Employee {
     @Id
     @Column(name = "EmployeeID", nullable = false, length = 10)

@@ -15,9 +15,4 @@ public class RequestData{
     //add일경우 true, delete일경우 false
     boolean addOrDelete;
 
-    public void clear(){
-        this.newValues = new ArrayList<>();
-        this.subListIndex = 0;
-        this.listIndex = 0;
-    }
 }

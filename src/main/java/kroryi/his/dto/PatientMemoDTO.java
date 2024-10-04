@@ -19,7 +19,7 @@ public class PatientMemoDTO {
 
     // 차트번호
     @NotNull
-    private String memoChartnum;
+    private String memoCharNum;
 
     // 내용
     @NotEmpty

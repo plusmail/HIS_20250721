@@ -1,14 +1,11 @@
 package kroryi.his.domain;
 
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -25,7 +22,7 @@ public class PatientRegister {
     @Column(name = "chart_num")
     private String chartNum;
 
-    @OneToMany(mappedBy = "patientRegister",
+    @OneToMany(
             cascade = {CascadeType.ALL}
     )
     private List<PatientRegisterMemo> memos =new ArrayList<>();
@@ -36,7 +33,7 @@ public class PatientRegister {
 
     public void addMemos(PatientRegisterMemo patientRegisterMemo){
         this.memos.add(patientRegisterMemo);
-        patientRegisterMemo.upDatePatientRegister(this);
+//        patientRegisterMemo.upDatePatientRegister(this);
     }
     // 환자이름
 //    @NotNull

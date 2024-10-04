@@ -537,9 +537,7 @@
                             </tr>
                             </thead>
                             <tbody id="nested-items-list">
-                            <tr>
-                                <!-- AJAX를 통해 동적으로 아이템을 추가할 예정 -->
-                            </tr>
+
                             </tbody>
 
                         </table>
@@ -1128,7 +1126,7 @@
 
 
     // 데이터 배열을 세션에 등록.
-     function masterToSubList(subListIndex, newValue, listIndex, trueFalse) {
+    function masterToSubList(subListIndex, newValue, listIndex, trueFalse) {
         $.ajax({
             url: '/his/addDelete-to-subList',
             method: 'POST',
@@ -1155,20 +1153,27 @@
     function renderItems(itemsArray) {
         var itemList = $('#nested-items-list');
         itemList.empty(); // 기존 내용 지우기
-        let i = 1;
-        itemsArray.forEach(function (subList) {
-            var subListItem = $('<th scope="col"  class="col-md-3" style="overflow-wrap: break-word ">').text(subList.join(','));
-            if (i < 4) {
-                itemList.append(subListItem);
-                i++
-            } else {
-                subListItem = $('<th scope="col" class="col-md-3" >' +
-                    '<button class="btn btn-sm" type="button">저장</button><br/>' +
-                    '<button type="button" class="btn btn-sm">삭제</button></th><br/>');
-                itemList.append(subListItem)
-                i = 1
+        let i = 0;
+        while (i < itemsArray.length) {
+
+            // 새로운 행 생성
+            let row = $('<tr>');
+
+            // 행을 테이블에 추가
+            itemList.append(row);
+            // 3개의 itemsArray 값을 출력
+            for (let j = 0; j < 3 && i < itemsArray.length; j++, i++) {
+                let subListItem = $('<th scope="col" class="col-md-3" style="overflow-wrap: break-word">').text(itemsArray[i].join(','));
+                row.append(subListItem);
             }
-        });
+
+
+            let buttonCell = $('<th scope="col" class="col-md-3">' +
+                '<button class="btn btn-sm" type="button">저장</button><br/>' +
+                '<button type="button" class="btn btn-sm">삭제</button></th>');
+
+            row.append(buttonCell);
+        }
     }
 
 
@@ -1227,6 +1232,9 @@
         }
         masterToSubList(2, memoList, listIndex, true)
         memo.value = ''
+
+        listIndex++;
+        masterToSubList(null, null, listIndex, true)
         console.log(memoList)
 
     })
@@ -1365,7 +1373,6 @@
         const closeModal = document.querySelector("#piModal")
         let modalInstance = bootstrap.Modal.getInstance(closeModal)
         if (!modalInstance) {
-            console.log("11111")
             modalInstance = new bootstrap.modal(closeModal);
         }
         modalInstance.hide();
