@@ -1,12 +1,15 @@
 package kroryi.his.controller;
 
 import jakarta.servlet.http.HttpSession;
+import kroryi.his.dto.ChartPaData;
+import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.dto.RequestData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +32,15 @@ public class ChartSessionController {
     List<List<String>> nestedList;
     final int plusNum = 3;
     int controllerListIndex = 0;
+    String paName;
+    String chartNum;
+
+   final WebClient webClient = WebClient.create("http://localhost:8080/");
+
+    List<List<String>> dbSaveList;
 
 
-    @PostMapping("/his/addDelete-to-subList")
+    @PostMapping("/medical_chart/addDelete-to-subList")
     private ResponseEntity<?> addDeleteToSubList(@RequestBody RequestData data) {
         List<String> newValues = data.getNewValues();
         int subListIndex = data.getSubListIndex();
@@ -39,7 +48,6 @@ public class ChartSessionController {
 
         if (data.getListIndex() != controllerListIndex) {
             dataArray(newValues, subListIndex, data.getListIndex(), addOrDelete);
-            log.info("111111111");
             return ResponseEntity.status(HttpStatus.CREATED).body("OK");
         }
 
@@ -49,9 +57,22 @@ public class ChartSessionController {
 
     }
 
+    @PostMapping("/medical_chart/savePaList")
+    private ResponseEntity<?> savePaList(@RequestBody ChartPaData paData) {
+         paName = paData.getPaName();
+        chartNum = paData.getChartNum();
+
+
+
+
+        return ResponseEntity.ok(paName);
+
+
+    }
+
 
     // 세션에서 배열을 가져오는 엔드포인트
-    @GetMapping("/his/get-session-items")
+    @GetMapping("/medical_chart/get-session-items")
     public List<List<String>> getSessionItems(HttpSession session) {
 
         // 세션에서 "nestedList" 가져오기
@@ -109,11 +130,14 @@ public class ChartSessionController {
         }
 
         if (listIndex != controllerListIndex) {
+            webDataServlet(dbSaveList);
             toothList.add(new ArrayList<>());
             symptomList.add(new ArrayList<>());
             memoList.add(new ArrayList<>());
             arrayList.add(new ArrayList<>());
             controllerListIndex++;
+
+
         }
 
         if (subArrayList != null) {
@@ -145,12 +169,18 @@ public class ChartSessionController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid subListIndex.");
             }
         }
-        piList=new ArrayList<>();
-    for(int i = 0; i<toothList.size(); i++) {
-        piList.add(toothList.get(i));
-        piList.add(symptomList.get(i));
-        piList.add(memoList.get(i));
-    }
+        dbSaveList = new ArrayList<>();
+        piList = new ArrayList<>();
+        for (int i = 0; i < toothList.size(); i++) {
+            piList.add(toothList.get(i));
+            piList.add(symptomList.get(i));
+            piList.add(memoList.get(i));
+            if(i == toothList.size()-1){
+                dbSaveList.add(toothList.get(i));
+                dbSaveList.add(symptomList.get(i));
+                dbSaveList.add(memoList.get(i));
+            }
+        }
 
 
         log.info("toothList get -----> {}", toothList);
@@ -178,6 +208,21 @@ public class ChartSessionController {
             });
         }
         return firstList;
+    }
+
+    private void webDataServlet(List<List<String>> data) {
+
+        MedicalChartDTO request = new MedicalChartDTO();
+        request.setChartData(data);
+        request.setPaName(paName);
+        request.setChartNum(chartNum);
+
+        webClient.post()
+                .uri("/medical_chart/saveData")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
 }
