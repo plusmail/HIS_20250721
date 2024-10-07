@@ -17,7 +17,7 @@ public class MedicalChart {
     private Integer cnum;
 
     @Column(name = "chart_num", nullable = false)
-    private Integer id;
+    private String id;
 
     @Column(name = "pa_name", nullable = false, length = 20)
     private String paName;

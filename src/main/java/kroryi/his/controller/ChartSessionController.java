@@ -31,7 +31,7 @@ public class ChartSessionController {
     int controllerListIndex = 0;
 
 
-    @PostMapping("/his/addDelete-to-subList")
+    @PostMapping("/medical_chart/addDelete-to-subList")
     private ResponseEntity<?> addDeleteToSubList(@RequestBody RequestData data) {
         List<String> newValues = data.getNewValues();
         int subListIndex = data.getSubListIndex();
@@ -51,7 +51,7 @@ public class ChartSessionController {
 
 
     // 세션에서 배열을 가져오는 엔드포인트
-    @GetMapping("/his/get-session-items")
+    @GetMapping("/medical_chart/get-session-items")
     public List<List<String>> getSessionItems(HttpSession session) {
 
         // 세션에서 "nestedList" 가져오기
