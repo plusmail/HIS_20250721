@@ -7,7 +7,7 @@ let selectedRow = null; // 클릭된 행을 저장할 변수
 
 let patientData = null; // 전역 변수 선언
 
-let selectedMemos = [];
+let selectedMemos = null;
 
 // 세션 데이터 get
 let patientInfo = sessionStorage.getItem('selectedPatient');
@@ -36,7 +36,7 @@ document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
         console.log(result);
 
         result.forEach((patient, index) => {
-            if (patient.name==='' || patient.name.includes(keyword.keyword)) {
+            if (patient.name === '' || patient.name.includes(keyword.keyword)) {
                 console.log(patient);
 
                 found = true;
@@ -98,8 +98,14 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
         if (window.location.href.includes("/patient_register")) {
             patientData.forEach((patient, index) => {
                 if (menu_chartNum === patient.chartNum) {
-                    selectedMemos = patient.memos;
+                    // Sort memos by regDate in descending order
+                    // Sort memos by regDate in ascending order
+                    selectedMemos = patient.memos.sort((a, b) => new Date(a.regDate) - new Date(b.regDate));
+
+
+                    // Call your test function with sorted selectedMemos
                     test(selectedMemos);
+                    console.log(selectedMemos)
                     name.value = patient.name || '';
                     firstPaResidentNum.value = patient.firstPaResidentNum || '';
                     lastPaResidentNum.value = patient.lastPaResidentNum || '';
@@ -181,11 +187,8 @@ function test(selectedMemos) {
     }
     if (selectedMemos.length > 0) {
         selectedMemos.forEach((memo) => {
-
             // 마지막 메모로 입력란을 채우고 싶다면
-            // memo_date.value = memo.regDate;
-            // memo_textarea.value = memo.content;
-            addRow(memo.regDate, memo.content);
+            addRow(memo.mmo, memo.regDate, memo.content);
         });
     }
 }

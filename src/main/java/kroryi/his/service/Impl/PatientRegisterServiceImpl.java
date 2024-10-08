@@ -114,12 +114,6 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
 
         return patientRegisterRepository.save(patientRegister);
     }
-
-    @Override
-    public PatientRegisterMemo registerMemo(PatientMemoDTO patientMemoDTO) {
-
-        return null;
-    }
 }
 
 

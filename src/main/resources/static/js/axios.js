@@ -17,8 +17,26 @@ async function removePatient(chartNum) {
 }
 
 async function modifyPatient(patientObj,chartnum) {
-    console.log("222222->" + patientObj.toString())
     const response = await axios.put(`/patient_register/modify/${chartnum}`, patientObj)
     console.log(response)
     return response.data.patientRegister;
 }
+
+async function addMemo(memoList) {
+    const response = await axios.post(`/patient_register/memo/`, memoList); // memos 배열로 감싸서 전송
+    console.log(response);
+    return response.data; // 서버의 응답에서 결과를 반환
+}
+
+async function removeMemo(mmo) {
+    const response = await axios.delete(`/patient_register/memo/remove/${mmo}`)
+    console.log(response)
+    return response.data;
+}
+
+async function modifyMemo(memoObj,mmo) {
+    const response = await axios.put(`/patient_register/memo/modify/${mmo}`, memoObj)
+    console.log(response)
+    return response.data;
+}
+

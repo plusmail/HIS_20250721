@@ -26,10 +26,6 @@ public class PatientRegisterMemo {
     @Column(name = "mmo")
     private Long mmo;
 
-    // 차트번호 (PatientRegister와 연결)
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JsonIgnore
-//    @JoinColumn(name = "memo_chart_num", referencedColumnName = "chart_num", nullable = false)
     private String memoChartNum;
 
     // 등록 날짜
@@ -40,11 +36,7 @@ public class PatientRegisterMemo {
     @Column(name = "content", length = 1000)
     private String content;
 
-//    public void upDatePatientRegister(PatientRegister patientRegister) {
-//        log.info("aaaaaaaaaaa {}", patientRegister);
-//        this.patientRegister = patientRegister;
-//    }
-//
-    // 기타 필드
-    // 필요한 경우 여기에 추가 필드를 정의할 수 있습니다.
+    public void changeText(String content) {
+        this.content = content;
+    }
 }

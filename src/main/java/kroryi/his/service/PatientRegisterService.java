@@ -23,5 +23,4 @@ public interface PatientRegisterService {
 
     PatientRegister modify(PatientDTO patientDTO);
 
-    PatientRegisterMemo registerMemo(PatientMemoDTO patientMemoDTO);
 }

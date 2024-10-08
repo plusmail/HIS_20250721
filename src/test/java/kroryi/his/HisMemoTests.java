@@ -5,6 +5,7 @@ import kroryi.his.domain.PatientRegisterMemo;
 import kroryi.his.dto.PatientMemoDTO;
 import kroryi.his.repository.PatientMemoRepository;
 import kroryi.his.repository.PatientRegisterRepository;
+import kroryi.his.service.PatientRegisterMemoService;
 import kroryi.his.service.PatientRegisterService;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,9 @@ public class HisMemoTests {
 
     @Autowired
     PatientRegisterService patientRegisterService;
-    private PatientRegister existingPatient;
+
+    @Autowired
+    PatientRegisterMemoService patientRegisterMemoService;
 
     @Test
     public void testMemoList(){
@@ -57,5 +60,20 @@ public class HisMemoTests {
         String chartNum = "241002007";
         patientRegisterService.remove(chartNum);
         log.info("remove->{}", chartNum);
+    }
+
+
+    @Test
+    public void testRegister() {
+        PatientMemoDTO patientMemoDTO = PatientMemoDTO.builder()
+                .content("ReplyDTO Text")
+                .regDate(LocalDate.parse("2020-10-01"))
+                .memoCharNum("240911002")
+                .build();
+
+        Long mmo = patientRegisterMemoService.register(patientMemoDTO);
+
+        log.info("patientRegisterMemoService.register---->{}", mmo);
+        log.info("patientMemoDTO.register---->{}", patientMemoDTO.toString());
     }
 }
