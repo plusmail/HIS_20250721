@@ -40,3 +40,19 @@ async function modifyMemo(memoObj,mmo) {
     return response.data;
 }
 
+async function PatientMaintenance(chartNum) {
+    try {
+        const response = await axios.post(`/patient_search/${chartNum}`, {}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(response);
+        return response.data.result;
+    } catch (error) {
+        console.error("Error fetching patient:", error);
+        throw error;
+    }
+}
+
+

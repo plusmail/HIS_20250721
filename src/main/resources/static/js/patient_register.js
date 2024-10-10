@@ -260,67 +260,6 @@ function addRow(mmo, date, content) {
     table.appendChild(newRow);
 }
 
-/*function addRow(mmo, date, content) {
-    const rowIndex = table.rows.length; // 현재 테이블의 행 개수를 이용해 고유한 인덱스 생성
-    const newRow = document.createElement('tr') // 새 행 생성
-    newRow.classList.add('new-row');
-// 테이블에 추가한 후에 해당 요소를 참조해야 함
-
-    // Hidden input for mmo
-    const hiddenCell = newRow.insertCell(0);
-    const hiddenMmoInput = document.createElement('input');
-    hiddenMmoInput.type = 'hidden';
-    hiddenMmoInput.name = 'mmo';
-    hiddenMmoInput.id = 'mmo_' + rowIndex;
-    hiddenMmoInput.value = mmo || ''; // 저장할 값
-    hiddenCell.appendChild(hiddenMmoInput);
-    hiddenCell.style.display = 'none'; // Hide the cell
-
-
-    // 날짜 입력란 셀
-    const dateCell = newRow.insertCell(1);
-    const dateInput = document.createElement('input');
-    dateInput.type = 'date';
-    dateInput.className = 'form-control';
-    dateInput.id = 'memoRegDate_' + rowIndex; // 고유 ID 부여
-    dateInput.name = 'memoRegDate';
-    dateInput.value = date ? date : new Date().toISOString().split('T')[0]; // ISO 포맷의 날짜 문자열로 변환
-    dateCell.appendChild(dateInput);
-
-    // 내용 입력란 셀
-    const memoCell = newRow.insertCell(2);
-    const memoInput = document.createElement('textarea');
-    memoInput.className = 'form-control';
-    memoInput.id = 'memoContent_' + rowIndex; // 고유 ID 부여
-    memoInput.name = 'memoContent';
-    memoInput.value = content || ''; // 메모의 값을 설정
-    memoCell.appendChild(memoInput);
-
-    // 삭제 및 수정 버튼이 들어갈 셀
-    const deleteCell = newRow.insertCell(3);
-
-    // 수정 버튼 생성 및 아이콘 추가
-    const editButton = document.createElement('button');
-    editButton.className = 'btn btn-primary m-1'; // 수정 버튼은 다른 색상을 사용
-    editButton.innerHTML = '<i class="bi bi-pencil"></i>';
-    editButton.onclick = function () {
-        editRow(this); // 수정 기능을 처리하는 함수
-    };
-    deleteCell.appendChild(editButton);
-
-    // 삭제 버튼 생성 및 아이콘 추가
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'btn btn-danger';
-    deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
-    deleteButton.onclick = function () {
-        deleteRow(this);
-    };
-    deleteCell.appendChild(deleteButton);
-
-    // 새로운 행을 테이블에 추가
-    table.appendChild(newRow);
-}*/
-
 
 // 공통함수(등록/수정)
 function collectMemoData() {

@@ -23,4 +23,6 @@ public interface PatientRegisterService {
 
     PatientRegister modify(PatientDTO patientDTO);
 
+    PatientRegister getPatient(String chartNum);
+
 }

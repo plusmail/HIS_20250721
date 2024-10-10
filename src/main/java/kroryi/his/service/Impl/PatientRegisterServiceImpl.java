@@ -1,6 +1,5 @@
 package kroryi.his.service.Impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import kroryi.his.domain.PatientRegister;
 import kroryi.his.domain.PatientRegisterMemo;
 import kroryi.his.dto.PatientDTO;
@@ -111,8 +110,13 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
         patientRegister.setLastVisit(patientDTO.getLastVisit());
 
 
-
         return patientRegisterRepository.save(patientRegister);
+    }
+
+    @Override
+    public PatientRegister getPatient(String chartNum) {
+        return patientRegisterRepository.findById(chartNum)
+                .orElseThrow(() -> new RuntimeException("환자를 찾을 수 없습니다."));
     }
 }
 

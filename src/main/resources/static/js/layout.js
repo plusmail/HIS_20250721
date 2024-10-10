@@ -9,6 +9,40 @@ let patientData = null; // 전역 변수 선언
 
 let selectedMemos = null;
 
+function assignPatientValues(patient) {
+    name.value = patient.name || '';
+    firstPaResidentNum.value = patient.firstPaResidentNum || '';
+    lastPaResidentNum.value = patient.lastPaResidentNum || '';
+    birthDate.value = patient.birthDate || '';
+    gender.value = patient.gender || '';
+    defaultAddress.value = patient.defaultAddress || '';
+    detailedAddress.value = patient.detailedAddress || '';
+    mainDoc.value = patient.mainDoc || '';
+    visitPath.value = patient.visitPath || '';
+    category.value = patient.category || '';
+    tendency.value = patient.tendency || '';
+    firstVisit.value = patient.firstVisit || '';
+    lastVisit.value = patient.lastVisit || '';
+    chartNum.value = patient.chartNum || ''; // Ensure a fallback here as well
+
+    // 자택전화 나누기
+    const [home_Num1, home_Num2, home_Num3] = patient.homeNum.split('-');
+    homeNum1.value = home_Num1 || '';
+    homeNum2.value = home_Num2 || '';
+    homeNum3.value = home_Num3 || '';
+
+    // 휴대전화 나누기
+    const [phone_Num1, phone_Num2, phone_Num3] = patient.phoneNum.split('-');
+    phoneNum1.value = phone_Num1 || '';
+    phoneNum2.value = phone_Num2 || '';
+    phoneNum3.value = phone_Num3 || '';
+
+    // 이메일 나누기
+    const [emailLocalPart, emailDomainPart] = patient.email.split('@');
+    emailLocal.value = emailLocalPart || '';
+    emailDomain.value = emailDomainPart || '';
+}
+
 // 세션 데이터 get
 let patientInfo = sessionStorage.getItem('selectedPatient');
 // 세션에 값이 있으면 세션 데이터를 사용
@@ -21,6 +55,22 @@ if (patientInfo) {
                 <label>생일: ${patientInfo.birthDate || '-'}</label>
             </div>
         `;
+
+    const ageInput = document.getElementById('age');
+    PatientMaintenance(patientInfo.chartNum).then(patient => {
+        console.log(patient);
+        selectedMemos = patient.memos.sort((a, b) => {
+            const dateA = new Date(a.regDate);
+            const dateB = new Date(b.regDate);
+            return dateA - dateB; // This will sort in ascending order
+        });
+        // Call your test function with sorted selectedMemos
+        test(selectedMemos);
+
+        assignPatientValues(patient);
+
+        ageInput.value = calculateAge(patient.birthDate);
+    })
 }
 
 document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
@@ -33,11 +83,10 @@ document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
         const tableBody = document.querySelector("#patientTableBody");
         tableBody.innerHTML = "";  // 기존 행을 지웁니다
         patientData = result; // 검색된 환자 정보를 전역 변수에 저장
-        console.log(result);
+        console.log(result)
 
         result.forEach((patient, index) => {
             if (patient.name === '' || patient.name.includes(keyword.keyword)) {
-                console.log(patient);
 
                 found = true;
 
@@ -98,46 +147,14 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
         if (window.location.href.includes("/patient_register")) {
             patientData.forEach((patient, index) => {
                 if (menu_chartNum === patient.chartNum) {
-                    // Sort memos by regDate in descending order
-                    // Sort memos by regDate in ascending order
                     selectedMemos = patient.memos.sort((a, b) => new Date(a.regDate) - new Date(b.regDate));
-
 
                     // Call your test function with sorted selectedMemos
                     test(selectedMemos);
-                    console.log(selectedMemos)
-                    name.value = patient.name || '';
-                    firstPaResidentNum.value = patient.firstPaResidentNum || '';
-                    lastPaResidentNum.value = patient.lastPaResidentNum || '';
-                    birthDate.value = patient.birthDate || '';
-                    gender.value = patient.gender || '';
-                    defaultAddress.value = patient.defaultAddress || '';
-                    detailedAddress.value = patient.detailedAddress || '';
-                    mainDoc.value = patient.mainDoc || '';
-                    visitPath.value = patient.visitPath || '';
-                    category.value = patient.category || '';
-                    tendency.value = patient.tendency || '';
-                    firstVisit.value = patient.firstVisit || '';
-                    lastVisit.value = patient.lastVisit || '';
-                    chartNum.value = patient.chartNum;
+
+                    assignPatientValues(patient);
+
                     ageInput.value = menu_age;
-
-                    // 자택전화 나누기
-                    const [home_Num1, home_Num2, home_Num3] = patient.homeNum.split('-');
-                    homeNum1.value = home_Num1 || '';
-                    homeNum2.value = home_Num2 || '';
-                    homeNum3.value = home_Num3 || '';
-
-                    // 휴대전화 나누기
-                    const [phone_Num1, phone_Num2, phone_Num3] = patient.phoneNum.split('-');
-                    phoneNum1.value = phone_Num1 || '';
-                    phoneNum2.value = phone_Num2 || '';
-                    phoneNum3.value = phone_Num3 || '';
-
-                    // 이메일 나누기
-                    const [emailLocalPart, emailDomainPart] = patient.email.split('@');
-                    emailLocal.value = emailLocalPart || '';
-                    emailDomain.value = emailDomainPart || '';
                 }
             })
         }

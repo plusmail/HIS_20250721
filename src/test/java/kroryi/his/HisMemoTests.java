@@ -49,7 +49,7 @@ public class HisMemoTests {
     @Test
     public void testSearchName(){
 
-        List<PatientRegister> registers = patientRegisterService.searchNameByKeyword("이재준");
+        List<PatientRegister> registers = patientRegisterService.searchNameByKeyword("이미자");
         for (PatientRegister register : registers) {
             log.info(register.toString());
         }
@@ -75,5 +75,11 @@ public class HisMemoTests {
 
         log.info("patientRegisterMemoService.register---->{}", mmo);
         log.info("patientMemoDTO.register---->{}", patientMemoDTO.toString());
+    }
+
+    @Test
+    public void testSearchChartNum(){
+        PatientRegister register = patientRegisterService.getPatient("240912046");
+            log.info(register.toString());
     }
 }
