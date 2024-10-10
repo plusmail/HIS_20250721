@@ -1,7 +1,3 @@
-console.log("reply 시작")
-
-
-
 const patient_register = document.getElementById("patient_reg")
 const name = document.getElementById("name")
 const firstPaResidentNum = document.getElementById("firstPaResidentNum")
@@ -17,9 +13,6 @@ const tendency = document.getElementById("tendency")
 const firstVisit = document.getElementById("firstVisit")
 const lastVisit = document.getElementById("lastVisit")
 const chartNum = document.querySelector("#chartNum")
-const memo_date = document.getElementById("memo_date")
-const memo_textarea = document.getElementById("memo_textarea")
-
 const homeNum1 = document.getElementById("homeNum");
 const homeNum2 = document.getElementById("homeNum2");
 const homeNum3 = document.getElementById("homeNum3");
@@ -30,6 +23,7 @@ const emailLocal = document.getElementById("emailLocal");
 const emailDomain = document.getElementById("emailDomain");
 
 patient_register.addEventListener("click", (e) => {
+    // 환자 정보를 담은 객체
     const patientObj = {
         name: name.value,
         firstPaResidentNum: firstPaResidentNum.value,
@@ -46,11 +40,13 @@ patient_register.addEventListener("click", (e) => {
         category: category.value,
         tendency: tendency.value,
         firstVisit: firstVisit.value,
-        lastVisit: lastVisit.value
+        lastVisit: lastVisit.value,
+        memos: [] // 메모 데이터를 담을 배열
     };
-    console.log(patientObj)
-    addReply(patientObj).then(result => {
+
+    function setPatientFields(result) {
         console.log("Received result:", result);
+
         // 단일 필드 값 설정
         name.value = result.name || '';
         chartNum.value = result.chartNum || '';
@@ -65,6 +61,23 @@ patient_register.addEventListener("click", (e) => {
         tendency.value = result.tendency || '';
         firstVisit.value = result.firstVisit || '';
         lastVisit.value = result.lastVisit || '';
+
+        // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
+        const tables = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+        const rows = Array.from(tables.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
+
+        rows.forEach((row, index) => {
+            // 각 행의 메모 날짜와 내용을 추출
+            const mmo = row.querySelector(`#mmo_${index}`);
+            // 인덱스가 result.memos의 범위 내에 있는지 확인
+            if (index < result.memos.length) {
+                const memo = result.memos[index]; // 해당 메모 가져오기
+                // 로그 출력 (필요시 제거 가능)
+                mmo.value = memo.mmo;
+            }
+
+        })
+        // memos.value = result.memos || '';
 
         // 자택전화 나누기
         const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
@@ -82,10 +95,41 @@ patient_register.addEventListener("click", (e) => {
         const [emailLocalPart, emailDomainPart] = result.email.split('@');
         document.getElementById("emailLocal").value = emailLocalPart || '';
         document.getElementById("emailDomain").value = emailDomainPart || '';
-    }).catch(e => {
-        alert("Exception....")
-        console.log(e)
-    })
+    }
+
+    if (chartNum.value) {
+        modifyPatient(patientObj, chartNum.value).then(setPatientFields).catch(e => {
+            alert("Exception....");
+            console.log(e);
+        });
+    } else {
+        // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
+        const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+        const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
+
+        rows.forEach((row, index) => {
+            // 각 행의 메모 날짜와 내용을 추출
+            const mmo = row.querySelector(`#mmo_${index}`);
+            const memoRegDate = row.querySelector(`#memoRegDate_${index}`);
+            const memoContent = row.querySelector(`#memoContent_${index}`);
+
+            // 각 메모를 배열에 추가
+            if (memoRegDate && memoContent) {
+                patientObj.memos.push({
+                    mmo: mmo.value,
+                    regDate: memoRegDate.value,
+                    content: memoContent.value
+                });
+                console.log(mmo.value);
+                console.log(memoContent.value);
+            }
+        });
+        addPatient(patientObj).then(setPatientFields).catch(e => {
+            alert("Exception....");
+            console.log(e);
+        });
+    }
+
 }, false)
 
 // 주소등록
@@ -126,69 +170,200 @@ function execDaumPostcode() {
     }).open();
 }
 
-// 테이블 기능-------------------------------------------------------------------------------
-// 새 행 추가 함수
-function addRow(date, content) {
-    const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-    const newRow = document.createElement('tr'); // 새 행 생성
 
-    // 날짜 입력란 셀
-    const dateCell = newRow.insertCell(0);
+// 테이블 기능-------------------------------------------------------------------------------
+
+const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
+
+// 새 행 추가 함수
+function addRow(mmo, date, content) {
+    // Collect existing rows
+    const rows = Array.from(table.rows);
+
+    // Sort existing rows by date
+    rows.sort((a, b) => {
+        const dateA = new Date(a.cells[1].querySelector('input').value);
+        const dateB = new Date(b.cells[1].querySelector('input').value);
+        return dateA - dateB; // Ascending sort
+    });
+
+    // Clear the table
+    while (table.rows.length > 0) {
+        table.deleteRow(0);
+    }
+
+    // Re-assign IDs in descending order and add sorted rows back to the table
+    const rowCount = rows.length;
+    rows.forEach((row, index) => {
+        const newIndex = rowCount - index; // Set new index in descending order
+        row.cells[0].querySelector('input').id = 'mmo_' + newIndex;
+        row.cells[1].querySelector('input').id = 'memoRegDate_' + newIndex;
+        row.cells[2].querySelector('textarea').id = 'memoContent_' + newIndex;
+        table.appendChild(row); // Append sorted row back to the table
+    });
+
+    // Create a new row with an ID of 0
+    const newRowIndex = 0; // This will be the index for the new row
+    const newRow = document.createElement('tr');
+    newRow.classList.add('new-row');
+
+    // Hidden input for mmo
+    const hiddenCell = newRow.insertCell(0);
+    const hiddenMmoInput = document.createElement('input');
+    hiddenMmoInput.type = 'hidden';
+    hiddenMmoInput.name = 'mmo';
+    hiddenMmoInput.id = 'mmo_' + newRowIndex; // Use 0 for the new row
+    hiddenMmoInput.value = mmo;
+    hiddenCell.appendChild(hiddenMmoInput);
+    hiddenCell.style.display = 'none';
+
+    // Date input cell
+    const dateCell = newRow.insertCell(1);
     const dateInput = document.createElement('input');
     dateInput.type = 'date';
     dateInput.className = 'form-control';
-    dateInput.value = date; // 메모의 값을 설정
+    dateInput.id = 'memoRegDate_' + newRowIndex; // Use 0 for the new row
+    dateInput.name = 'memoRegDate';
+    dateInput.value = date ? date : new Date().toISOString().split('T')[0];
     dateCell.appendChild(dateInput);
 
-    // 내용 입력란 셀
-    const memoCell = newRow.insertCell(1);
+    // Memo input cell
+    const memoCell = newRow.insertCell(2);
     const memoInput = document.createElement('textarea');
     memoInput.className = 'form-control';
-    memoInput.value = content; // 메모의 값을 설정
+    memoInput.id = 'memoContent_' + newRowIndex; // Use 0 for the new row
+    memoInput.name = 'memoContent';
+    memoInput.value = content || '';
     memoCell.appendChild(memoInput);
 
-    // 삭제 버튼 셀
-    const deleteCell = newRow.insertCell(2);
+    // Delete and edit buttons cell
+    const deleteCell = newRow.insertCell(3);
+    // Edit button
+    const editButton = document.createElement('button');
+    editButton.className = 'btn btn-primary m-1';
+    editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+    editButton.onclick = function () {
+        editRow(this);
+    };
+    deleteCell.appendChild(editButton);
+
+    // Delete button
     const deleteButton = document.createElement('button');
     deleteButton.className = 'btn btn-danger';
-    deleteButton.innerText = '삭제';
+    deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
     deleteButton.onclick = function () {
         deleteRow(this);
     };
     deleteCell.appendChild(deleteButton);
 
-    // 기존 행들을 배열에 담아 정렬
-    const rows = Array.from(table.getElementsByTagName('tr'));
+    // Append the new row to the table
+    table.appendChild(newRow);
+}
 
-    // 새 행의 날짜를 비교하여 삽입 위치 결정
-    let inserted = false;
-    for (let i = 0; i < rows.length; i++) {
-        const rowDateInput = rows[i].cells[0].getElementsByTagName('input')[0];
-        if (rowDateInput) {
-            const rowDate = new Date(rowDateInput.value);
-            const newDate = new Date(date);
-            // 새로운 날짜가 기존 날짜보다 최신이라면
-            if (newDate > rowDate) {
-                table.insertBefore(newRow, rows[i]);
-                inserted = true;
-                break;
-            }
+
+// 공통함수(등록/수정)
+function collectMemoData() {
+    const rowIndex = table.rows.length; // Current number of rows
+    const memoList = []; // Array to hold memo information
+
+    for (let i = 0; i < rowIndex; i++) {
+        const memoRegDate = document.getElementById("memoRegDate_" + i);
+        const memoContent = document.getElementById("memoContent_" + i);
+        const mmo = document.getElementById("mmo_" + i);
+
+        // Check if mmo is undefined
+        if (mmo.value === "undefined") {
+            console.log("메모 날짜 ->", memoRegDate.value);
+            console.log("메모 내용 ->", memoContent.value);
+            const memoObj = {
+                memoCharNum: chartNum.value, // Chart number
+                regDate: memoRegDate.value, // Registration date
+                content: memoContent.value // Content
+            };
+            memoList.push(memoObj); // Add memo information to array
         }
     }
 
-    // 삽입되지 않았다면 가장 마지막에 추가
-    if (!inserted) {
-        table.appendChild(newRow);
-    }
+    console.log(memoList); // Log memo list
+    return memoList; // Return the collected memo list
 }
+
+// 메모 저장 버튼 클릭 이벤트
+document.getElementById('memo_reg').addEventListener('click', (e) => {
+    const memoList = collectMemoData(); // Collect memo data
+
+    try {
+        addMemo(memoList).then(result => {
+            const rows = Array.from(table.getElementsByTagName('tr'));
+            const totalRows = rows.length;
+            rows.forEach((row, index) => {
+                const reverseIndex = totalRows - 1 - index; // Calculate the reverse index
+                const mmoCell = row.querySelector(`#mmo_${reverseIndex}`);
+
+                console.log(row);
+                console.log(reverseIndex); // Log the reverse index
+                console.log(mmoCell);
+                console.log(result[reverseIndex]);
+                if (mmoCell.value === "undefined") {
+                    console.log("!!!!!!!!!!!!")
+                    mmoCell.value = result[reverseIndex]; // Assign value from result
+                }
+            });
+        }); // Send all memos to the server
+    } catch (e) {
+        alert("Exception...");
+        console.error(e);
+    }
+});
+
 
 // 행 삭제 함수
 function deleteRow(button) {
     const row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
+    const mmoCell = row.querySelector('input[name="mmo"]'); // Select the hidden input by name
+    const mmoValue = mmoCell.value; // Get the value from the hidden input
+    console.log(mmoValue);
+    if (mmoValue !== "undefined") {
+        removeMemo(mmoCell.value).then(result => {
+            row.parentNode.removeChild(row);
+            alert("삭제하였습니다.")
+        }).catch(e => {
+            alert("Exception....")
+            console.log(e)
+        })
+    } else {
+        row.parentNode.removeChild(row);
+
+    }
+
+}
+
+// 행 수정 함수
+function editRow(button) {
+    const row = button.parentNode.parentNode;
+    const mmoCell = row.querySelector('input[name="mmo"]');
+    const memoRegDate = row.querySelector('input[name="memoRegDate"]');
+    const memoContent = row.querySelector('textarea[name="memoContent"]');
+    const mmoValue = mmoCell.value; // Get the value from the hidden input
+    console.log(mmoValue);
+
+    const memoObj = {
+        memoCharNum: chartNum.value, // Chart number
+        regDate: memoRegDate.value, // Registration date
+        content: memoContent.value // Content
+    };
+    console.log(memoObj)
+
+    modifyMemo(memoObj, mmoValue).then(result => {
+        alert("수정하였습니다.")
+    }).catch(e => {
+        alert("Exception....")
+        console.log(e)
+    })
 }
 
 // 테이블 기능-----------------------------------------------------------------------------
+
 
 // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
 const birthDateInput = document.getElementById('birthDate');
@@ -215,3 +390,76 @@ birthDateInput.addEventListener('change', () => {
     }
 });
 // 생년월일 입력 필드와 나이 입력 필드 가져오기-----------------------
+
+// 새로고침 버튼
+document.querySelector("#refreshBtn").addEventListener("click", () => {
+    name.value = '';
+    chartNum.value = '';
+    firstPaResidentNum.value = '';
+    lastPaResidentNum.value = '';
+    birthDate.value = '';
+    gender.value = '';
+    defaultAddress.value = '';
+    mainDoc.value = '';
+    visitPath.value = '';
+    category.value = '';
+    tendency.value = '';
+    firstVisit.value = '';
+    lastVisit.value = '';
+
+    homeNum1.value = '';
+    homeNum2.value = '';
+    homeNum3.value = '';
+    phoneNum1.value = '';
+    phoneNum2.value = '';
+    phoneNum3.value = '';
+    emailLocal.value = '';
+    emailDomain.value = '';
+
+    const rows = table.getElementsByClassName('new-row');
+
+    // Loop backwards to avoid index issues when removing
+    while (rows.length > 0) {
+        rows[0].parentNode.removeChild(rows[0]);
+    }
+
+});
+
+// 환자 삭제
+document.querySelector("#patient_del").addEventListener("click", () => {
+    removePatient(chartNum.value).then(result => {
+        name.value = '';
+        chartNum.value = '';
+        firstPaResidentNum.value = '';
+        lastPaResidentNum.value = '';
+        birthDate.value = '';
+        gender.value = '';
+        defaultAddress.value = '';
+        mainDoc.value = '';
+        visitPath.value = '';
+        category.value = '';
+        tendency.value = '';
+        firstVisit.value = '';
+        lastVisit.value = '';
+
+        homeNum1.value = '';
+        homeNum2.value = '';
+        homeNum3.value = '';
+        phoneNum1.value = '';
+        phoneNum2.value = '';
+        phoneNum3.value = '';
+        emailLocal.value = '';
+        emailDomain.value = '';
+
+        const rows = table.getElementsByClassName('new-row');
+
+        // Loop backwards to avoid index issues when removing
+        while (rows.length > 0) {
+            rows[0].parentNode.removeChild(rows[0]);
+        }
+    }).catch(e => {
+        alert("Exception....")
+        console.log(e)
+    })
+
+}, false);

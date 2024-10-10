@@ -57,6 +57,7 @@ public class CompanyRegisterController {
         return result;
     }
 
+    // 업체 검색
     @GetMapping("/searchCompany")
     public List<CompanyRegister> searchCompanies(@RequestParam(value = "companyName", required = false) String companyName) {
         if (companyName == null || companyName.isEmpty()) {
@@ -69,7 +70,6 @@ public class CompanyRegisterController {
     // 업체 삭제
     @DeleteMapping("/deleteCompany")
     public ResponseEntity<String> deleteCompany(@RequestParam String companyCode) {
-        // 회사 삭제 로직
         companyRegisterService.deleteCompany(companyCode);
         return ResponseEntity.ok("업체가 성공적으로 삭제되었습니다.");
     }

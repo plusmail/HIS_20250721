@@ -1,14 +1,14 @@
 package kroryi.his.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import kroryi.his.domain.MaterialRegister;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Builder
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class MaterialDTO {
@@ -34,4 +34,20 @@ public class MaterialDTO {
     //최초등록일
     private LocalDate firstRegisterDate;
 
+    //업체코드
+    private String companyCode;
+
+    //업체명
+    private String companyName;
+
+    public MaterialDTO(MaterialRegister materialRegister) {
+        this.materialCode = materialRegister.getMaterialCode();
+        this.materialName = materialRegister.getMaterialName();
+        this.materialUnit = materialRegister.getMaterialUnit();
+        this.materialUnitPrice = materialRegister.getMaterialUnitPrice();
+        this.minQuantity = materialRegister.getMinQuantity();
+        this.stockManagementItem = materialRegister.isStockManagementItem();
+        this.companyName = materialRegister.getCompanyRegister().getCompanyName();
+        this.companyCode = materialRegister.getCompanyRegister().getCompanyCode();
+    }
 }

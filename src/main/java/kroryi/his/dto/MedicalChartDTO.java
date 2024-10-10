@@ -16,4 +16,5 @@ public class MedicalChartDTO implements Serializable {
     String medicalDivision;
     String teethNum;
     String medicalContent;
+    String checkDoc;
 }

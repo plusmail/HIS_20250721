@@ -23,7 +23,7 @@ import java.util.Map;
 public class PatientSearchController {
     private final PatientRegisterService patientRegisterService;
 
-    @ApiOperation(value = "환자등록 POST", notes = "POST 방식으로 환자 등록")
+    @ApiOperation(value = "keyword 검색 POST", notes = "POST 방식으로 환자 검색")
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String,Object> searchName(@RequestBody SearchKeywordDTO keyword) {
         log.info("keyword: {}", keyword);
@@ -40,4 +40,18 @@ public class PatientSearchController {
         return result;
     }
 
+    @ApiOperation(value = "환자검색 POST", notes = "POST 방식으로 환자 정보")
+    @PostMapping(value = "/{chartNum}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String,Object> searchChartNum(@PathVariable String chartNum) {
+        log.info("chartNum: {}", chartNum);
+        Map<String,Object> result = new HashMap<>();
+
+        // 키워드로 환자 검색
+        PatientRegister register = patientRegisterService.getPatient(chartNum);
+
+            log.info(register.toString());
+
+        result.put("result", register);
+        return result;
+    }
 }

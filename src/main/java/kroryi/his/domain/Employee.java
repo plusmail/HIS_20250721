@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "employees", schema = "project_db")
+@Table(name = "employees")
 public class Employee {
     @Id
     @Column(name = "EmployeeID", nullable = false, length = 10)
@@ -53,8 +53,4 @@ public class Employee {
 
     @Column(name = "emp_status", length = 10)
     private String empStatus;
-
-//    @OneToMany(mappedBy = "checkDoc")
-//    private Set<MedicalChart> medicalCharts = new LinkedHashSet<>();
-
 }

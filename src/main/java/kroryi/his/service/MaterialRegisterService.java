@@ -10,10 +10,15 @@ public interface MaterialRegisterService {
 
     MaterialRegister register(MaterialDTO materialDTO);
 
-    boolean isMaterialCodeDuplicate(String materialCode);
+    void customDeleteByMaterialCode(String materialCode);
 
-    List<MaterialRegister> searchByName(String materialName);
+    List<MaterialRegister> searchByCompanyName(String companyName);
 
-    void deleteMaterial(String materialCode);
+    List<MaterialRegister> searchByMaterialName(String materialName);
 
+    List<MaterialRegister> searchByCompanyNameAndMaterialName(String companyName, String materialName);
+
+    void updateMaterial(MaterialDTO materialDTO);
+
+    boolean isNewMaterial(String materialCode);
 }
