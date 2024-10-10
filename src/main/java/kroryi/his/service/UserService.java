@@ -1,5 +1,6 @@
 package kroryi.his.service;
 
+import kroryi.his.domain.PatientRegister;
 import kroryi.his.domain.User;
 import kroryi.his.dto.UserDTO;
 
@@ -40,7 +41,8 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    Object findAllUsers();
+   List<User> findAllUsers();
+
 
 }
 

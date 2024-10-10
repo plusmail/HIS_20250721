@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,13 +21,20 @@ import java.util.Map;
 
 @RestController
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/admin_management")
 @Log4j2
 @RequiredArgsConstructor
 public class UserController {
-
-
     private final UserService userService;
+   /* @GetMapping("/")
+    public List<User> getAllUsers() {
+        log.info("!!!!!!!!!!!!!!!!!!!");
+        return userService.findAllUsers();
+    }*/
+
+
+
+
 
     @PostMapping("/add")
     public ResponseEntity<String> addUser(@RequestBody UserDTO userDto) {
@@ -38,8 +47,14 @@ public class UserController {
 
     @ApiOperation(value = "회원 등록 POST", notes = "POST방식으로 회원 등록")
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> saveUser(@Valid @RequestBody UserDTO userDto) {
+    public Map<String, Object> saveUser(@Valid @RequestBody UserDTO userDto, BindingResult bindingResult)throws BindException {
         log.info("userDTO---------{}",userDto);
+
+        if(bindingResult.hasErrors()) {
+//            bindingResult.rejectValue("bno","값을 넣어야 합니다.");
+            throw new BindException(bindingResult);
+        }
+
         Map<String, Object> response = new HashMap<>();
         log.info("response---------{}",response);
         try {
@@ -80,13 +95,6 @@ public class UserController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false));
 //        }
 //    }
-
-    @GetMapping
-    public String getAllUsers(Model model) {
-        model.addAttribute("users", userService.findAllUsers());
-        return "admin_management";
-    }
-
 
     @RequestMapping("/admin/admin_management")
     public String main() {
