@@ -57,20 +57,22 @@ if (patientInfo) {
         `;
 
     const ageInput = document.getElementById('age');
-    PatientMaintenance(patientInfo.chartNum).then(patient => {
-        console.log(patient);
-        selectedMemos = patient.memos.sort((a, b) => {
-            const dateA = new Date(a.regDate);
-            const dateB = new Date(b.regDate);
-            return dateA - dateB; // This will sort in ascending order
-        });
-        // Call your test function with sorted selectedMemos
-        test(selectedMemos);
+    if (window.location.href.includes("/patient_register")) {
+        PatientMaintenance(patientInfo.chartNum).then(patient => {
+            console.log(patient);
+            selectedMemos = patient.memos.sort((a, b) => {
+                const dateA = new Date(a.regDate);
+                const dateB = new Date(b.regDate);
+                return dateA - dateB; // This will sort in ascending order
+            });
+            // Call your test function with sorted selectedMemos
+            test(selectedMemos);
 
-        assignPatientValues(patient);
+            assignPatientValues(patient);
 
-        ageInput.value = calculateAge(patient.birthDate);
-    })
+            ageInput.value = calculateAge(patient.birthDate);
+        })
+    }
 }
 
 document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
@@ -83,7 +85,6 @@ document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
         const tableBody = document.querySelector("#patientTableBody");
         tableBody.innerHTML = "";  // 기존 행을 지웁니다
         patientData = result; // 검색된 환자 정보를 전역 변수에 저장
-        console.log(result)
 
         result.forEach((patient, index) => {
             if (patient.name === '' || patient.name.includes(keyword.keyword)) {
@@ -195,6 +196,7 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
 });
 
 function test(selectedMemos) {
+    const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
     const rows = table.getElementsByClassName('new-row');
 
 
