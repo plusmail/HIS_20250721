@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import kroryi.his.domain.User;
 import kroryi.his.dto.UserDTO;
+import kroryi.his.repository.UserRepository;
 import kroryi.his.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,9 +34,6 @@ public class UserController {
     }*/
 
 
-
-
-
     @PostMapping("/add")
     public ResponseEntity<String> addUser(@RequestBody UserDTO userDto) {
         // 사용자 추가 로직
@@ -47,16 +45,16 @@ public class UserController {
 
     @ApiOperation(value = "회원 등록 POST", notes = "POST방식으로 회원 등록")
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> saveUser(@Valid @RequestBody UserDTO userDto, BindingResult bindingResult)throws BindException {
-        log.info("userDTO---------{}",userDto);
+    public Map<String, Object> saveUser(@Valid @RequestBody UserDTO userDto, BindingResult bindingResult) throws BindException {
+        log.info("userDTO---------{}", userDto);
 
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
 //            bindingResult.rejectValue("bno","값을 넣어야 합니다.");
             throw new BindException(bindingResult);
         }
 
         Map<String, Object> response = new HashMap<>();
-        log.info("response---------{}",response);
+        log.info("response---------{}", response);
         try {
             User user = userService.saveUser(userDto);
             log.info(user.toString());
@@ -72,7 +70,7 @@ public class UserController {
 
 //    @PostMapping("/save")
 //    public Map<String,User> saveUser(@RequestBody UserDTO userDto) {
-        // 사용자 저장 로직 처리 (데이터베이스에 저장 등)
+    // 사용자 저장 로직 처리 (데이터베이스에 저장 등)
        /* try {
             userService.saveUser(userDto);
             return ResponseEntity.ok().body(Map.of("success", true));
@@ -164,31 +162,44 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @GetMapping("/login")
-    public String loginGET(String error, String logout) {
-        log.info("로그인 컨트롤러");
-        log.info("로그아웃 : {}", logout);
-        if (logout != null) {
-            log.info("회원 로그아웃");
-        }
+    @PostMapping("/searchUsers")
+    @ResponseBody
+    public List<User> searchUsers(@RequestBody Map<String, String> params) {
+        String userId = params.get("id");
+        String userName = params.get("name");
+        String userRole = params.get("role");
+        String startDate = params.get("startDate");
 
-        return "user/login";
+        // 검색 조건을 사용해 사용자 목록 필터링
+        List<User> filteredUsers = UserRepository.findUsersByConditions(userId, userName, userRole, startDate);
+        return filteredUsers;
 
-    }
+//    @GetMapping("/login")
+//    public String loginGET(String error, String logout) {
+//        log.info("로그인 컨트롤러");
+//        log.info("로그아웃 : {}", logout);
+//        if (logout != null) {
+//            log.info("회원 로그아웃");
+//        }
 
-    // 새로운 사용자 추가 폼 페이지
-    @GetMapping("/users/new")
-    public String showNewUserForm(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
-        return "admin_management";
-    }
+//        return "user/login";
+//
+//    }
+
+//    // 새로운 사용자 추가 폼 페이지
+//    @GetMapping("/users/new")
+//    public String showNewUserForm(Model model) {
+//        User user = new User();
+//        model.addAttribute("user", user);
+//        return "admin_management";
+//    }
 
 
-    // 새로운 사용자 저장
+        // 새로운 사용자 저장
     /*@PostMapping("/users")
     public String saveUser(@ModelAttribute("user") User user) {
         userService.saveUser(user);
         return "redirect:/users";  // 사용자 리스트로 리디렉션
     }*/
+    }
 }
