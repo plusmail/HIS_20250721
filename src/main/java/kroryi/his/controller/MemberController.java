@@ -28,28 +28,26 @@ public class MemberController {
             log.info("회원 로그아웃");
         }
 
-        return "member/login";
+        return "user/login";
     }
-
+/*
     @GetMapping("/join")
-    public String joinGET() {
-        log.info("회원가입....");
-        return "member/join";
+    public void joinGET() {
+        log.info("join get.......");
     }
 
     @PostMapping("/join")
     public String joinPOST(MemberJoinDTO memberJoinDTO, RedirectAttributes redirectAttributes) {
-
-        log.info("회원가입 POST->>>");
-        log.info("memberJoinDTO: {}", memberJoinDTO);
+        log.info("join post--->{}", memberJoinDTO);
         try {
             memberService.join(memberJoinDTO);
-        }catch (MemberService.MidExistException e) {
-
+        }catch (MemberService.MidExistException e){
             redirectAttributes.addFlashAttribute("error", "mid");
-            return "redirect:/member/join";
+            return "redirect:/user/join";
         }
 
-        return "redirect:/home";
-    }
+        redirectAttributes.addFlashAttribute("result","success");
+
+        return "redirect:/user/login";
+    }*/
 }

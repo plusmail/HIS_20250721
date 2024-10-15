@@ -1,7 +1,7 @@
 package kroryi.his.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kroryi.his.security.CustomUserDetailsService;
+import kroryi.his.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,17 +55,17 @@ public class CustomerSecurityConfig {
                 )
                 .authorizeHttpRequests(
                         authorize -> authorize
-                                .requestMatchers("/member/login","/member/join").permitAll() //permitAll 모든 접근 허요
-//                                .anyRequest().authenticated() // 모든 사이트 다 막고 시작
+                                .requestMatchers("/member/login").permitAll()
 
-                                .anyRequest().permitAll() // 모든 사이트 다 막고 시작
+                                .anyRequest().authenticated() // 모든 사이트 다 막고 시작
+//                                .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
-                        .loginPage("/user/login") // 로그인 페이지로 이동
+                        .loginPage("/member/login") // 로그인 페이지로 이동
                         .defaultSuccessUrl("/home", true)
                         .permitAll() // 모든 사용자에 로그인 페이지 접근 허용
                 )
-                .oauth2Login(login->login.loginPage("/user/login"))
+                .oauth2Login(login->login.loginPage("/member/login"))
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling.accessDeniedHandler(accessDeniedHandler()))
                 .logout(LogoutConfigurer::permitAll

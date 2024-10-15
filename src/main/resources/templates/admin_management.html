@@ -20,20 +20,20 @@
                             <thead>
                             <tr>
                                 <th>아이디</th>
-                                <th>이메일</th>
-                                <th>비밀번호</th>
-                                <th>권한</th>
                                 <th>이름</th>
+                                <th>이메일</th>
+<!--                                <th>비밀번호</th>-->
+<!--                                <th>권한</th>-->
                             </tr>
                             </thead>
                             <tbody>
                             <!-- 사용자 리스트 반복 -->
-                            <tr th:each="user : ${users}">
-                                <td th:text="${user.id}"></td>
-                                <td th:text="${user.username}"></td>
+                            <tr th:each="user : ${members}">
+                                <td th:text="${user.mid}"></td>
+                                <td th:text="${user.name}"></td>
                                 <td th:text="${user.email}"></td>
-                                <td th:text="${user.role}"></td>
-                                <td th:text="${user.password}"></td>
+<!--                                <td th:text="${user.role}"></td>-->
+<!--                                <td th:text="${user.password}"></td>-->
                             </tr>
                             </tbody>
                         </table>
@@ -70,83 +70,10 @@
                             <button type="button" id="btnSearch" class="btn btn-primary">조회</button>
                             <button type="reset" id="btnReset" class="btn btn-secondary">초기화</button>
                             <!--                                <button type="button" id="btnEdit" class="btn btn-secondary mt-4">수정</button>-->
-                            <button type="button" id="btnDelete" class="btn btn-secondary" data-id="${user.id}">삭제</button>
+                            <button type="button" id="btnDelete" class="btn btn-secondary" data-id="${user.id}">삭제
+                            </button>
 
-                            <script>
-                                document.getElementById("btnDelete").addEventListener("click", function() {
-                                    const userId = this.getAttribute("data-id");
 
-                                    if (confirm("정말 삭제하시겠습니까?")) {
-                                        fetch(`/delete/${userId}`, {
-                                            method: 'POST', // DELETE로 하려면 method: 'DELETE' 사용
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': document.querySelector('input[name="_csrf"]').value // CSRF 보호
-                                            }
-                                        })
-                                            .then(response => {
-                                                if (response.ok) {
-                                                    alert("삭제되었습니다.");
-                                                    window.location.href = "/users"; // 삭제 후 리다이렉트
-                                                } else {
-                                                    alert("삭제에 실패했습니다.");
-                                                }
-                                            })
-                                            .catch(error => console.error('Error:', error));
-                                    }
-                                });
-                            </script>
-                            <script>
-                                document.getElementById("btnSearch").addEventListener("click", function() {
-                                    // 입력된 검색 조건을 가져옴
-                                    const userId = document.getElementById("txtId").value;
-                                    const userName = document.getElementById("txtName").value;
-                                    const userRole = document.getElementById("cmbAuth").value;
-                                    const startDate = document.getElementById("transactionStartDate").value;
-
-                                    // 검색 조건을 객체로 만들기
-                                    const searchParams = {
-                                        id: userId,
-                                        name: userName,
-                                        role: userRole,
-                                        startDate: startDate
-                                    };
-
-                                    // AJAX 요청을 통해 서버로 검색 조건을 전송
-                                    fetch("/searchUsers", {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json"
-                                        },
-                                        body: JSON.stringify(searchParams)
-                                    })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            // 서버로부터 받은 데이터를 이용해 사용자 리스트를 갱신
-                                            updateUserTable(data);
-                                        })
-                                        .catch(error => console.error('Error:', error));
-                                });
-
-                                function updateUserTable(users) {
-                                    const tbody = document.querySelector("table tbody");
-                                    tbody.innerHTML = ""; // 기존 데이터 삭제
-
-                                    // 새로운 사용자 리스트 추가
-                                    users.forEach(user => {
-                                        const row = document.createElement("tr");
-
-                                        row.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.username}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td>${user.password}</td>
-            `;
-                                        tbody.appendChild(row);
-                                    });
-                                }
-                            </script>
                             <!--                                <button type="button" id="btnSave" class="btn btn-success mt-4">저장</button>-->
                         </div>
                     </div>
@@ -162,26 +89,26 @@
                     <div class="row">
                         <div class="col">
                             <small>아이디</small>
-                            <input type="text" class="form-control" id="txtPopId" value="" size="20"
+                            <input type="text" class="form-control" id="txtPopId" name="mid" value="" size="20"
                                    placeholder="아이디 입력"
                                    required>
                             <small>비밀번호</small>
-                            <input type="password" class="form-control" id="txtPopPwd" value=""
+                            <input type="password" class="form-control" id="txtPopPwd" value="" name="password"
                                    placeholder="비밀번호 입력"
                                    required>
                             <small>사용자 권한</small>
-                            <select class="form-control" id="cmbPopUserAuth">
+                            <select class="form-control" id="cmbPopUserAuth" name="role">
                                 <option value="1">일반사용자</option>
                                 <option value="2">관리자</option>
                             </select>
                             <small>이름</small>
-                            <input type="text" class="form-control popTxt" id="txtPopName" value=""
+                            <input type="text" class="form-control popTxt" id="txtPopName" value="" name="name"
                                    placeholder="이름 입력">
                             <small>전화번호</small>
                             <input type="number" class="form-control popTxt" id="txtPopTel" min="0"
                                    placeholder="전화번호 입력" value="">
                             <small>이메일</small>
-                            <input type="email" class="form-control popTxt" id="txtPopMail"
+                            <input type="email" class="form-control popTxt" id="txtPopMail" name="email"
                                    placeholder="이메일 입력"
                                    value="">
 
@@ -192,10 +119,9 @@
                             <textarea class="form-control" id="note" placeholder="특이사항"></textarea><br>
                             <div class="card-footer">
                                 <div class="col" style="text-align: right;">
-                                    <a id="userTable" class="btn btn-success">저장</a>
+                                    <button id="userTable" class="btn btn-success">저장</button>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col">
                             <div class="card m-2 mb-1" style="height: 100%">
@@ -206,116 +132,40 @@
                                     <div class="row">
                                         <div class="col">
                                             <small>아이디</small>
-                                            <input type="text" class="form-control" id="txtPopId" value="" size="20"
+                                            <input type="text" class="form-control" value="" size="20"
                                                    placeholder="아이디 입력"
                                                    required>
                                             <small>비밀번호</small>
-                                            <input type="password" class="form-control" id="txtPopPwd" value=""
+                                            <input type="password" class="form-control" value=""
                                                    placeholder="비밀번호 입력"
                                                    required>
                                             <small>사용자 권한</small>
-                                            <select class="form-control" id="cmbPopUserAuth">
+                                            <select class="form-control" id="">
                                                 <option value="1">일반사용자</option>
                                                 <option value="2">관리자</option>
                                             </select>
                                             <small>이름</small>
-                                            <input type="text" class="form-control popTxt" id="txtPopName" value=""
+                                            <input type="text" class="form-control popTxt" value=""
                                                    placeholder="이름 입력">
                                             <small>전화번호</small>
-                                            <input type="number" class="form-control popTxt" id="txtPopTel" min="0"
+                                            <input type="number" class="form-control popTxt" min="0"
                                                    placeholder="전화번호 입력" value="">
                                             <small>이메일</small>
-                                            <input type="email" class="form-control popTxt" id="txtPopMail"
+                                            <input type="email" class="form-control popTxt"
                                                    placeholder="이메일 입력"
                                                    value="">
 
                                             <small>주소</small>
-                                            <input type="email" class="form-control popTxt" id="txtPop"
+                                            <input type="email" class="form-control popTxt"
                                                    placeholder="주소 입력"
                                                    value="">
                                             <small>특이사항</small>
-                                            <textarea class="form-control" id="note" placeholder="특이사항"></textarea><br>
+                                            <textarea class="form-control"  placeholder="특이사항"></textarea><br>
                                         </div>
-                                        <script>
-                                            document.getElementById("btnSearch").addEventListener("click", function() {
-                                                // 검색 조건을 가져옴
-                                                const userId = document.getElementById("txtId").value;
-                                                const userName = document.getElementById("txtName").value;
-                                                const userRole = document.getElementById("cmbAuth").value;
-                                                const startDate = document.getElementById("transactionStartDate").value;
-
-                                                // 검색 조건을 객체로 만들기
-                                                const searchParams = {
-                                                    id: userId,
-                                                    name: userName,
-                                                    role: userRole,
-                                                    startDate: startDate
-                                                };
-
-                                                // AJAX 요청을 통해 서버로 검색 조건을 전송
-                                                fetch("/searchUsers", {
-                                                    method: "POST",
-                                                    headers: {
-                                                        "Content-Type": "application/json"
-                                                    },
-                                                    body: JSON.stringify(searchParams)
-                                                })
-                                                    .then(response => response.json())
-                                                    .then(data => {
-                                                        if (data.length > 0) {
-                                                            // 검색된 사용자가 있으면 첫 번째 사용자 정보를 수정 폼에 표시
-                                                            const user = data[0];  // 예를 들어 첫 번째 사용자 선택
-
-                                                            // 사용자 정보를 수정 창에 채우기
-                                                            document.getElementById("txtPopId").value = user.id;
-                                                            document.getElementById("txtPopPwd").value = "";  // 비밀번호는 보안상 빈칸으로 둠
-                                                            document.getElementById("cmbPopUserAuth").value = user.role;
-                                                            document.getElementById("txtPopName").value = user.username;
-                                                            document.getElementById("txtPopTel").value = user.phone || "";  // 전화번호
-                                                            document.getElementById("txtPopMail").value = user.email;
-                                                            document.getElementById("txtPop").value = user.address || "";  // 주소
-                                                            document.getElementById("note").value = user.note || "";  // 특이사항
-                                                        } else {
-                                                            alert("검색된 사용자가 없습니다.");
-                                                        }
-                                                    })
-                                                    .catch(error => console.error('Error:', error));
-                                            });
-                                        </script>
-                                        <!-- <div class="col">
-                                             <small>아이디</small>
-                                             <input type="text" class="form-control" id="txtPopId" value="" size="20"
-                                                    placeholder="아이디 입력"
-                                                    required>
-                                             <small>비밀번호</small>
-                                             <input type="password" class="form-control" id="txtPopPwd" value=""
-                                                    placeholder="비밀번호 입력"
-                                                    required>
-                                             <small>사용자 권한</small>
-                                             <select class="form-control" id="cmbPopUserAuth">
-                                                 <option value="1">일반사용자</option>
-                                                 <option value="2">관리자</option>
-                                             </select>
-                                             <small>이름</small>
-                                             <input type="text" class="form-control popTxt" id="txtPopName" value=""
-                                                    placeholder="이름 입력">
-                                             <small>전화번호</small>
-                                             <input type="number" class="form-control popTxt" id="txtPopTel" min="0"
-                                                    placeholder="전화번호 입력" value="">
-                                             <small>이메일</small>
-                                             <input type="email" class="form-control popTxt" id="txtPopMail"
-                                                    placeholder="이메일 입력"
-                                                    value="">
-
-                                             <small>주소</small>
-                                             <input type="email" class="form-control popTxt" id="txtPop" placeholder="주소 입력"
-                                                    value="">
-                                             <small>특이사항</small>
-                                             <textarea class="form-control" id="note" placeholder="특이사항"></textarea><br>-->
                                     </div>
                                     <div class="card-footer">
                                         <div class="col" style="text-align: right;">
-                                            <a id="userTable" class="btn btn-success">저장</a>
+                                            <a  class="btn btn-success">저장</a>
                                         </div>
                                     </div>
                                 </div>
@@ -325,62 +175,9 @@
                     <div layout:fragment="content">
                     </div>
                     <!-- page script -->
-                    <script src="/js/user.js"></script>
                 </div>
             </div>
         </div>
-
-        <script>
-            function saveNote() {
-                const note = document.getElementById('note').value;
-                if (note) {
-                    const savedNotesDiv = document.getElementById('savedNotes');
-                    const noteElement = document.createElement('div');
-                    noteElement.textContent = note;
-                    savedNotesDiv.appendChild(noteElement);
-                    document.getElementById('note').value = ''; // 입력창 비우기
-                } else {
-                    alert('메모를 입력해주세요.');
-                }
-            }
-
-            function addUser() {
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const role = document.getElementById('role').value;
-
-                const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
-                const newRow = userTable.insertRow();
-                newRow.innerHTML = `<td>${userTable.rows.length}</td><td>${name}</td><td>${email}</td><td>${role}</td><td><button onclick="editUser(${userTable.rows.length - 1})">수정</button> <button onclick="deleteUser(this)">삭제</button></td>`;
-
-                document.getElementById('addUserForm').reset(); // 폼 초기화
-            }
-
-            function editUser(rowIndex) {
-                // 수정 기능을 구현하는 코드
-            }
-
-            function deleteUser(button) {
-                const row = button.parentNode.parentNode;
-                row.parentNode.removeChild(row);
-            }
-
-            function searchUser() {
-                const input = document.getElementById('search').value.toLowerCase();
-                const table = document.getElementById('userTable');
-                const rows = table.getElementsByTagName('tr');
-
-                for (let i = 1; i < rows.length; i++) {
-                    const cells = rows[i].getElementsByTagName('td');
-                    let match = false;
-
-                    for (let j = 0; j < cells.length - 1; j++) {
-                        if (cells[j].textContent.toLowerCase().indexOf(input) > -1) {
-                            match = true;
-                            break;
-                        }
-                    }
-                    rows[i].style.display = match ? "" : "none";
-                }
-            }
-        </script>
+    </div>
+    <script src="/js/admin_management.js"></script>
+</div>

@@ -1,8 +1,8 @@
 package kroryi.his.controller;
 
 
-import kroryi.his.domain.User;
-import kroryi.his.service.UserService;
+import kroryi.his.domain.Member;
+import kroryi.his.service.MemberService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,15 +21,15 @@ public class HomeController {
 
     //    사용자관리
     @Autowired
-    private UserService userService;  // UserService 주입
+    private MemberService memberService;  // UserService 주입
 
     @GetMapping("/admin_management")
     public String adminManagement(Model model) {
         // 사용자 목록을 가져옴
-        List<User> users = userService.findAllUsers();
+        List<Member> members = memberService.findAllUsers();
 
         // 모델에 사용자 목록을 추가
-        model.addAttribute("users", users);
+        model.addAttribute("members", members);
 
         // admin_management.jsp로 이동 (또는 다른 뷰 템플릿)
         return "admin_management";

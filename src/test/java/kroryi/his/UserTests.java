@@ -1,9 +1,8 @@
 package kroryi.his;
 
-import kroryi.his.domain.PatientRegister;
-import kroryi.his.domain.User;
+import kroryi.his.domain.Member;
 import kroryi.his.repository.UserRepository;
-import kroryi.his.service.UserService;
+import kroryi.his.service.MemberService;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,13 @@ public class UserTests {
     UserRepository userRepository;
 
     @Autowired
-    UserService userService;
+    MemberService memberService;
 
     @Test
     public void testUserAllFind(){
 
-        List<User> registers = userService.findAllUsers();
-        for (User register : registers) {
+        List<Member> registers = memberService.findAllUsers();
+        for (Member register : registers) {
             log.info(register);
         }
     }
