@@ -1,9 +1,6 @@
 package kroryi.his.domain;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
@@ -26,7 +23,9 @@ public class Member extends BaseEntity{
     private boolean retirement;
     private String social;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "member_role_set", joinColumns = @JoinColumn(name = "member_mid"))
+    @Enumerated(EnumType.ORDINAL) // Store enum as string
     @Builder.Default
     private Set<MemberRole> roleSet = new HashSet<>();
 

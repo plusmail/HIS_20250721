@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -90,8 +91,29 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public List<Member> getMembersByRole(MemberRole role) {
+        return memberRepository.findByRoleSet(role);
+    }
+
+    @Override
+    public List<MemberJoinDTO> getMembers() {
+        List<Member> members = memberRepository.findAll();
+        return members.stream()
+                .map(member -> new MemberJoinDTO(
+                        member.getMid(),
+                        member.getName(),
+                        member.getPassword(),
+                        member.getEmail(),
+                        member.isRetirement(),
+                        member.getSocial(),
+                        member.getRoleSet()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Member> findAllUsers() {
-        log.info(memberRepository.findAll());
+        log.info("!!!!!!!!!!!!!!!!!" + memberRepository.findAll());
 
         return memberRepository.findAll();
     }

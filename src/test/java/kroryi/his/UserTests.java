@@ -1,7 +1,9 @@
 package kroryi.his;
 
 import kroryi.his.domain.Member;
-import kroryi.his.repository.UserRepository;
+import kroryi.his.domain.MemberRole;
+import kroryi.his.domain.PatientRegister;
+import kroryi.his.repository.MemberRepository;
 import kroryi.his.service.MemberService;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,7 @@ import java.util.List;
 @Log4j2
 public class UserTests {
     @Autowired
-    UserRepository userRepository;
+    MemberRepository memberRepository;
 
     @Autowired
     MemberService memberService;
@@ -25,6 +27,15 @@ public class UserTests {
         List<Member> registers = memberService.findAllUsers();
         for (Member register : registers) {
             log.info(register);
+        }
+    }
+
+    @Test
+    public void testSearchName(){
+
+        List<Member> Members = memberService.getMembersByRole(MemberRole.EMP);
+        for (Member Member : Members) {
+            log.info(Member.toString());
         }
     }
 }

@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import kroryi.his.domain.Member;
 import kroryi.his.dto.MemberJoinDTO;
-import kroryi.his.repository.UserRepository;
+import kroryi.his.repository.MemberRepository;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,8 +26,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
-    @ApiOperation(value = "회원 등록 POST", notes = "POST방식으로 회원 등록")
+    @ApiOperation(value = "회원 등록 POST", notes = "POST 방식으로 회원 등록")
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> saveUser(@Valid @RequestBody MemberJoinDTO memberJoinDTO, BindingResult bindingResult) throws BindException {
         log.info("userDTO---------{}", memberJoinDTO);
@@ -110,44 +111,15 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @PostMapping("/searchUsers")
+   /* @PostMapping("/searchUsers")
     @ResponseBody
     public List<Member> searchUsers(@RequestBody Map<String, String> params) {
-        String userId = params.get("id");
-        String userName = params.get("name");
+        String userId = params.get("mid");
+        String userName = params.get("username");
         String userRole = params.get("role");
         String startDate = params.get("startDate");
 
         // 검색 조건을 사용해 사용자 목록 필터링
-        List<Member> filteredUsers = UserRepository.findUsersByConditions(userId, userName, userRole, startDate);
-        return filteredUsers;
-
-//    @GetMapping("/login")
-//    public String loginGET(String error, String logout) {
-//        log.info("로그인 컨트롤러");
-//        log.info("로그아웃 : {}", logout);
-//        if (logout != null) {
-//            log.info("회원 로그아웃");
-//        }
-
-//        return "user/login";
-//
-//    }
-
-//    // 새로운 사용자 추가 폼 페이지
-//    @GetMapping("/users/new")
-//    public String showNewUserForm(Model model) {
-//        User user = new User();
-//        model.addAttribute("user", user);
-//        return "admin_management";
-//    }
-
-
-        // 새로운 사용자 저장
-    /*@PostMapping("/users")
-    public String saveUser(@ModelAttribute("user") User user) {
-        userService.saveUser(user);
-        return "redirect:/users";  // 사용자 리스트로 리디렉션
+        return memberRepository.findUsersByConditions(userId, userName, userRole, startDate);
     }*/
-    }
 }

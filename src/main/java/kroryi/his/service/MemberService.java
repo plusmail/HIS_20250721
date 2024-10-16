@@ -1,6 +1,7 @@
 package kroryi.his.service;
 
 import kroryi.his.domain.Member;
+import kroryi.his.domain.MemberRole;
 import kroryi.his.dto.MemberJoinDTO;
 
 import java.util.List;
@@ -25,6 +26,10 @@ public interface MemberService {
     Member getUserById(Long id);
 
     void deleteUser(Long id);
+
+    List<Member> getMembersByRole(MemberRole role);
+
+    List<MemberJoinDTO> getMembers();
 
     List<Member> findAllUsers();
 }
