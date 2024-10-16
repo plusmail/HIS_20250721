@@ -27,6 +27,12 @@ import java.util.Map;
 public class UserController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    @GetMapping("/")
+    @ResponseBody
+    public List<MemberJoinDTO> getMembers() {
+        return memberService.getMembers(); // DTO 리스트 반환
+    }
+
 
     @ApiOperation(value = "회원 등록 POST", notes = "POST 방식으로 회원 등록")
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -34,13 +40,13 @@ public class UserController {
         log.info("userDTO---------{}", memberJoinDTO);
 
         if (bindingResult.hasErrors()) {
-//            bindingResult.rejectValue("bno","값을 넣어야 합니다.");
             throw new BindException(bindingResult);
         }
 
         Map<String, Object> response = new HashMap<>();
         log.info("response---------{}", response);
         try {
+            log.info("~~~~~~~~~~~~: {}",memberJoinDTO);
             memberService.join(memberJoinDTO);
             response.put("success", true);
             response.put("message", "등록 성공");

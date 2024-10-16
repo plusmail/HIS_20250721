@@ -1,3 +1,26 @@
+window.onload = function() {
+    axios.get('/admin_management/') // 적절한 API 엔드포인트를 사용
+        .then(response => {
+            const members = response.data; // 서버에서 가져온 데이터
+            const tbody = document.querySelector('#membersTable tbody');
+
+            // 사용자 리스트를 반복하며 테이블에 추가
+            members.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${user.mid}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.roles.join(', ')}</td> <!-- Set이나 배열을 문자열로 변환 -->
+                    `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching members:', error);
+        });
+};
+
 // 저장 버튼 클릭 이벤트
 document.getElementById('userTable').addEventListener('click', function (event) {
     event.preventDefault(); // 기본 동작 방지
@@ -8,13 +31,15 @@ document.getElementById('userTable').addEventListener('click', function (event) 
         // 사용자 입력값 가져오기
         mid: document.getElementById('txtPopId').value,
         password: document.getElementById('txtPopPwd').value,
-        role: document.getElementById('cmbPopUserAuth').value,
+        roles: Array.from(document.getElementById('cmbPopUserAuth').value),
+        // roles: document.getElementById('cmbPopUserAuth').value,
         name: document.getElementById('txtPopName').value,
         // phone : document.getElementById('txtPopTel').value,
         email: document.getElementById('txtPopMail').value,
         // address: document.getElementById('txtPop').value,
         // note : document.getElementById('note').value
     };
+    console.log(userData)
     // 필수 입력값 체크
     if (!userData.mid || !userData.password || !userData.name || !userData.email) {
         alert('필수 입력값을 확인하세요.');

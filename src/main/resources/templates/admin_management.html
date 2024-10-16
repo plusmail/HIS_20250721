@@ -16,14 +16,15 @@
                 </div>
                 <div class="card-body">
                     <div style="max-height: 500px; overflow-y: auto;">
-                        <table class="table table-striped">
+                        <table class="table table-striped" id="membersTable">
                             <thead>
                             <tr>
                                 <th>아이디</th>
                                 <th>이름</th>
                                 <th>이메일</th>
-<!--                                <th>비밀번호</th>-->
                                 <th>권한</th>
+                                <!--                                <th>비밀번호</th>-->
+
                             </tr>
                             </thead>
                             <tbody>
@@ -54,9 +55,10 @@
                         <div class="col">
                             <small>권한</small>
                             <select id="cmbAuth" class="form-control">
-                                <option value="">전체</option>
-                                <option value="1">일반사용자</option>
-                                <option value="2">관리자</option>
+                                <option value="0">관리자</option>
+                                <option value="1">의사</option>
+                                <option value="2">간호사</option>
+                                <option value="3">일반사용자</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -98,8 +100,11 @@
                                    required>
                             <small>사용자 권한</small>
                             <select class="form-control" id="cmbPopUserAuth" name="role">
-                                <option value="1">일반사용자</option>
-                                <option value="2">관리자</option>
+                                <option value="0">일반사용자</option>
+                                <option value="1">관리자</option>
+                                <option value="2">의사</option>
+                                <option value="3">간호사</option>
+
                             </select>
                             <small>이름</small>
                             <input type="text" class="form-control popTxt" id="txtPopName" value="" name="name"

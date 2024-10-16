@@ -30,6 +30,4 @@ public interface MemberService {
     List<Member> getMembersByRole(MemberRole role);
 
     List<MemberJoinDTO> getMembers();
-
-    List<Member> findAllUsers();
 }

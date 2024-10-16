@@ -22,15 +22,6 @@ public class UserTests {
     MemberService memberService;
 
     @Test
-    public void testUserAllFind(){
-
-        List<Member> registers = memberService.findAllUsers();
-        for (Member register : registers) {
-            log.info(register);
-        }
-    }
-
-    @Test
     public void testSearchName(){
 
         List<Member> Members = memberService.getMembersByRole(MemberRole.EMP);

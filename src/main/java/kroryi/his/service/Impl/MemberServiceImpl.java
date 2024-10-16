@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -34,7 +35,20 @@ public class MemberServiceImpl implements MemberService {
         Member member = modelMapper.map(memberJoinDTO, Member.class);
         member.changePassword(passwordEncoder.encode(memberJoinDTO.getPassword()));
 
-        member.addRole(MemberRole.EMP);
+        Set<MemberRole> rolesSet = memberJoinDTO.getRoles();
+
+        if(rolesSet.contains(MemberRole.EMP)) {
+            member.addRole(MemberRole.EMP);
+        } else if (rolesSet.contains(MemberRole.ADMIN)) {
+            member.addRole(MemberRole.ADMIN);
+        } else if (rolesSet.contains(MemberRole.DOCTOR)) {
+            member.addRole(MemberRole.DOCTOR);
+
+        } else if (rolesSet.contains(MemberRole.NURSE)) {
+            member.addRole(MemberRole.NURSE);
+        }else{
+            member.addRole(MemberRole.EMP);
+        }
         log.info("============");
         log.info(member);
         log.info(member.getRoleSet());
@@ -110,12 +124,4 @@ public class MemberServiceImpl implements MemberService {
                 ))
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public List<Member> findAllUsers() {
-        log.info("!!!!!!!!!!!!!!!!!" + memberRepository.findAll());
-
-        return memberRepository.findAll();
-    }
-
 }
