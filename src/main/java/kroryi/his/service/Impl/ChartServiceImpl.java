@@ -115,6 +115,22 @@ public class ChartServiceImpl implements ChartService {
     }
 
     @Override
+    public MedicalChartDTO addMedicalChart(String teethNum, String plan, String chartNum, String paName) {
+
+        MedicalChart chartPlan = MedicalChart.builder()
+                .teethNum(teethNum)
+                .medicalDivision(plan)
+                .mdTime(LocalDate.now())
+                .checkDoc("의사")
+                .paName(paName)
+                .chartNum(chartNum)
+                .build();
+
+        medicalChartRepository.save(chartPlan);
+        return null;
+    }
+
+    @Override
     // 새로운 메모를 저장
     public ChartMemo saveMemo(ChartMemo newMemo) {
         return chartMemoRepository.save(newMemo);  // 메모를 데이터베이스에 저장

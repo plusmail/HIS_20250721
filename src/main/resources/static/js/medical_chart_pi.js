@@ -66,7 +66,9 @@ function saveChartNum() {
             chartNum: patientInfos.chartNum
         }),
         success: function (response) {
-        },
+
+        }
+        ,
         error: function (xhr, status, error) {
             console.log("fail")
             console.error('Failed to add to sublist:', error);
@@ -78,9 +80,7 @@ function fetchSessionItems() {
     $.ajax({
         url: '/medical_chart/get-session-items',
         method: 'GET',
-        success: function (response) {
-            console.log("------------ response ->" + response)
-            renderItems(response);
+        success: function (response) {renderItems(response);
         },
         error: function (xhr, status, error) {
             console.error('Failed to fetch session items:', error);
@@ -103,7 +103,6 @@ function masterToSubList(subListIndex, newValue, listIndex, trueFalse) {
             addOrDelete: trueFalse
         }),
         success: function (response) {
-            console.log("masterToSubList ->" + response);
             fetchSessionItems(); // 변경된 세션 데이터를 가져와 화면에 갱신
         },
         error: function (xhr, status, error) {
@@ -195,7 +194,6 @@ symptom.addEventListener("click", e => {
         symptomList.push(e.target.value);
         if (e.target.checked) {
             masterToSubList(1, symptomList, listIndex, true);
-            console.log(symptomList)
         } else {
             masterToSubList(1, symptomList, listIndex, false);
         }
@@ -214,7 +212,6 @@ saveMemo.addEventListener("click", e => {
     listIndex++;
     masterToSubList(null, null, listIndex, true)
     toothValueReset()
-    console.log(memoList)
 
 })
 

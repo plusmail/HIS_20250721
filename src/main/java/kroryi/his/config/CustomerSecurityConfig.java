@@ -57,8 +57,8 @@ public class CustomerSecurityConfig {
                         authorize -> authorize
                                 .requestMatchers("/member/login").permitAll()
 
-                                .anyRequest().authenticated() // 모든 사이트 다 막고 시작
-//                                .anyRequest().permitAll()
+//                                .anyRequest().authenticated() // 모든 사이트 다 막고 시작
+                                .anyRequest().permitAll()       // 모든 사이트 비로그인 접근 허용.
                 )
                 .formLogin(form -> form
                         .loginPage("/member/login") // 로그인 페이지로 이동
