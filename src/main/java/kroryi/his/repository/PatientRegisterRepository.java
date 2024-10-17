@@ -11,7 +11,5 @@ public interface PatientRegisterRepository extends JpaRepository<PatientRegister
 
     PatientRegister findTopByChartNumStartingWithOrderByChartNumDesc(String chartNum);
 
-//    List<PatientRegister> findByName(String keyword);
-
     List<PatientRegister> findByNameContainingIgnoreCase(String keyword);
 }
