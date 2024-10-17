@@ -14,26 +14,16 @@ import java.util.List;
 import java.util.Optional;
 import java.io.*;
 
-public interface MaterialTransactionRepository extends JpaRepository<MaterialTransactionRegister, Long> {
-    // 재료명으로 검색
-    List<MaterialTransactionRegister> findByMaterialRegisterMaterialNameContaining(String materialName);
-
-    // 재료코드로 검색
-    List<MaterialTransactionRegister> findByMaterialRegisterMaterialCodeContaining(String materialCode);
-
-    Optional<MaterialTransactionRegister> findBystockInDateAndMaterialRegister(LocalDate stockInDate, MaterialRegister materialRegister);
-
-    // MaterialRegister로 검색 (MaterialRegister 자체로 트랜잭션 조회)
-    List<MaterialTransactionRegister> findByMaterialRegister(MaterialRegister materialRegister);
+public interface MaterialStatusRepository extends JpaRepository<MaterialTransactionRegister, Long> {
 
     @Query("SELECT mt FROM MaterialTransactionRegister mt " +
-            "JOIN mt.materialRegister mr " +
-            "JOIN mr.companyRegister cr " +
-            "WHERE (:materialName IS NULL OR LOWER(mr.materialName) LIKE LOWER(:materialName)) " +
-            "AND (:materialCode IS NULL OR LOWER(mr.materialCode) LIKE LOWER(:materialCode)) " +
-            "AND (:companyName IS NULL OR LOWER(cr.companyName) LIKE LOWER(:companyName)) " +
-            "AND (:transactionStartDate IS NULL OR mt.stockInDate >= :transactionStartDate) " +
-            "AND (:transactionEndDate IS NULL OR mt.stockInDate <= :transactionEndDate) " +
+            "LEFT JOIN mt.materialRegister mr " +
+            "LEFT JOIN mr.companyRegister cr " +
+            "WHERE (:materialName IS NULL OR :materialName = '' OR LOWER(mr.materialName) LIKE LOWER(CONCAT('%', :materialName, '%'))) " +
+            "AND (:materialCode IS NULL OR :materialCode = '' OR LOWER(mr.materialCode) LIKE LOWER(CONCAT('%', :materialCode, '%'))) " +
+            "AND (:transactionStartDate IS NULL OR mr.firstRegisterDate >= :transactionStartDate) " +
+            "AND (:transactionEndDate IS NULL OR mr.firstRegisterDate <= :transactionEndDate) " +
+            "AND (:companyName IS NULL OR :companyName = '' OR LOWER(cr.companyName) LIKE LOWER(CONCAT('%', :companyName, '%'))) " +
             "AND (:belowSafetyStock IS NULL OR mt.belowSafetyStock = :belowSafetyStock) " +
             "AND (:stockManagementItem IS NULL OR mr.stockManagementItem = :stockManagementItem)")
     Optional<List<MaterialTransactionRegister>> findSearch(
