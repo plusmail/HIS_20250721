@@ -57,8 +57,8 @@
                         <div class="input-group col">
                             <input type="text" class="form-control" id="patient_name_keyword" placeholder="환자성명 입력">
                             <button type="button" class="btn btn-secondary" id="resetBtn">
-                                <i class="bi bi-x-circle" style="padding: 0.5rem;"></i>
-                            </button>
+                            <i class="bi bi-x-circle" style="padding: 0.5rem;"></i>
+                        </button>
                         </div>
                         <div class="col">
 
@@ -145,8 +145,12 @@
 <div layout:fragment="inventory_management" style="width: 100%"></div>
 
 <script layout:fragment="patientscript" th:inline="javascript"></script>
+<script layout:fragment="axios" th:inline="javascript"></script>
 <script layout:fragment="reservationscript" th:inline="javascript"></script>
+
 <script layout:fragment="chartscript" th:inline="javascript"></script>
+<script layout:fragment="chartscriptPlan" th:inline="javascript"></script>
+
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/axios.js"></script>

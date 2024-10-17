@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -32,6 +35,9 @@ public class PatientAdmissionController {
         return ResponseEntity.ok("{\"message\": \"환자가 대기 상태로 등록되었습니다.\"}");
     }
 
+
+
+
     // 대기 환자 목록 반환
     @GetMapping("/waiting")
     public ResponseEntity<List<PatientAdmission>> getWaitingPatients() {
@@ -48,8 +54,6 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setViTime(LocalDateTime.now());
         patientAdmissionDTO.setTreatStatus("2"); // 진료중은 2
 
-
-
         // DB에 저장
         patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 
@@ -59,30 +63,56 @@ public class PatientAdmissionController {
     // 진료 중 대기 환자 목록 반환
     @GetMapping("/treatment/waiting")
     public ResponseEntity<List<PatientAdmission>> getWaitingPatientsForTreatment() {
-        List<PatientAdmission> waitingPatients = patientAdmissionService.getWaitingPatients();
-        return ResponseEntity.ok(waitingPatients);
+        List<PatientAdmission> inTreatmentPatients  = patientAdmissionService.getWaitingPatients();
+        return ResponseEntity.ok(inTreatmentPatients );
     }
 
-//    진료완료
-    @PostMapping("/completed/start")
+    //    진료완료
+    @PostMapping("/completeTreatment")
     public ResponseEntity<String> completed(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
-    System.out.println("진료 완료 요청 수신: " + patientAdmissionDTO);
+        System.out.println("진료 완료 요청 수신: " + patientAdmissionDTO);
+
+        // 진료 완료 시간 처리
+        LocalDateTime completionTime = LocalDateTime.now();
+        patientAdmissionDTO.setCompletionTime(completionTime); // completionTime 설정
+        patientAdmissionDTO.setTreatStatus("3");
+
+        // viTime 처리
+        LocalDateTime viTime = patientAdmissionDTO.getViTime(); // 클라이언트로부터 받은 viTime
+        if (viTime == null) {
+            System.err.println("viTime이 null입니다.");
+            return ResponseEntity.badRequest().body("{\"message\": \"viTime은 필수입니다.\"}");
+        }
+
+        // DTO 저장
+        patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+        return ResponseEntity.ok("{\"message\": \"환자가 진료 완료 상태로 등록되었습니다.\"}");
+    }
 
 
-    patientAdmissionDTO.setCompletionTime(LocalDateTime.now());
-    patientAdmissionDTO.setTreatStatus("3"); //
 
 
-    patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+    @GetMapping("/date/{date}")
+    public List<PatientAdmissionDTO> getAdmissionsByDate(@PathVariable String date) {
+        try {
+            // 날짜 문자열을 LocalDate로 변환
+            LocalDate localDate = LocalDate.parse(date);
+            LocalDateTime startDate = localDate.atStartOfDay(); // 시작 시간
+            LocalDateTime endDate = localDate.plusDays(1).atStartOfDay(); // 끝 시간
 
-    return ResponseEntity.ok("환자가 진료 완료 상태로 등록되었습니다.");
-}
+            System.out.println("시작 날짜: " + startDate); // 시작 날짜 로그
+            System.out.println("종료 날짜: " + endDate); // 종료 날짜 로그
 
-    // 진료 중 대기 환자 목록 반환
-    @GetMapping("/completed/waiting")
-    public ResponseEntity<List<PatientAdmission>> getWaitingPatientsForCompleted() {
-        List<PatientAdmission> waitingPatients = patientAdmissionService.getWaitingPatients();
-        return ResponseEntity.ok(waitingPatients);
+            // 해당 날짜의 환자 접수 정보를 가져옴
+            List<PatientAdmissionDTO> admissions = patientAdmissionService.getAdmissionsByReceptionTime(startDate, endDate);
+
+            System.out.println("가져온 환자 접수 정보: " + admissions); // 가져온 환자 접수 정보 로그
+
+            return admissions;
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력
+            return Collections.emptyList(); // 비어 있는 리스트 반환
+        }
     }
 
 }

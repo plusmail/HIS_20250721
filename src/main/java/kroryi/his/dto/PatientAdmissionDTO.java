@@ -1,5 +1,6 @@
 package kroryi.his.dto;
 
+import kroryi.his.domain.PatientAdmission;
 import lombok.*;
 
 import java.io.Serializable;
@@ -22,4 +23,6 @@ public class PatientAdmissionDTO implements Serializable {
     private LocalDateTime viTime;  // 진료 시작 시간
     private LocalDateTime completionTime;  //진료 완료 시간
     private String treatStatus;
+
+
 }
