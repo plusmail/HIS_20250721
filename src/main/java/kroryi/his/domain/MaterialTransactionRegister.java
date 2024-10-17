@@ -5,11 +5,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Builder
 @Getter
 @Setter
@@ -17,10 +18,11 @@ import java.time.LocalDate;
 public class MaterialTransactionRegister {
 
     //material 테이블과 join. 무한참조 방지
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
     @JoinColumn(name = "material_Code", nullable = false)
     private MaterialRegister materialRegister;
+
 
     //입출일자 아이디(PK)
     @Id
@@ -28,17 +30,13 @@ public class MaterialTransactionRegister {
     @Column(name = "transaction_Id")
     private Long transactionId;
 
-    //입출일자
-    @Column(name = "transaction_Date")
-    private LocalDate transactionDate;
+    //입고일자
+    @Column(name = "stock_in_date", nullable = false)
+    private LocalDate stockInDate;
 
     //입고량
     @Column(name = "stock_In")
     private Long stockIn;
-
-    //출고량
-    @Column(name = "stock_Out")
-    private Long stockOut;
 
     //잔량
     @Column(name = "remaining_Stock")
