@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "patient_admissions", schema = "project_db")
+@Table(name = "patient_admissions")
 public class PatientAdmission {
     @Id
     @Column(name = "chart_num", nullable = false)
