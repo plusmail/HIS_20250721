@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "chart_memo", schema = "project_db")
+@Table(name = "chart_memo")
 public class ChartMemo {
 
     @Id

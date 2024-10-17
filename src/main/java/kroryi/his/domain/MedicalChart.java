@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Builder
-@Table(name = "medical_chart", schema = "project_db")
+@Table(name = "medical_chart")
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicalChart {
