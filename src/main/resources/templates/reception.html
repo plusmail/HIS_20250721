@@ -4,54 +4,13 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
-<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cerulean/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
-<link rel="stylesheet" href="/static/css/patient_admission.css">
 
-<style>
-    /* 테이블의 스타일 설정 */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    /* 헤더를 고정시키기 위한 스타일 */
-    thead th {
-        position: sticky;
-        top: 0;
-        background-color: #FFCCCC; /* 헤더 배경색 */
-        z-index: 1; /* 헤더가 다른 내용 위에 오도록 설정 */
-        border: 1px solid #dee2e6; /* 헤더 테두리 색상 */
-    }
-
-    /* 스크롤이 가능한 tbody 스타일 */
-    .scrollable-tbody {
-        display: block;
-        height: 300px; /* 높이 설정 */
-        overflow-y: auto; /* 상하 스크롤바 표시 */
-        width: 100%; /* 테이블 너비에 맞춤 */
-    }
-
-    /* tbody의 tr을 테이블 레이아웃으로 설정 */
-    tbody tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed; /* 열 너비 고정 */
-    }
-
-    /* 테두리 및 패딩 추가 */
-    th, td {
-        padding: 8px;
-        border: 1px solid #dee2e6; /* 테두리 색상 */
-    }
+<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">-->
 
 
-</style>
 
 <div layout:fragment="reception">
+    <link  rel="stylesheet" href="/css/patient_admission.css">
     <div class="button-container">
 
         <!-- 날짜 선택 기능 -->
@@ -60,19 +19,19 @@
         <!--  접수 버튼-->
         <button class="btn btn-info ReceptionBtn">접수</button>
 
-        <button id="startTreatmentButton">진료중</button>
+        <button id="startTreatmentButton" class="btn btn-secondary">진료중</button>
 
-        <button id="completeTreatmentButton">진료완료</button>
+        <button id="completeTreatmentButton" class="btn btn-success">진료완료</button>
 
         <button id="cancelReceptionButton" class="btn btn-warning">접수 취소</button>
 
     </div>
-    <div style="display: flex;">
+    <div class="table-container">
         <!-- 진료대기테이블 -->
-        <table id="waitingPatientsTable" border="1" cellspacing="0" cellpadding="5" style="width: 460px">
-            <thead>
+        <table id="waitingPatientsTable" class="table table-hover">
+            <thead class="table-secondary">
             <tr>
-                <th colspan="6" bgcolor="#FFCCCC">진료 대기 환자: 0명</th>
+                <th colspan="6">진료 대기 환자: 0명</th>
             </tr>
             <tr>
                 <th>0</th>
@@ -81,21 +40,19 @@
                 <th>의사</th>
                 <th>예약시간</th>
                 <th>접수시간</th>
-
             </tr>
             </thead>
-            <tbody style="height: 300px" class="scrollable-tbody">
+            <tbody id="waitingPatientsBody">
 
 
             </tbody>
         </table>
 
         <!-- 진료중테이블 -->
-        <table id="treatmentPatientsTable" border="1" cellspacing="0" cellpadding="5"
-               style="margin-left: 10px; width: 460px ">
-            <thead>
+        <table id="treatmentPatientsTable" class="table table-hover">
+            <thead class="table-light">
             <tr>
-                <th colspan="7" bgcolor="#CCFFCC">진료중환자 : 0명</th>
+                <th colspan="6">진료중환자 : 0명</th>
             </tr>
 
             <tr>
@@ -103,22 +60,20 @@
                 <th>차트번호</th>
                 <th>환자이름</th>
                 <th>의사</th>
-                <th>예약시간</th>
-                <th>진료시작시간</th>
                 <th>접수시간</th>
+                <th>진료시작시간</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="treatmentPatientsBody">
 
             </tbody>
         </table>
 
         <!-- 진료완료테이블 -->
-        <table id="completedPatientsTable" border="1" cellspacing="0" cellpadding="5"
-               style="margin-left: 10px; width: 460px">
-            <thead>
+        <table id="completedPatientsTable" class="table table-hover">
+            <thead class="table-light">
             <tr>
-                <th colspan="6" bgcolor="#FF9999">진료 완료 환자:0명</th>
+                <th colspan="6" >진료 완료 환자: 0명</th>
             </tr>
             <tr>
                 <th>0</th>
@@ -129,7 +84,7 @@
                 <th>진료완료시간</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="completedPatientsBody">
 
             </tbody>
         </table>
@@ -172,13 +127,30 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="confirmTreatmentBtn">예</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">아니요</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">아니요</button>
                 </div>
             </div>
         </div>
     </div>
 
-
+    <div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="completeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="completeModalLabel">진료 완료</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="completeInfo"></p>
+                    <p>진료완료로 이동 하시겠습니까?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmCompleteButton">예</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">아니요</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
