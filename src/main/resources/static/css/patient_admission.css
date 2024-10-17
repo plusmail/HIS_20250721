@@ -1,55 +1,87 @@
-/* 커스텀 컨텍스트 메뉴 스타일 */
-.custom-context-menu {
-    position: absolute;
-    background-color: white;
+/* 전체 테이블 컨테이너 */
+.date-input {
+    width: 130px;
+    height: 30px;
+    padding: 5px;
+    font-size: 15px;
     border: 1px solid #ccc;
-    z-index: 1000;
-    width: 150px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.custom-context-menu div {
-    padding: 10px;
-    cursor: pointer;
-}
-
-.custom-context-menu div:hover {
-    background-color: #f0f0f0;
-}
-
-/* 선택된 행 강조 스타일 */
-.selected-row {
-    background-color: #FFCCCC; /* 선택된 행의 배경색 */
+.button-container button {
+    width: 130px;
+    height: 30px;
+    font-size: 15px;
+    margin: 0 10px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
 }
 
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+
+.table-container {
+    display: flex;
+    gap: 10px; /* 테이블 간의 간격 */
+    align-items: flex-start;
+    margin-top: 20px;
+    font-size: small;
 }
 
-thead th {
-    position: sticky;
-    top: 0;
-    background-color: #FFCCCC; /* 헤더 배경색 */
-    z-index: 1; /* 헤더가 다른 내용 위에 오도록 설정 */
-    border: 1px solid #dee2e6; /* 헤더 테두리 색상 */
+#waitingPatientsTable {
+    width: 600px;             /* 대기 환자 테이블의 높이 설정 */
+    margin-left: 10px;
+}
+#treatmentPatientsTable {
+    width: 650px;             /* 진료 중 환자 테이블의 높이 설정 */
 }
 
-.scrollable-tbody {
-    display: block;
-    height: 300px; /* 높이 설정 */
-    overflow-y: auto; /* 상하 스크롤바 표시 */
-    width: 100%; /* 테이블 너비에 맞춤 */
+#completedPatientsTable {
+    width: 630px;             /* 진료 완료 환자 테이블의 높이 설정 */
 }
-
-tbody tr {
+thead {
+    background-color: #f8f9fa; /* 헤더 배경색 */
     display: table;
     width: 100%;
-    table-layout: fixed; /* 열 너비 고정 */
+    table-layout: fixed;
 }
 
-th, td {
-    padding: 8px;
-    border: 1px solid #dee2e6; /* 테두리 색상 */
+
+/* tbody에 스크롤바 추가 */
+tbody {
+    display: block;
+    max-height: 520px; /* tbody의 최대 높이 설정 */
+    overflow-y: auto; /* 스크롤바 추가 */
+    width: 100%;
+}
+
+/* 각 행 높이 설정 */
+tbody tr {
+    display: table; /* 테이블의 각 행을 다시 테이블 형태로 */
+    table-layout: fixed; /* 고정된 테이블 레이아웃 */
+    width: 100%; /* 테이블 너비에 맞게 설정 */
+
+}
+
+
+/* 테이블 셀 스타일 */
+td, th{
+    height: 40px; /* 셀 높이 설정 */
+    text-align: center !important;
+    vertical-align: middle !important;
+
+    padding: 0;
+}
+
+.selected {
+    background-color: silver;
+}
+
+.clicked {
+    background-color: silver; /* 클릭한 행의 회색 배경색 */
+}
+.table-hover tbody tr:hover {
+    background-color: silver; /* 원하는 색상으로 변경 */
 }
