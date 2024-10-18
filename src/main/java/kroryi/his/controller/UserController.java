@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import kroryi.his.domain.Member;
 import kroryi.his.dto.MemberJoinDTO;
+import kroryi.his.dto.MemberRoleSetDTO;
 import kroryi.his.repository.MemberRepository;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
