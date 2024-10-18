@@ -39,21 +39,8 @@ public class MaterialTransactionController {
     private final MaterialRegisterService materialRegisterService;
 
     private final MaterialTransactionService materialTransactionService;
-
-    // 재료 목록 조회 (GET 요청)
-    @ApiOperation(value = "재료 목록 조회", notes = "GET 방식으로 재료 목록을 조회합니다.")
-    @GetMapping("/searchMaterials")
-    public ResponseEntity<List<MaterialDTO>> searchMaterials() {
-        try {
-            List<MaterialDTO> materialCompanies = materialRegisterService.getAllMaterialsWithCompany();
-            return ResponseEntity.ok(materialCompanies);
-        } catch (Exception e) {
-            log.error("재료 목록 조회 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
-        }
-    }
-
     // 재료 출납 등록 (POST 요청)
+
     @PostMapping("/addTransaction")
     public ResponseEntity<?> addTransaction(@Valid @RequestBody MaterialTransactionDTO materialTransactionDTO, BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
@@ -94,6 +81,21 @@ public class MaterialTransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", e.getMessage()));
         }
     }
+
+    // 재료 목록 조회 (GET 요청)
+    @ApiOperation(value = "재료 목록 조회", notes = "GET 방식으로 재료 목록을 조회합니다.")
+    @GetMapping("/searchMaterials")
+    public ResponseEntity<List<MaterialDTO>> searchMaterials() {
+        try {
+            List<MaterialDTO> materialCompanies = materialRegisterService.getAllMaterialsWithCompany();
+            return ResponseEntity.ok(materialCompanies);
+        } catch (Exception e) {
+            log.error("재료 목록 조회 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
+    }
+
+
 
     // 재료 출납 삭제 (DELETE 요청)
     @DeleteMapping("/deleteTransaction/{transactionId}")

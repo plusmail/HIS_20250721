@@ -30,24 +30,35 @@ public class MaterialStockOutController {
             return ResponseEntity.ok(Map.of("success", true, "message", "출고 내역이 저장되었습니다."));
         } catch (IllegalArgumentException e) {
             // 재고 부족으로 인한 예외 처리
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.ok(Map.of("success", false, "message", "현재고량을 초과해 저장할 수 없습니다."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", "서버 오류가 발생했습니다."));
         }
     }
 
+
     // 기존 출고 데이터 수정
     @PutMapping("/updateStockTransaction")
     public ResponseEntity<?> updateStockTransaction(@RequestBody MaterialStockOutDTO stockOutDTO) {
         try {
-            materialStockOutService.updateOutgoingTransaction(stockOutDTO);
+            // 출고 데이터 수정 시 재고량 초과 여부를 처리
+            Map<String, Object> result = materialStockOutService.updateOutgoingTransaction(stockOutDTO);
+
+            if (!(Boolean) result.get("success")) {
+                // 재고량 초과 시 메시지 반환
+                return ResponseEntity.status(HttpStatus.OK).body(result);
+            }
+
             log.info("Stock transaction updated: {}", stockOutDTO);
-            return ResponseEntity.ok(Map.of("success", true, "message", "출고 데이터가 수정되었습니다."));
+            return ResponseEntity.ok(result);
+
         } catch (Exception e) {
             log.error("Error updating stock transaction", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "출고 데이터 수정 중 오류가 발생했습니다."));
         }
     }
+
 
 
     @GetMapping("/getByMaterialCode")

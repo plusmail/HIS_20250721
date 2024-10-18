@@ -37,9 +37,6 @@ function clearTransactionForm() {
     document.getElementById('twoMaterialName').value = '';
     document.getElementById('twoMaterialCode').value = '';
     document.getElementById('stockIn').value = 0;
-
-    // 필드를 다시 수정 가능하게 변경 (입고일자는 제외)
-    setReadOnlyFields(true);  // 입고일자는 항상 읽기 전용으로 유지
 }
 
 // 필드를 읽기 전용으로 설정하는 함수 (입고일자는 항상 읽기 전용)
@@ -49,14 +46,18 @@ function setReadOnlyFields(readOnly) {
     document.getElementById('twoMaterialCode').readOnly = readOnly;
 }
 
-// 오늘 날짜를 설정하는 함수
+// 로딩했을때 최신 날짜로 설정하는 함수
 function setTodayDate() {
     const today = new Date().toISOString().split('T')[0];  // 오늘 날짜를 'YYYY-MM-DD' 형식으로 가져옴
     document.getElementById('stockInDate').value = today;  // 입고일자 필드에 오늘 날짜 설정
     document.getElementById('stockOutDate').value = today;  // 출고일자 필드에 오늘 날짜 설정 (필요한 경우)
-
 }
 
+// 출고 날짜를 설정하는 함수
+function setStockDate() {
+    const today = new Date().toISOString().split('T')[0];  // 오늘 날짜를 'YYYY-MM-DD' 형식으로 가져옴
+    document.getElementById('stockOutDate').value = today;  // 출고일자 필드에 오늘 날짜 설정 (필요한 경우)
+}
 
 // 페이지가 로드될 때, 그리고 저장/취소/삭제 후에 오늘 날짜로 설정
 document.addEventListener('DOMContentLoaded', function() {
@@ -225,8 +226,6 @@ function twoSearch() {
         url += queryParams.join('&');
     }
 
-    // 쿼리 파라미터 확인 (디버깅용)
-    // console.log("Generated URL:", url);
 
     // 서버에 fetch 요청
     fetch(url)
@@ -413,9 +412,6 @@ function populateMaterialAndSetStockOutDate(material) {
     // 출고일자 필드에 오늘 날짜 설정
     const today = new Date().toISOString().split('T')[0];  // 'YYYY-MM-DD' 형식으로 오늘 날짜 가져오기
     document.getElementById('stockOutDate').value = today;
-
-    // 메시지 표시 (재료가 선택되었고 출고일자가 설정되었음을 알림)
-    console.log('재료가 선택되었으며, 출고일자가 오늘 날짜로 설정되었습니다.');
 }
 
 // 더블 클릭 시 재료를 선택하고 출고일자에 오늘 날짜 설정
@@ -484,32 +480,29 @@ document.getElementById('saveOutTransactionBtn').addEventListener('click', funct
     event.preventDefault();
     event.stopPropagation();
 
-    // 필드에서 값 가져오기
-    const stockOutId = document.getElementById('stockOutId').value; // 수정 시 사용 (stockOutId로 변경)
-    const stockOutDate = document.getElementById('stockOutDate').value;  // 출고일자
-    const stockOut = document.getElementById('stockOut').value;  // 출고량
-    const materialCode = document.getElementById('selectedMaterialCode').textContent;  // 선택된 재료 코드
+    const stockOutId = document.getElementById('stockOutId').value;
+    const stockOutDate = document.getElementById('stockOutDate').value;
+    const stockOut = document.getElementById('stockOut').value;
+    const materialCode = document.getElementById('selectedMaterialCode').textContent;
 
     let url, method;
 
-    // stockOutId가 존재하면 수정, 없으면 신규 추가
+    // 수정인지 신규 저장인지 확인
     if (stockOutId) {
-        url = `/inventory_management/updateStockTransaction`;  // 수정 URL
-        method = "PUT";  // 수정은 PUT 메서드
+        url = `/inventory_management/updateStockTransaction`;
+        method = "PUT";
     } else {
-        url = `/inventory_management/addStockTransaction`;  // 신규 추가 URL
-        method = "POST";  // 추가는 POST 메서드
+        url = `/inventory_management/addStockTransaction`;
+        method = "POST";
     }
 
-    // 서버에 보낼 데이터 객체 생성
     const stockOutData = {
-        stockOutId: stockOutId,  // stockOutId로 전송
+        stockOutId: stockOutId,
         stockOutDate: stockOutDate,
         stockOut: parseInt(stockOut, 10),
         materialCode: materialCode
     };
 
-    // 서버에 저장 요청 보내기
     fetch(url, {
         method: method,
         headers: {
@@ -517,32 +510,27 @@ document.getElementById('saveOutTransactionBtn').addEventListener('click', funct
         },
         body: JSON.stringify(stockOutData)
     })
-        .then(response => {
-            // 서버에서 재고 부족 예외를 처리한 경우 400 상태 코드 또는 사용자 정의 오류 반환
-            if (!response.ok) {
-                if (response.status === 400) {
-                    return response.json().then(data => {
-                        // 재고 부족 메시지를 클라이언트에 전달
-                        throw new Error(data.message || '재고 부족 오류 발생');
-                    });
-                } else {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            alert(data.message);  // 성공 메시지 표시
-            clearStockTransactionForm(); // 저장 후 필드 초기화
-            setTodayDate();
-            loadOutgoingTransactionList(materialCode);  // 목록 다시 로드
+            if (!data.success) {
+                alert(data.message);  // 재고량 초과 시 메시지 표시
+            } else {
+                alert(data.message);  // 성공 메시지 표시
+                clearStockTransactionForm(); // 폼 초기화
+                setStockDate();  // 오늘 날짜로 다시 설정
+                loadOutgoingTransactionList(materialCode);  // 목록 다시 로드
+
+                document.getElementById('stockOutId').value = '';  // ID 초기화
+            }
         })
         .catch(error => {
-            // 재고 부족 등 오류 발생 시 처리
-            console.error("Error:", error);
-            alert(`상세 내용: ${error.message}`);
+            console.error("수정 오류:", error);
+            alert(`수정 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
         });
 });
+
+
+
 
 
 // 삭제 버튼 클릭 시 동작하는 함수
@@ -563,7 +551,7 @@ document.getElementById('deleteStockTransactionBtn').addEventListener('click', f
             if (response.ok) {
                 alert('출고 기록이 삭제되었습니다.');
                 clearStockTransactionForm();  // 출고 필드만 초기화
-                setTodayDate();
+                setStockDate();
                 loadOutgoingTransactionList(document.getElementById('selectedMaterialCode').textContent);  // 삭제 후에도 재료 목록 다시 로딩
             } else {
                 throw new Error('출고 기록 삭제에 실패했습니다.');
@@ -577,9 +565,9 @@ document.getElementById('deleteStockTransactionBtn').addEventListener('click', f
 
 // 취소 버튼 클릭 시 선택한 출고 내역을 초기화하는 함수
 document.getElementById('resetStockTransaction').addEventListener('click', function () {
-    document.getElementById('stockOut').value = '';  // 출고 초기화
-    document.getElementById('transactionId').value = ''; // id 초기화
-    setTodayDate();
+    clearStockTransactionForm();  // 출고 필드 초기화
+    setStockDate();  // 오늘 날짜로 다시 설정
+    selectedTransactionId = null;  // 기존 선택된 ID 초기화 (신규 저장 모드로 전환)
 });
 
 // 필드를 초기화하는 함수
@@ -587,7 +575,7 @@ function clearStockTransactionForm() {
     document.getElementById('stockOutDate').value = '';
     document.getElementById('stockOut').value = '';
     document.getElementById('transactionId').value = '';
-
+    document.getElementById('stockOutId').value = '';
 }
 
 
