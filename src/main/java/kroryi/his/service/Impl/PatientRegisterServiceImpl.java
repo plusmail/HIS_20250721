@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +64,7 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
                 memo.setContent(patientMemoDTO.getContent());
                 memo.setMemoChartNum(chartNum);
                 memoList.add(memo);
+                log.info("memo!!!!!{}", memo.getMemoChartNum());
             }
         }
         patientRegister.setMemos(memoList);
@@ -83,5 +85,40 @@ public class PatientRegisterServiceImpl implements PatientRegisterService {
         patientRegisterRepository.deleteById(chartNum);
     }
 
+    @Override
+    public PatientRegister modify(PatientDTO patientDTO) {
+        Optional<PatientRegister> patientRegisterOptional = patientRegisterRepository.findById(patientDTO.getChartNum());
 
+        PatientRegister patientRegister = patientRegisterOptional.orElseThrow();
+
+        // Update PatientRegister fields
+        patientRegister.setName(patientDTO.getName());
+        patientRegister.setFirstPaResidentNum(patientDTO.getFirstPaResidentNum());
+        patientRegister.setLastPaResidentNum(patientDTO.getLastPaResidentNum());
+        patientRegister.setGender(patientDTO.getGender());
+        patientRegister.setBirthDate(patientDTO.getBirthDate());
+        patientRegister.setHomeNum(patientDTO.getHomeNum());
+        patientRegister.setPhoneNum(patientDTO.getPhoneNum());
+        patientRegister.setEmail(patientDTO.getEmail());
+        patientRegister.setDefaultAddress(patientDTO.getDefaultAddress());
+        patientRegister.setDetailedAddress(patientDTO.getDetailedAddress());
+        patientRegister.setMainDoc(patientDTO.getMainDoc());
+        patientRegister.setVisitPath(patientDTO.getVisitPath());
+        patientRegister.setCategory(patientDTO.getCategory());
+        patientRegister.setTendency(patientDTO.getTendency());
+        patientRegister.setFirstVisit(patientDTO.getFirstVisit());
+        patientRegister.setLastVisit(patientDTO.getLastVisit());
+
+
+        return patientRegisterRepository.save(patientRegister);
+    }
+
+    @Override
+    public PatientRegister getPatient(String chartNum) {
+        return patientRegisterRepository.findById(chartNum)
+                .orElseThrow(() -> new RuntimeException("환자를 찾을 수 없습니다."));
+    }
 }
+
+
+
