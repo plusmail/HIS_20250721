@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-//@ToString
+@ToString
 @Builder
 @Getter
 @Setter
@@ -27,6 +27,12 @@ public class MaterialRegister {
     //Transaction과 조인
     @OneToMany(mappedBy = "materialRegister", cascade = CascadeType.ALL)
     private List<MaterialTransactionRegister> materialTransactionList = new ArrayList<>();
+
+
+    //StockOut과 조인
+    @OneToMany(mappedBy = "materialRegister", cascade = CascadeType.ALL)
+    private List<MaterialStockOut> materialStockOutList = new ArrayList<>();
+
 
     //재료명
     @Column(name = "material_Name", nullable = false,length = 30)
@@ -57,6 +63,12 @@ public class MaterialRegister {
     @Column(name = "first_Register_Date")
     private LocalDate firstRegisterDate;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.firstRegisterDate == null) {
+            this.firstRegisterDate = LocalDate.now();
+        }
+    }
 
 
 }
