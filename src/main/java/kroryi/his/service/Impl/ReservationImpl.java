@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class ReservationImpl implements ReservationService {
 
     // 캘린더에서 날짜 선택시
     public List<ReservationDTO> selectedDatePatientList(ReservationDTO dto) {
-        List<Reservation> reservations = reRepo.findByReservationDate(dto.getReservationDate());
+        List<Reservation> reservations = reRepo.findByReservationDate(LocalDateTime.parse(dto.getReservationDate()));
         return reservations.stream()
                 .map(reservation -> modelMapper.map(reservation, ReservationDTO.class))
                 .collect(Collectors.toList());
