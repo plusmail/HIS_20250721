@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import kroryi.his.domain.Member;
 import kroryi.his.dto.MemberJoinDTO;
+import kroryi.his.dto.MemberRoleSetDTO;
 import kroryi.his.repository.MemberRepository;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class UserController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+
     @GetMapping("/")
     @ResponseBody
     public List<MemberJoinDTO> getMembers() {
@@ -117,7 +119,7 @@ public class UserController {
         return "redirect:/users";
     }
 
-   /* @PostMapping("/searchUsers")
+    @PostMapping("/searchUsers")
     @ResponseBody
     public List<Member> searchUsers(@RequestBody Map<String, String> params) {
         String userId = params.get("mid");
@@ -126,6 +128,6 @@ public class UserController {
         String startDate = params.get("startDate");
 
         // 검색 조건을 사용해 사용자 목록 필터링
-        return memberRepository.findUsersByConditions(userId, userName, userRole, startDate);
-    }*/
+        return memberRepository.findByIdOrUsernameOrEmailAndRolesIn(userId, userName, userRole);
+    }
 }

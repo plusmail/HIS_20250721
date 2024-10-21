@@ -124,7 +124,7 @@ function renderItems(itemsArray) {
     while (i < itemsArray.length) {
 
         // 새로운 행 생성
-        let row = $('<tr>');
+        let row = $('<tr style="overflow-wrap: break-word">');
 
         // 행을 테이블에 추가
         itemList.append(row);

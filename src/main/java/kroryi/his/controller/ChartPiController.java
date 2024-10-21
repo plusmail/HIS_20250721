@@ -18,7 +18,7 @@ import java.util.List;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-public class ChartSessionController {
+public class ChartPiController {
     //치아의 List를 관리하긴 2중 List
     List<List<String>> toothList = null;
     //치아의 증상을 관리하기위한 2중 List

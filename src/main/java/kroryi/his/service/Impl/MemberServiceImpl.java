@@ -2,9 +2,11 @@ package kroryi.his.service.Impl;
 
 import kroryi.his.domain.Member;
 import kroryi.his.domain.MemberRole;
+import kroryi.his.domain.MemberRoleSet;
 import kroryi.his.dto.MemberJoinDTO;
 import kroryi.his.mapper.UserMapper;
 import kroryi.his.repository.MemberRepository;
+import kroryi.his.repository.MemberRoleSetRepository;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
+    private final MemberRoleSetRepository memberRoleSetRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private UserMapper userMapper;
@@ -32,26 +35,28 @@ public class MemberServiceImpl implements MemberService {
         boolean exist = memberRepository.existsById(mid);
         if (exist) throw new MidExistException();
 
+        // DTO의 roleSet 가져오기
+        Set<MemberRoleSet> roleSetDTO = memberJoinDTO.getRoles();
+        log.info("Received roleSetDTO: {}", roleSetDTO);
+
         Member member = modelMapper.map(memberJoinDTO, Member.class);
         member.changePassword(passwordEncoder.encode(memberJoinDTO.getPassword()));
 
-        Set<MemberRole> rolesSet = memberJoinDTO.getRoles();
+        Set<MemberRoleSet> roleSetEntities = roleSetDTO.stream().map(roleDTO -> {
+            MemberRoleSet memberRoleSet = new MemberRoleSet();
+            memberRoleSet.setRoleSet(roleDTO.getRoleSet());  // role 필드 매핑
+            memberRoleSet.setMember(member);  // Member 엔티티와 연관 설정
+            return memberRoleSet;
+        }).collect(Collectors.toSet());
 
-        if(rolesSet.contains(MemberRole.EMP)) {
-            member.addRole(MemberRole.EMP);
-        } else if (rolesSet.contains(MemberRole.ADMIN)) {
-            member.addRole(MemberRole.ADMIN);
-        } else if (rolesSet.contains(MemberRole.DOCTOR)) {
-            member.addRole(MemberRole.DOCTOR);
+        // Member 객체에 roleSetEntities 추가
+        member.setRoleSet(roleSetEntities);
 
-        } else if (rolesSet.contains(MemberRole.NURSE)) {
-            member.addRole(MemberRole.NURSE);
-        }else{
-            member.addRole(MemberRole.EMP);
-        }
-        log.info("============");
-        log.info(member);
-        log.info(member.getRoleSet());
+        // Member와 연관된 roleSet 확인
+        log.info("Member after roleSet mapping: {}", member);
+        log.info("Roles: {}", member.getRoleSet());
+
+        // 저장
         memberRepository.save(member);
     }
 
@@ -112,6 +117,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<MemberJoinDTO> getMembers() {
         List<Member> members = memberRepository.findAll();
+        log.info("dddddddddddddd0< {}", members);
         return members.stream()
                 .map(member -> new MemberJoinDTO(
                         member.getMid(),
@@ -124,4 +130,30 @@ public class MemberServiceImpl implements MemberService {
                 ))
                 .collect(Collectors.toList());
     }
+
+//    // Member에 새로운 역할을 추가하는 메서드
+//    public void addRole(String memberId, MemberRole newRole) {
+//        // Member 조회
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new RuntimeException("Member not found"));
+//
+//        // 이미 해당 역할이 존재하는지 확인
+//        boolean roleExists = member.getRoleSet().stream()
+//                .anyMatch(roleSet -> roleSet.getRoleSet().equals(newRole));
+//
+//        if (!roleExists) {
+//            // 새로운 역할 추가
+//            MemberRoleSet newMemberRoleSet = new MemberRoleSet();
+//            newMemberRoleSet.setRoleSet(newRole.toString());
+//
+//            // 역할 저장
+//            memberRoleSetRepository.save(newMemberRoleSet);
+//
+//            // Member에 역할 추가 (양방향 매핑일 경우)
+//            member.getRoleSet().add(newMemberRoleSet);
+//            memberRepository.save(member);  // 필요할 경우 저장
+//        } else {
+//            throw new RuntimeException("Role already exists for this member");
+//        }
+//    }
 }

@@ -39,21 +39,8 @@ public class MaterialTransactionController {
     private final MaterialRegisterService materialRegisterService;
 
     private final MaterialTransactionService materialTransactionService;
-
-    // 재료 목록 조회 (GET 요청)
-    @ApiOperation(value = "재료 목록 조회", notes = "GET 방식으로 재료 목록을 조회합니다.")
-    @GetMapping("/searchMaterials")
-    public ResponseEntity<List<MaterialDTO>> searchMaterials() {
-        try {
-            List<MaterialDTO> materialCompanies = materialRegisterService.getAllMaterialsWithCompany();
-            return ResponseEntity.ok(materialCompanies);
-        } catch (Exception e) {
-            log.error("재료 목록 조회 중 오류 발생", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
-        }
-    }
-
     // 재료 출납 등록 (POST 요청)
+
     @PostMapping("/addTransaction")
     public ResponseEntity<?> addTransaction(@Valid @RequestBody MaterialTransactionDTO materialTransactionDTO, BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
@@ -63,7 +50,6 @@ public class MaterialTransactionController {
         try {
             // 재료 출납 등록 로직
             MaterialTransactionRegister materialTransactionRegister = materialTransactionService.register(materialTransactionDTO);
-            log.info("Transaction Registered for Material Code: {}", materialTransactionDTO.getMaterialCode());
             return ResponseEntity.ok(Map.of("success", true, "message", "재료 출납이 등록되었습니다.", "materialTransactionRegister", materialTransactionRegister));
         } catch (IllegalArgumentException e) {
             log.warn("재료 출납 등록 실패: {}", e.getMessage());
@@ -84,7 +70,6 @@ public class MaterialTransactionController {
         try {
             // 재료 출납 수정 로직
             MaterialTransactionRegister materialTransactionRegister = materialTransactionService.update(materialTransactionDTO);
-            log.info("Transaction Updated for Material Code: {}", materialTransactionDTO.getMaterialCode());
             return ResponseEntity.ok(Map.of("success", true, "message", "재료 출납이 수정되었습니다.", "materialTransactionRegister", materialTransactionRegister));
         } catch (IllegalArgumentException e) {
             log.warn("재료 출납 수정 실패: {}", e.getMessage());
@@ -95,12 +80,26 @@ public class MaterialTransactionController {
         }
     }
 
+    // 재료 목록 조회 (GET 요청)
+    @ApiOperation(value = "재료 목록 조회", notes = "GET 방식으로 재료 목록을 조회합니다.")
+    @GetMapping("/searchMaterials")
+    public ResponseEntity<List<MaterialDTO>> searchMaterials() {
+        try {
+            List<MaterialDTO> materialCompanies = materialRegisterService.getAllMaterialsWithCompany();
+            return ResponseEntity.ok(materialCompanies);
+        } catch (Exception e) {
+            log.error("재료 목록 조회 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
+    }
+
+
+
     // 재료 출납 삭제 (DELETE 요청)
     @DeleteMapping("/deleteTransaction/{transactionId}")
     public ResponseEntity<?> deleteTransaction(@PathVariable Long transactionId) {
         try {
             materialTransactionService.deleteByTransactionId(transactionId);
-            log.info("Transaction Deleted for Transaction ID: {}", transactionId);
             return ResponseEntity.ok(Map.of("success", true, "message", "재료가 삭제되었습니다."));
         } catch (Exception e) {
             log.error("재료 삭제 중 오류 발생", e);
