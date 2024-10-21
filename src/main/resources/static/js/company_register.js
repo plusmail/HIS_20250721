@@ -31,7 +31,18 @@ function loadCompanyList() {
                             <td>${company.managerNumber}</td>
                             <td>${company.companyMemo}</td>
                         `;
-                    row.addEventListener('dblclick', () => populateCompanyForm(company));
+                    row.addEventListener('dblclick', () => {
+                        populateCompanyForm(company)
+                        // 기존 선택된 행에서 하이라이트 제거
+                        if (selectedRow) {
+                            selectedRow.classList.remove('selected-highlight');
+                        }
+
+                        // 현재 선택된 행에 하이라이트 추가
+                        row.classList.add('selected-highlight');
+                        selectedRow = row;  // 선택된 행 업데이트
+                    });
+
                     tbody.appendChild(row);
                 });
             }
@@ -90,7 +101,6 @@ document.getElementById('addCompanyBtn').addEventListener('click', (event) => {
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data);  // 서버 응답 확인
 
                     if (data.success) {
                         alert(data.message);  // 성공 메시지 출력
