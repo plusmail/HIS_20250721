@@ -9,6 +9,7 @@ import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
@@ -151,4 +152,11 @@ public class UserController {
         // 검색 조건을 사용해 사용자 목록 필터링
         return memberRepository.findByIdOrUsernameOrEmailAndRolesIn(userId, userName, userRole);
     }
+
+    @GetMapping("/checkId")
+    public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String mid) {
+        boolean isDuplicate = memberService.isDuplicateMemberId(mid);
+        return ResponseEntity.ok(isDuplicate);  // true: 중복, false: 사용 가능
+    }
+
 }
