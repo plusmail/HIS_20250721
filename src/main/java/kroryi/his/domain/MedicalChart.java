@@ -34,7 +34,6 @@ public class MedicalChart {
     private String teethNum;
 
 
-    @Column(name = "medical_content", nullable = false)
     private String medicalContent;
 
     @Column(name = "check_doc")
