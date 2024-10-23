@@ -13,16 +13,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Log4j2
 @Service
 public class MaterialStatusServiceImpl implements MaterialStatusService {
+    private final MaterialTransactionRepository materialTransactionRepository;
     private final MaterialStatusRepository materialStatusRepository;
     private final MaterialStockOutRepository materialStockOutRepository;
     private final MaterialRegisterRepository materialRegisterRepository;
@@ -79,9 +77,47 @@ public class MaterialStatusServiceImpl implements MaterialStatusService {
                 })
                 .collect(Collectors.toList());
 
+
         // firstRegisterDate 기준으로 정렬 (가장 최근 등록된 항목이 위로 오도록)
         return dtoList.stream()
                 .sorted(Comparator.comparing(MaterialTransactionDTO::getFirstRegisterDate).reversed()) // 날짜를 내림차순으로 정렬
                 .collect(Collectors.toList());
+
+
+    }
+
+    @Override
+    public List<MaterialTransactionDTO> getLowStockItems() {
+        List<MaterialRegister> materials = materialRegisterRepository.findByStockManagementItemTrue();
+        List<MaterialTransactionDTO> resultList = new ArrayList<>();
+
+        for (MaterialRegister material : materials) {
+            // Get total stock in for the material
+            Long totalStockIn = materialTransactionRepository.getTotalStockInByMaterialCode(material.getMaterialCode());
+            // Get total stock out for the material
+            Long totalStockOut = materialStockOutRepository.getTotalStockOutByMaterialCode(material.getMaterialCode());
+
+            totalStockIn = (totalStockIn != null) ? totalStockIn : 0L;
+            totalStockOut = (totalStockOut != null) ? totalStockOut : 0L;
+
+            // Calculate remaining stock
+            Long remainingStock = totalStockIn - totalStockOut;
+
+            // Determine if the remaining stock is below the minimum quantity
+            boolean isBelowSafetyStock = remainingStock < material.getMinQuantity();
+
+            // Only add to the result list if both stockManagementItem and belowSafetyStock are true
+            if (material.isStockManagementItem() && isBelowSafetyStock) {
+                MaterialTransactionDTO dto = MaterialTransactionDTO.builder()
+                        .materialCode(material.getMaterialCode())
+                        .materialName(material.getMaterialName())
+                        .remainingStock(remainingStock)
+                        .build();
+
+                resultList.add(dto);
+            }
+        }
+
+        return resultList;
     }
 }

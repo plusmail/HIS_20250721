@@ -30,7 +30,6 @@ public class MaterialStatusController {
             @RequestParam(required = false) String materialCode,
             @RequestParam(required = false) Boolean belowSafetyStock,
             @RequestParam(required = false) Boolean stockManagementItem) {
-
         try {
             LocalDate start = (startDate != null) ? LocalDate.parse(startDate) : null;
             LocalDate end = (endDate != null) ? LocalDate.parse(endDate) : null;
@@ -43,5 +42,7 @@ public class MaterialStatusController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
         }
     }
+
+
 
 }
