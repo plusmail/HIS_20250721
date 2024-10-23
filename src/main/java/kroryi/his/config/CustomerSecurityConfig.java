@@ -9,24 +9,33 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Map;
 
 @Log4j2
 @Configuration
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class CustomerSecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
@@ -37,42 +46,61 @@ public class CustomerSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         log.info("--보안환경설정--");
         http
-                .csrf(csrf->csrf.disable())
-                .rememberMe(me->me
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+                .rememberMe(me -> me
                         .key("12345")
                         .tokenRepository(persistentTokenRepository())
                         .userDetailsService(userDetailsService)
-                        .tokenValiditySeconds(60*60*24*30)
+                        .tokenValiditySeconds(60 * 60 * 24 * 30)
                 )
-                .authorizeHttpRequests(
-                        authorize -> authorize
-                                .requestMatchers("/member/login").permitAll()
-
-                                .anyRequest().authenticated() // 모든 사이트 다 막고 시작
-//                                .anyRequest().permitAll()
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/member/login/**").permitAll()
+                        .requestMatchers("/member/login-proc").permitAll()
+//                        .requestMatchers("/home").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/member/login") // 로그인 페이지로 이동
+                        .loginPage("/member/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .loginProcessingUrl("/member/login-proc")
                         .defaultSuccessUrl("/home", true)
-                        .permitAll() // 모든 사용자에 로그인 페이지 접근 허용
+                        .permitAll()
                 )
-//                .oauth2Login(login->login.loginPage("/member/login"))
                 .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedHandler(accessDeniedHandler()))
-                .logout(LogoutConfigurer::permitAll
-                );
+                        exceptionHandling.accessDeniedHandler(accessDeniedHandler())
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 세션 생성 정책
+                        .maximumSessions(1) // 최대 세션 수
+                        .expiredUrl("/login?expired") // 세션 만료 시 리다이렉트 URL
+                )
+                .userDetailsService(userDetailsService)
+                .logout(LogoutConfigurer::permitAll);
 
         return http.build();
     }
+
+    // ⭐️ CORS 설정
+    CorsConfigurationSource corsConfigurationSource() {
+        return request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedHeaders(Collections.singletonList("*"));
+            config.setAllowedMethods(Collections.singletonList("*"));
+            config.setAllowedOriginPatterns(Collections.singletonList("http://localhost:3000")); // ⭐️ 허용할 origin
+            config.setAllowCredentials(true);
+            return config;
+        };
+    }
+
 
     @Bean
     public PersistentTokenRepository persistentTokenRepository() {
@@ -97,5 +125,16 @@ public class CustomerSecurityConfig {
             response.getWriter().write(new ObjectMapper()
                     .writeValueAsString(responseEntity.getBody()));
         };
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
+
+        return authenticationManagerBuilder.build(); // Directly return the builder's result
     }
 }

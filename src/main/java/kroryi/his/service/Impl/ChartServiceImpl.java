@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
@@ -111,6 +113,50 @@ public class ChartServiceImpl implements ChartService {
         medicalChartRepository.save(entity);
 
 
+        return null;
+    }
+
+    @Override
+    public MedicalChartDTO addMedicalChart(String teethNum, String plan, String chartNum, String paName) {
+
+        MedicalChart chartPlan = MedicalChart.builder()
+                .teethNum(teethNum)
+                .medicalDivision(plan)
+                .mdTime(LocalDate.now())
+                .medicalContent("")
+                .checkDoc("의사")
+                .paName(paName)
+                .chartNum(chartNum)
+                .build();
+
+        medicalChartRepository.save(chartPlan);
+        return null;
+    }
+
+    @Override
+    public MedicalChartDTO deleteChart(String charNum, String paName, String teethNum, String medicalDivision) {
+
+        LocalDate today = LocalDate.now();
+        log.info("deleteChart 시작");
+        log.info("chartNum: '{}'", charNum);
+        log.info("paName: '{}'", paName);
+        log.info("teethNum: '{}'", teethNum);
+        log.info("medicalDivision: '{}'", medicalDivision);
+        log.info("-----------------------");
+        log.info("chartNum ---->{}", Objects.equals(charNum,"240912043"));
+        log.info("paName --->{}", Objects.equals(paName, "김유신"));
+        log.info("teethNum ---->{}", Objects.equals(teethNum, "11, 28"));
+        log.info("medicalDivision ---->{}", Objects.equals(medicalDivision, "레진"));
+        int year = today.getYear();     // 연도
+        int month = today.getMonthValue();  // 월
+        int day = today.getDayOfMonth();   // 일
+
+        LocalDate localDate = LocalDate.of(year, month, day);
+        log.info("localDate --->{}", localDate.equals(LocalDate.of(2024,10,22)));
+
+        log.info("1111111111-{}", charNum);
+        medicalChartRepository.deleteByChartNumAndPaNameAndTeethNumAndMedicalDivisionAndMdTime(charNum,paName,teethNum,medicalDivision,today);
+        log.info("deleteChart 실행");
         return null;
     }
 

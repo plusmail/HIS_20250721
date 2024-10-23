@@ -9,11 +9,14 @@ import kroryi.his.service.PatientRegisterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,8 +25,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PatientRegisterController {
     private final PatientRegisterService patientRegisterService;
-    private final PatientRegisterServiceImpl patientRegisterServiceImpl;
 
+    @GetMapping("/doctors")
+    public List<String> getDoctorNames() {
+        List<String> doctorNames = patientRegisterService.getDoctorNames();
+        log.info("Available Doctors: {}", doctorNames); // 의사 이름 로그 출력
+        return doctorNames; // JSON 응답 반환
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @ApiOperation(value = "환자등록 POST", notes = "POST 방식으로 환자 등록")
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String,PatientRegister> register(@Valid @RequestBody PatientDTO patientDTO,

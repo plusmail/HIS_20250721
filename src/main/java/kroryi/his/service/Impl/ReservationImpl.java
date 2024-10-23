@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,13 +31,23 @@ public class ReservationImpl implements ReservationService {
         this.modelMapper = modelMapper;
     }
 
+
     // 캘린더에서 날짜 선택시
     public List<ReservationDTO> selectedDatePatientList(ReservationDTO dto) {
-        List<Reservation> reservations = reRepo.findByReservationDate(dto.getReservationDate());
+
+        // 문자열 형식으로 날짜 가져오기
+        String reservationDate = dto.getReservationDate(); // "2024-10-21" 형식
+        List<Reservation> reservations = reRepo.findByReservationDate(reservationDate);
+
+        // 콘솔에 예약 목록 출력
+        System.out.println("선택한 날짜: " + reservationDate);
+        System.out.println("예약 목록: " + reservations);
+
         return reservations.stream()
                 .map(reservation -> modelMapper.map(reservation, ReservationDTO.class))
                 .collect(Collectors.toList());
     }
+
 
     // 환자의 예약 정보 확인
     public List<ReservationDTO> selectedByReservation(ReservationDTO dto) {
@@ -47,11 +58,21 @@ public class ReservationImpl implements ReservationService {
     }
 
     // 예약에서 저장을 눌렀을 경우
-    public void insertReservationInformation(ReservationDTO dto) {
+    public List<ReservationDTO> insertReservationInformation(ReservationDTO dto) {
+        // ReservationDTO를 Reservation으로 변환
         Reservation reservation = modelMapper.map(dto, Reservation.class);
-        System.out.println(reservation.getReservationDate());
+
+        // 예약 정보 저장
         reRepo.save(reservation);
+
+        // 저장된 예약 정보를 다시 DTO로 변환
+        ReservationDTO savedDto = modelMapper.map(reservation, ReservationDTO.class);
+
+        // 결과를 리스트에 담아 반환
+        return Collections.singletonList(savedDto);
     }
+
+
 
     // 예약에서 수정을 눌렀을 경우
     public void updateReservationInformation(ReservationDTO dto) {
@@ -65,4 +86,34 @@ public class ReservationImpl implements ReservationService {
             throw new EntityNotFoundException("Reservation not found with seq: " + dto.getSeq());
         }
     }
+
+    @Override
+    public void deleteReservation(Long seq) {
+        if (!reRepo.existsById(seq)) {
+            throw new EntityNotFoundException("Reservation not found with seq: " + seq);
+        }
+        reRepo.deleteById(seq);
+
+    }
+
+    @Override
+    public List<ReservationDTO> getReservations(String chartNumber, String reservationDate) {
+        List<Reservation> reservations = reRepo.findByChartNumberAndReservationDate(chartNumber, reservationDate);
+        return reservations.stream()
+                .map(reservation -> new ReservationDTO(
+                        reservation.getSeq(),
+                        reservation.getReservationDate(),
+                        reservation.getDepartment(),
+                        reservation.isSnsNotification(),
+                        reservation.getChartNumber(),
+                        reservation.getDoctor(),
+                        reservation.getTreatmentType(),
+                        reservation.getPatientNote(),
+                        reservation.getReservationStatusCheck()
+                ))
+                .collect(Collectors.toList());
+    }
 }
+
+
+

@@ -1,11 +1,9 @@
 package kroryi.his.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 
 import java.time.LocalDateTime;
@@ -13,9 +11,15 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "patient_admissions")
 public class PatientAdmission {
+
     @Id
+    @Column(name = "pid", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int pid;
+
     @Column(name = "chart_num", nullable = false)
     private Integer chartNum;
 

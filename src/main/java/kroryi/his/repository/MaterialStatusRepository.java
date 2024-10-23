@@ -47,4 +47,5 @@ public interface MaterialStatusRepository extends JpaRepository<MaterialTransact
     void updateBelowSafetyStock(@Param("transactionId") Long transactionId, @Param("belowSafetyStock") Boolean belowSafetyStock);
 
 
+
 }

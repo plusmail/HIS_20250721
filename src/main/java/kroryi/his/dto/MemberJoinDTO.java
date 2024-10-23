@@ -32,4 +32,7 @@ public class MemberJoinDTO {
 
     public MemberJoinDTO(String mid, String email, String name, String password, boolean retirement, String social, LocalDateTime regDate, LocalDateTime modDate, String address, String detailAddress, int zipCode) {
     }
+
+    public MemberJoinDTO(String mid, String email, String name, String password, boolean retirement, String social, LocalDateTime regDate, LocalDateTime modDate, String address, String detailAddress) {
+    }
 }

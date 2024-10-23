@@ -23,6 +23,22 @@ const emailLocal = document.getElementById("emailLocal");
 const emailDomain = document.getElementById("emailDomain");
 
 patient_register.addEventListener("click", (e) => {
+    globalUserData.authorities.forEach(auth => {
+        console.log(auth.authority);
+    });
+
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
+
+
     // 환자 정보를 담은 객체
     const patientObj = {
         name: name.value,
@@ -62,23 +78,6 @@ patient_register.addEventListener("click", (e) => {
         firstVisit.value = result.firstVisit || '';
         lastVisit.value = result.lastVisit || '';
 
-        // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
-        const tables = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-        const rows = Array.from(tables.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
-
-        rows.forEach((row, index) => {
-            // 각 행의 메모 날짜와 내용을 추출
-            const mmo = row.querySelector(`#mmo_${index}`);
-            // 인덱스가 result.memos의 범위 내에 있는지 확인
-            if (index < result.memos.length) {
-                const memo = result.memos[index]; // 해당 메모 가져오기
-                // 로그 출력 (필요시 제거 가능)
-                mmo.value = memo.mmo;
-            }
-
-        })
-        // memos.value = result.memos || '';
-
         // 자택전화 나누기
         const [homeNum1, homeNum2, homeNum3] = result.homeNum.split('-');
         document.getElementById("homeNum").value = homeNum1 || '';
@@ -96,6 +95,7 @@ patient_register.addEventListener("click", (e) => {
         document.getElementById("emailLocal").value = emailLocalPart || '';
         document.getElementById("emailDomain").value = emailDomainPart || '';
     }
+
 
     if (chartNum.value) {
         modifyPatient(patientObj, chartNum.value).then(setPatientFields).catch(e => {
@@ -290,6 +290,17 @@ function collectMemoData() {
 
 // 메모 저장 버튼 클릭 이벤트
 document.getElementById('memo_reg').addEventListener('click', (e) => {
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
+
     const memoList = collectMemoData(); // Collect memo data
 
     try {
@@ -319,6 +330,17 @@ document.getElementById('memo_reg').addEventListener('click', (e) => {
 
 // 행 삭제 함수
 function deleteRow(button) {
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
+
     const row = button.parentNode.parentNode;
     const mmoCell = row.querySelector('input[name="mmo"]'); // Select the hidden input by name
     const mmoValue = mmoCell.value; // Get the value from the hidden input
@@ -340,6 +362,17 @@ function deleteRow(button) {
 
 // 행 수정 함수
 function editRow(button) {
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
+
     const row = button.parentNode.parentNode;
     const mmoCell = row.querySelector('input[name="mmo"]');
     const memoRegDate = row.querySelector('input[name="memoRegDate"]');
@@ -427,6 +460,17 @@ document.querySelector("#refreshBtn").addEventListener("click", () => {
 
 // 환자 삭제
 document.querySelector("#patient_del").addEventListener("click", () => {
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
+
     removePatient(chartNum.value).then(result => {
         name.value = '';
         chartNum.value = '';

@@ -1,13 +1,39 @@
 const searchModal = new bootstrap.Modal(document.querySelector(".SearchModal"))
 const closeBtn = document.querySelector(".closeBtn")
 const patient_name_keyword = document.querySelector("#patient_name_keyword")
-
+const departmentElement = document.getElementById('department');
+const chartNumberElement = document.getElementById('chart-number');
 
 let selectedRow = null; // 클릭된 행을 저장할 변수
 
 let patientData = null; // 전역 변수 선언
 
 let selectedMemos = null;
+
+
+let globalUserData;
+
+window.globalUserData = {};
+function fetchUserSession() {
+    fetch('/api/user/session')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Assigning fetched data to the global variable
+            globalUserData = data;
+            console.log('Global user data:', globalUserData);
+        })
+        .catch(error => {
+            console.error('Error fetching user session:', error);
+        });
+}
+
+// Call the function to fetch user session
+fetchUserSession();
 
 function assignPatientValues(patient) {
     name.value = patient.name || '';
@@ -107,7 +133,7 @@ document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
 
                 row.addEventListener("click", () => {
                     if (selectedRow) {
-                        selectedRow.classList.remove('selected');
+                        selectedRow.classList.remove('selected');``
                     }
                     selectedRow = row;
                     selectedRow.classList.add('selected');
@@ -143,7 +169,6 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             </div>
         `;
 
-
         const ageInput = document.getElementById('age');
         if (window.location.href.includes("/patient_register")) {
             patientData.forEach((patient, index) => {
@@ -158,6 +183,9 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
                     ageInput.value = menu_age;
                 }
             })
+        }else if(window.location.href.includes("/reservation")){
+            departmentElement.value=menu_name;
+            chartNumberElement.value=menu_chartNum;
         }
 
 

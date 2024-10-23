@@ -31,7 +31,6 @@ public class CompanyRegisterController {
     @PostMapping(value = "/addCompany", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> registerCompany(@Valid @RequestBody CompanyDTO companyDTO,
                                                                BindingResult bindingResult) throws BindException {
-        log.info("CompanyDTO -> {}", companyDTO);
 
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
@@ -45,7 +44,6 @@ public class CompanyRegisterController {
             }
 
             CompanyRegister companyRegister = companyRegisterService.register(companyDTO);
-            log.info("CompanyRegister -> {}", companyRegister);
 
             result.put("success", true);
             result.put("message", "업체가 성공적으로 등록되었습니다.");
@@ -70,7 +68,6 @@ public class CompanyRegisterController {
     @PutMapping(value = "/updateCompany", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> updateCompany(@Valid @RequestBody CompanyDTO companyDTO,
                                                              BindingResult bindingResult) throws BindException {
-        log.info("CompanyDTO -> {}", companyDTO);
 
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
@@ -85,22 +82,14 @@ public class CompanyRegisterController {
             }
 
             CompanyRegister companyRegister = companyRegisterService.update(companyDTO);
-            log.info("CompanyRegister -> {}", companyRegister);
 
-            result.put("success", true);
-            result.put("message", "업체가 성공적으로 수정되었습니다.");
-            result.put("companyRegister", companyRegister);
             return ResponseEntity.ok(result);
 
         } catch (IllegalArgumentException e) {
             log.warn("업체 수정 실패: {}", e.getMessage());
-            result.put("success", false);
-            result.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
         } catch (Exception e) {
             log.error("업체 수정 중 오류 발생", e);
-            result.put("success", false);
-            result.put("message", "업체 수정 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
     }

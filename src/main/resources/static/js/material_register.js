@@ -1,3 +1,5 @@
+
+
 // 재료 정보를 폼에 채우는 함수 (수정 모드)
 function populateMaterialForm(material) {
     document.getElementById('threeMaterialCode').value = material.materialCode;
@@ -32,6 +34,17 @@ function resetMaterialForm() {
 document.getElementById('addMaterialBtn').addEventListener('click', (event) => {
     event.preventDefault();  // 기본 폼 제출 동작을 막음
     event.stopPropagation();  // 이벤트 전파 방지
+
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
 
     const materialCode = document.getElementById('threeMaterialCode').value;
 
@@ -105,7 +118,18 @@ function loadMaterialList() {
                         <td>${material.minQuantity}</td>
                         <td>${material.stockManagementItem ? "예" : "아니오"}</td>
                     `;
-                    row.addEventListener('dblclick', () => populateMaterialForm(material));
+                    row.addEventListener('dblclick', () => {
+                        populateMaterialForm(material);
+                        // 기존 선택된 행에서 하이라이트 제거
+                        if (selectedRow) {
+                            selectedRow.classList.remove('selected-highlight');
+                        }
+
+                        // 현재 선택된 행에 하이라이트 추가
+                        row.classList.add('selected-highlight');
+                        selectedRow = row;  // 선택된 행 업데이트
+                    });
+
                     tbody.appendChild(row);
                 });
             }
@@ -251,6 +275,17 @@ document.getElementById('companySearchIcon').addEventListener('click', function(
 
 // 재료 삭제 버튼 클릭 시 데이터 전송
 document.getElementById('deleteMaterialBtn').addEventListener('click', function() {
+    // 권한 체크를 직접 수행합니다.
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+    );
+
+    // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+    if (!hasPermission) {
+        alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+        return; // 등록 과정 중단
+    }
+
     const materialCode = document.getElementById('threeMaterialCode').value;
 
     if (confirm("정말로 이 재료를 삭제하시겠습니까?")) {

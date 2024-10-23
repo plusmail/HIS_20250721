@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -34,7 +35,7 @@ public class MedicalChart {
     private String teethNum;
 
 
-    @Column(name = "medical_content", nullable = false)
+    @Column(name = "medical_content")
     private String medicalContent;
 
     @Column(name = "check_doc")
