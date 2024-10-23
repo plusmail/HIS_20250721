@@ -17,11 +17,12 @@ import java.util.List;
 public class MedicalChartDTO implements Serializable {
     private String paName;
 //    private LocalDate mdTime;
-//    private String medicalDivision;
-//    private String teethNum;
-//    private String medicalContent;
-//    private String checkDoc;
+    private String medicalDivision;
+    private String teethNum;
+    private String medicalContent;
+    private String checkDoc;
     private String chartNum;
+
 
     private List<List<String>> chartData;
 

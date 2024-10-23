@@ -6,6 +6,7 @@ import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.dto.RequestData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 public class ChartPiController {
+
+    @Autowired
+    private ChartController chartController;
+
     //치아의 List를 관리하긴 2중 List
     List<List<String>> toothList = null;
     //치아의 증상을 관리하기위한 2중 List
@@ -35,7 +40,7 @@ public class ChartPiController {
     String paName;
     String chartNum;
 
-   final WebClient webClient = WebClient.create("http://localhost:8080/");
+    final WebClient webClient = WebClient.create("http://localhost:8080/");
 
     List<List<String>> dbSaveList;
 
@@ -53,19 +58,6 @@ public class ChartPiController {
 
         dataArray(newValues, subListIndex, data.getListIndex(), addOrDelete);
         return ResponseEntity.ok(newValues);
-
-
-    }
-
-    @PostMapping("/medical_chart/savePaList")
-    private ResponseEntity<?> savePaList(@RequestBody ChartPaData paData) {
-         paName = paData.getPaName();
-        chartNum = paData.getChartNum();
-
-
-
-
-        return ResponseEntity.ok(paName);
 
 
     }
@@ -175,7 +167,7 @@ public class ChartPiController {
             piList.add(toothList.get(i));
             piList.add(symptomList.get(i));
             piList.add(memoList.get(i));
-            if(i == toothList.size()-1){
+            if (i == toothList.size() - 1) {
                 dbSaveList.add(toothList.get(i));
                 dbSaveList.add(symptomList.get(i));
                 dbSaveList.add(memoList.get(i));
@@ -214,8 +206,8 @@ public class ChartPiController {
 
         MedicalChartDTO request = new MedicalChartDTO();
         request.setChartData(data);
-        request.setPaName(paName);
-        request.setChartNum(chartNum);
+        request.setPaName(chartController.getPaName());
+        request.setChartNum(chartController.getChartNum());
 
         webClient.post()
                 .uri("/medical_chart/saveData")

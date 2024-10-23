@@ -22,4 +22,6 @@ public interface ChartService {
     MedicalChartDTO addMedicalChart(MedicalChartDTO dto);
 
     MedicalChartDTO addMedicalChart(List<List<String>> piList,String paName, String chartNum);
+
+    MedicalChartDTO addMedicalChart(String teethNum, String plan,String chartNum,String paName);
 }

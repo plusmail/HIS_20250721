@@ -571,11 +571,11 @@
                                     <th>치료 계획 #1</th>
                                     <th>계획#2 지시</th>
                                     <th>치료 계획 #2</th>
-                                    <th>상태/미정</th>
-                                    <th>작업</th>
+                                    <th>저장</th>
+                                    <th>삭제</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="plan-data">
                                 <tr>
                                     <td><p style="cursor: pointer;" data-bs-toggle="modal"
                                            data-bs-target="#Plan-tooth-Modal" class="select-pTag">
@@ -593,8 +593,8 @@
                                            data-bs-target="#Plan-cure-modal" class="select-pTag">
                                         치료계획 선택
                                     </p></td>
-                                    <td>미지정</td>
-                                    <td>삭제</td>
+                                    <td><button class="btn save-db-btn" type="button" id="save-db-btn">저장</button></td>
+                                    <td><button class="btn" type="button">삭제</button></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -860,7 +860,7 @@
 
                 <!-- Modal Body -->
                 <div class="modal-body">
-                    <div class="container text-center tooth-container" id="modal-tooth-container">
+                    <div class="container text-center modal-tooth-container" id="modal-tooth-container">
                         <!-- 상악 (윗니) -->
                         <div class="tooth-row mb-2">
                             <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="18">18</button>
@@ -1007,7 +1007,7 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success">저장</button>
+                    <button type="button" class="btn btn-success" id="save-tooth">저장</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
