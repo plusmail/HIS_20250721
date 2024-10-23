@@ -62,8 +62,7 @@
 
     /* 중앙 채팅창 스타일 */
     .chat-room {
-        margin-left: 320px;
-        display: none;  /* 기본적으로 숨김 */
+        display: none;
     }
 
     /* 메시지 리스트 */
@@ -274,84 +273,8 @@
 <script layout:fragment="chartscript" th:inline="javascript"></script>
 <script layout:fragment="chartscriptPlan" th:inline="javascript"></script>
 </body>
-<script>
-    // HTML 요소들 가져오기
-    const chatButton = document.getElementById('chatButton');
-    const chatPanel = document.getElementById('chatPanel');
-    const roomList = document.getElementById('roomList');
-    const messageList = document.getElementById('messageList');
-    const messageInput = document.getElementById('messageInput');
-    const sendMessageButton = document.getElementById('sendMessageButton');
-    const chatModalLabel = document.getElementById('chatModalLabel');
-
-    let chatRooms = [];
-    let currentRoomId = null;
-
-    // 왼쪽 아래 채팅 버튼 클릭 시 채팅방 목록 패널을 슬라이딩으로 보여줌
-    chatButton.addEventListener('click', () => {
-        chatPanel.classList.toggle('open');  // 패널의 open 클래스를 추가/제거하여 나타내기
-    });
-
-    // 새로운 채팅방 생성
-    document.getElementById('createChatRoomBtn').addEventListener('click', () => {
-        const roomId = `room-${chatRooms.length + 1}`;
-        const roomName = `채팅방 ${chatRooms.length + 1}`;
-        chatRooms.push({ id: roomId, name: roomName, messages: [] });
-        renderChatRooms();
-    });
-
-    // 채팅방 목록 렌더링
-    function renderChatRooms() {
-        roomList.innerHTML = '';  // 기존 목록을 초기화
-
-        chatRooms.forEach(room => {
-            const li = document.createElement('li');
-            li.classList.add('list-group-item');
-            li.textContent = room.name;
-            li.addEventListener('click', () => openChatRoom(room.id));  // 클릭하면 해당 채팅방 열림
-            roomList.appendChild(li);
-        });
-    }
-
-    // 채팅방 열기
-    function openChatRoom(roomId) {
-        currentRoomId = roomId;
-        const room = chatRooms.find(r => r.id === roomId);
-        chatModalLabel.textContent = room.name;  // 모달 제목을 채팅방 이름으로 설정
-
-        // 메시지 목록 렌더링
-        renderMessages(room.messages);
-
-        // 모달을 열기
-        const chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
-        chatModal.show();
-    }
-
-    // 메시지 렌더링
-    function renderMessages(messages) {
-        messageList.innerHTML = '';  // 기존 메시지 초기화
-
-        messages.forEach(message => {
-            const li = document.createElement('li');
-            li.classList.add('message-item');
-            li.textContent = message;
-            messageList.appendChild(li);
-        });
-    }
-
-    // 메시지 전송
-    sendMessageButton.addEventListener('click', () => {
-        const message = messageInput.value;
-        if (message && currentRoomId) {
-            const room = chatRooms.find(r => r.id === currentRoomId);
-            room.messages.push(message);
-            renderMessages(room.messages);
-            messageInput.value = '';  // 입력창 초기화
-        }
-    });
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/chat.js"></script>
 <script src="/js/axios.js"></script>
 <script src="/js/layout.js"></script>
 <div th:fragment="reception_js"></div>
