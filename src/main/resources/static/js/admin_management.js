@@ -13,6 +13,10 @@ const streetAdr = document.getElementById("streetAdr");
 const detailAdr = document.getElementById("detailAdr");
 const note = document.getElementById("note");
 const userTableRest = document.getElementById("userTableRest");
+const userTableDelete = document.getElementById("userTableDelete");
+const userTableUpdate = document.getElementById("userTableUpdate");
+const userTableAdd = document.getElementById("userTableAdd");
+const duplicateBtn = document.getElementById("duplicateBtn");
 
 window.onload = function () {
     loadPage(1);
@@ -37,6 +41,8 @@ function loadPage(pageNumber) {
             // 사용자 리스트를 반복하며 테이블에 추가
 
             members[0].dtoList.forEach(user => {
+                console.log("9999999999 ", user)
+
                 const row = document.createElement('tr');
                 const roles = user.roles.map(role => role).join(', ');
                 row.setAttribute("data-mid", user.mid);
@@ -52,8 +58,10 @@ function loadPage(pageNumber) {
                             // 회원 정보 처리 로직 (예: 모달 창에 정보 표시 등)
                             console.log(memberInfo);
                             txtPopId.value = memberInfo.mid
+                            txtPopId.setAttribute("disabled", 'true')
+                            duplicateBtn.setAttribute("disabled", 'true')
                             txtPopName.value = memberInfo.name
-                            txtPopPwd.value = memberInfo.password
+                            txtPopPwd.value = ''
                             txtPopMail.value = memberInfo.email
                             zipCode.value = memberInfo.zipCode
                             streetAdr.value = memberInfo.address
@@ -105,6 +113,7 @@ function loadPage(pageNumber) {
                 row.innerHTML = `
                         <td>${user.mid}</td>
                         <td>${user.name}</td>
+                        <td>${user.phone}</td>
                         <td>${user.email}</td>
                         <td>${roles}</td> <!-- Set이나 배열을 문자열로 변환 -->
                     `;
@@ -169,7 +178,7 @@ function renderPagination(responseDTO) {
 
 
 // 저장 버튼 클릭 이벤트
-document.getElementById('userTable').addEventListener('click', function (event) {
+document.getElementById('userTableAdd').addEventListener('click', function (event) {
     event.preventDefault(); // 기본 동작 방지
 
     // 저장할 사용자 데이터 객체 생성
@@ -219,6 +228,120 @@ document.getElementById('userTable').addEventListener('click', function (event) 
             alert('저장 중 오류가 발생했습니다.');
         });
 });
+
+// 다중 선택된 값들을 배열로 가져오는 함수
+function getSelectedRoles() {
+    const selectedOptions = document.getElementById('cmbPopUserAuth').selectedOptions;
+    const roles = [];
+
+    for (let option of selectedOptions) {
+        roles.push({ roleSet: option.value });  // 선택된 각 값을 배열에 추가
+    }
+
+    return roles;
+}
+
+userTableUpdate.addEventListener("click", e=>{
+    e.preventDefault()
+
+    const txtPipIdDisabled = txtPopId.getAttribute("disabled")
+    const txtDupBtnDisabled = duplicateBtn.getAttribute("disabled")
+    if(!txtPipIdDisabled || !txtDupBtnDisabled) return;
+
+    // 저장할 사용자 데이터 객체 생성
+    const userDataUpdate = {
+        // 사용자 입력값 가져오기
+        mid: txtPopId.value,
+        password: txtPopPwd.value,
+        name: txtPopName.value,
+        roles: getSelectedRoles(),
+        tel : txtPopTel.value,
+        phone : txtPopHandPhone.value,
+        email: txtPopMail.value,
+        address: streetAdr.value,
+        detailAddress: detailAdr.value,
+        zipCode: zipCode.value,
+        note : note.value
+    };
+    console.log("userDataUpdate:", userDataUpdate)
+    // 필수 입력값 체크
+    if (!userDataUpdate.mid || !userDataUpdate.name || !userDataUpdate.email) {
+        alert('필수 입력값을 확인하세요.');
+        return;
+    }
+    // 서버에 사용자 데이터 전송
+    fetch('/admin_management/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userDataUpdate),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            if (data.success) {
+                alert('사용자가 성공적으로 수정되었습니다.');
+                window.location.reload();
+            } else {
+                alert('수정에 실패했습니다. 다시 시도해주세요.');
+                console.error('Error:', data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('수정 중 오류가 발생했습니다.');
+        });
+})
+
+userTableDelete.addEventListener("click", e=>{
+    e.preventDefault()
+    // 저장할 사용자 데이터 객체 생성
+    const userDataDelete = {
+        // 사용자 입력값 가져오기
+        mid: txtPopId.value,
+        password: txtPopPwd.value,
+        name: txtPopName.value,
+        roles: getSelectedRoles(),
+        tel : txtPopTel.value,
+        phone : txtPopHandPhone.value,
+        email: txtPopMail.value,
+        address: streetAdr.value,
+        detailAddress: detailAdr.value,
+        zipCode: zipCode.value,
+        note : note.value
+    };
+    console.log("userDataDelete:", userDataDelete)
+    // 필수 입력값 체크
+    if (!userDataDelete.mid) {
+        alert('필수 입력값을 확인하세요.');
+        return;
+    }
+    // 서버에 사용자 데이터 전송
+    fetch('/admin_management/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userDataDelete),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            if (data.success) {
+                alert('사용자가 성공적으로 삭제되었습니다.');
+                window.location.reload();
+            } else {
+                alert('삭제에 실패했습니다. 다시 시도해주세요.');
+                console.error('Error:', data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('삭제 중 오류가 발생했습니다.');
+        });
+})
+
 
 document.getElementById("btnDelete").addEventListener("click", function () {
     const userId = this.getAttribute("data-id");
@@ -456,6 +579,8 @@ function checkDuplicateId() {
 }
 
 userTableRest.addEventListener("click", (e)=>{
+    txtPopId.removeAttribute('disabled')
+    duplicateBtn.removeAttribute('disabled')
     userFormData.reset();
     idCheckMsg.innerText = ''
     idCheckStatus.checked = false;

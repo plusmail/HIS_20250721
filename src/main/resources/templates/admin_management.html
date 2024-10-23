@@ -21,6 +21,7 @@
                             <tr>
                                 <th style="width: 100px;">아이디</th>
                                 <th style="width: 150px;">이름</th>
+                                <th style="width: 150px;">연락처</th>
                                 <th style="width: 200px;">이메일</th>
                                 <th style="width: 120px;">권한</th>
                             </tr>
@@ -29,6 +30,7 @@
                             <!-- 사용자 리스트 반복 -->
                             <tr th:each="user : ${members}">
                                 <td th:text="${user.mid}"></td>
+                                <td th:text="${user.tel}"></td>
                                 <td th:text="${user.name}"></td>
                                 <td th:text="${user.email}"></td>
                                 <td th:text="${user.roles}"></td>
@@ -101,7 +103,7 @@
                                            required
                                            style="display: inline-block; width: auto;"
                                     >
-                                    <button type="button" class="btn btn-primary mr-2" onclick="checkDuplicateId()">
+                                    <button type="button" id="duplicateBtn" class="btn btn-primary mr-2" onclick="checkDuplicateId()">
                                         중복체크
                                     </button>
                                     <input type="checkbox" id="idCheckStatus" disabled unchecked>
@@ -154,8 +156,10 @@
                                 <textarea class="form-control" id="note" placeholder="특이사항"></textarea><br>
                                 <div class="card-footer">
                                     <div class="col" style="text-align: right;">
-                                        <input type="reset" id="userTableRest" class="btn btn-danger" value="취소">
-                                        <button id="userTable" class="btn btn-success">저장</button>
+                                        <button id="userTableRest" class="btn btn-warning">취소</button>
+                                        <button id="userTableDelete" class="btn btn-danger">삭제</button>
+                                        <button id="userTableUpdate" class="btn btn-primary">수정</button>
+                                        <button id="userTableAdd" class="btn btn-success">저장</button>
                                     </div>
                                 </div>
 
