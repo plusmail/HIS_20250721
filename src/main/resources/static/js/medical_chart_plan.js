@@ -286,6 +286,7 @@ $(document).ready(function() {
             }),
             success: function(response) {
                 console.log("Data saved to DB:", response);
+                readPaChart()
 
                 // 저장이 완료되면 새 행을 추가
                 addNewRow();
@@ -295,21 +296,63 @@ $(document).ready(function() {
             }
         });
     });
+});
 
-    // 새로운 행 추가 함수
-    function addNewRow() {
-        const newRow = `
+
+$(document).ready(function() {
+    saveChartNum();
+
+    // 저장 버튼 클릭 이벤트
+    $('#plan-data').on('click', 'button.del-db-btn', function() {
+        // 클릭된 버튼의 부모 tr 요소를 찾음
+        const row = $(this).closest('tr');
+
+        // 현재 tr 안의 모든 p 태그의 값을 가져옴
+        const rowData = [];
+        row.find('p.select-pTag').each(function() {
+            rowData.push($(this).text().trim()); // 각 p 태그의 내용을 수집
+        });
+
+        row.remove();
+        // DB 저장을 위한 데이터
+        console.log(rowData); // rowData를 서버에 전송하여 DB에 저장하는 로직을 추가
+        // AJAX를 이용해 DB에 저장
+        $.ajax({
+            url: '/medical_chart/delPlan',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({toothOne: rowData[[0]],
+                planOne: rowData[[1]],
+                toothTwo:rowData[[2]],
+                planTwo:rowData[[3]]
+            }),
+            success: function(response) {
+                console.log("Data del to DB:", response);
+                readPaChart()
+
+                // 저장이 완료되면 새 행을 추가
+            },
+            error: function(error) {
+                console.error('Error saving data:', error);
+            }
+        });
+    });
+});
+
+
+// 새로운 행 추가 함수
+function addNewRow() {
+    const newRow = `
             <tr>
                 <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
                 <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
                 <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
                 <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
-                <td><button class="btn" type="button">저장</button></td>
-                <td><button class="btn" type="button">삭제</button></td>
+                <td><button class="btn save-db-btn" type="button">저장</button></td>
+                <td><button class="btn del-db-btn" type="button">삭제</button></td>
             </tr>
         `;
 
-        // 새로운 행을 tbody에 추가
-        $('#plan-data').append(newRow);
-    }
-});
+    // 새로운 행을 tbody에 추가
+    $('#plan-data').append(newRow);
+}
