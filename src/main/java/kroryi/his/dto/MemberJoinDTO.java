@@ -27,12 +27,32 @@ public class MemberJoinDTO {
     private String address;
     private String detailAddress;
     private String note;
+    private LocalDateTime regDate;
 
     private Set<MemberRoleSet> roles;  // roleSet 값
 
-    public MemberJoinDTO(String mid, String email, String name, String password, boolean retirement, String social, LocalDateTime regDate, LocalDateTime modDate, String address, String detailAddress, int zipCode) {
+
+    public MemberJoinDTO(String mid, String name, String password, String email, boolean retirement, String social, Set<MemberRoleSet> roleSet) {
+        this.mid = mid;
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.retirement = retirement;
+        this.social = social;
+        this.roles = roleSet;
     }
 
-    public MemberJoinDTO(String mid, String email, String name, String password, boolean retirement, String social, LocalDateTime regDate, LocalDateTime modDate, String address, String detailAddress) {
+    public MemberJoinDTO(String mid, String email, String name, String password, boolean retirement, String social, LocalDateTime regDate, LocalDateTime modDate, String address, String detailAddress, int zipCode) {
+        this.mid = mid;
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.retirement = retirement;
+        this.social = social;
+        this.regDate = regDate;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.zipCode = zipCode;
+
     }
 }

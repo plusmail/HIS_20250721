@@ -27,58 +27,38 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("loadUserByUsername: {}", username);
+        log.info("loadUserByUsername: {}" , username);
         Optional<Member> result = memberRepository.getWithRoles(username);
-
         if (result.isEmpty()) {
-            throw new UsernameNotFoundException(username + "를 찾을 수 없습니다.");
+            throw new UsernameNotFoundException(username+"를 찾을수 없습니다.");
         }
 
         Member member = result.get();
-
-//        String mid,
-//        String email,
-//        String name,
-//        String password,
-//        boolean retirement,
-//        String social,
-//        LocalDateTime regDate,
-//        LocalDateTime modDate,
-//        String address,
-//        String detailAddress,
-//        int zipCode
-
         // MemberJoinDTO 객체 생성
         MemberJoinDTO memberJoinDTO = new MemberJoinDTO(
                 member.getMid(),
-                member.getEmail(),
                 member.getName(), // 이름도 추가
                 member.getPassword(),
+                member.getEmail(),
                 member.isRetirement(), // 퇴직 여부
                 member.getSocial(),
-                member.getRegDate(),
-                member.getModDate(),
-                member.getAddress(),
-                member.getDetailAddress()
-        );
-
-        // MemberSecurityDTO 객체 생성
-        MemberSecurityDTO memberSecurityDTO = new MemberSecurityDTO(
-                memberJoinDTO,
                 member.getRoleSet()
-                        .stream()
-                        .map(memberRole -> new SimpleGrantedAuthority("ROLE_" + memberRole.getRoleSet()))
-                        .collect(Collectors.toList())
         );
 
-        log.info("----------------memberSecurityDTO: {}", memberSecurityDTO);
-
+        MemberSecurityDTO memberSecurityDTO =
+                new MemberSecurityDTO(
+                        memberJoinDTO,
+                        member.getRoleSet()
+                                .stream().map(memberRole -> new SimpleGrantedAuthority(
+                                        "ROEL_" + memberRole.getRoleSet()))
+                                .collect(Collectors.toList())
+                );
         // Create Authentication object
         Authentication authentication = new UsernamePasswordAuthenticationToken(memberSecurityDTO, null, memberSecurityDTO.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication); // Store Authentication in SecurityContext
 
-        // Log current Authentication
-        log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+        log.info("memberSecurityDTO: {}", memberSecurityDTO);
+
         return memberSecurityDTO;
     }
 }

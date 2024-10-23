@@ -101,12 +101,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarColor02">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                        <input type="text" class="form-control" name="name" style="width: 80px"
-                               th:if="${#authentication.principal instanceof T(org.springframework.security.core.userdetails.UserDetails)}"
-                               th:value="${#authentication.principal.name}"
-                               readonly>
-                </li>
+<!--                <li class="nav-item">-->
+<!--                        <input type="text" class="form-control" name="name" style="width: 80px"-->
+<!--                               th:if="${#authentication.principal instanceof T(org.springframework.security.core.userdetails.UserDetails)}"-->
+<!--                               th:value="${#authentication.principal.name}"-->
+<!--                               readonly>-->
+<!--                </li>-->
                 <li class="nav-item" th:if="${#authorization.expression('hasAnyRole(''ADMIN'')')}">
                     <a class="nav-link" href="admin_management" id="admin_management">
                         <i class="bi bi-gear"></i> 사용자관리
