@@ -1,6 +1,7 @@
 package kroryi.his.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import kroryi.his.domain.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
     void deleteById(Long seq);
 
+
+    Optional<Reservation> findByChartNumber(String chartNumber);
 }
