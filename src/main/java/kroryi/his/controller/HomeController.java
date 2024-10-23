@@ -1,16 +1,38 @@
 package kroryi.his.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import kroryi.his.dto.MemberSecurityDTO;
+import kroryi.his.service.PatientRegisterService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 @Log4j2
+@RequiredArgsConstructor
 public class HomeController {
+    private final PatientRegisterService patientRegisterService;
+
     @GetMapping("/home")
-    public String home() {
+    public String home(@AuthenticationPrincipal UserDetails user, Model model, HttpSession session) {
+        model.addAttribute("user",user.getUsername());
+        session.setAttribute("user", user);
+        log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+
+        log.info("세선 값 {}", session.getAttribute("user"));
+        log.info("User authorities: {}", user.getAuthorities());
         return "home";
     }
 
@@ -22,8 +44,10 @@ public class HomeController {
 
     //    환자등록
     @GetMapping("/patient_register")
-    public String patient_register() {
-        return "patient_register";
+    public String patientRegister(Model model) {
+        List<String> doctorNames = patientRegisterService.getDoctorNames();
+        model.addAttribute("doctorNames", doctorNames); // 의사 이름을 모델에 추가
+        return "patient_register"; // Thymeleaf 템플릿 이름
     }
 
     //    진료예약
@@ -49,4 +73,21 @@ public class HomeController {
     public String inventory_management() {
         return "inventory_management";
     }
+
+    @GetMapping("/list")
+    public String list() {
+        return "board/list";
+    }
+
+    @GetMapping("/api/user/session")
+    @ResponseBody
+    public ResponseEntity<MemberSecurityDTO> getUserSession(HttpSession session) {
+        MemberSecurityDTO user = (MemberSecurityDTO) session.getAttribute("user");
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
 }
