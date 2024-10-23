@@ -50,13 +50,15 @@ public class CustomUserDetailsService implements UserDetailsService {
                         memberJoinDTO,
                         member.getRoleSet()
                                 .stream().map(memberRole -> new SimpleGrantedAuthority(
-                                        "ROEL_" + memberRole.getRoleSet()))
+                                        "ROLE_" + memberRole.getRoleSet()))
                                 .collect(Collectors.toList())
                 );
         // Create Authentication object
         Authentication authentication = new UsernamePasswordAuthenticationToken(memberSecurityDTO, null, memberSecurityDTO.getAuthorities());
+
         SecurityContextHolder.getContext().setAuthentication(authentication); // Store Authentication in SecurityContext
 
+        log.info("authentication: {}", authentication);
         log.info("memberSecurityDTO: {}", memberSecurityDTO);
 
         return memberSecurityDTO;
