@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,10 +58,20 @@ public class ReservationImpl implements ReservationService {
     }
 
     // 예약에서 저장을 눌렀을 경우
-    public void insertReservationInformation(ReservationDTO dto) {
+    public List<ReservationDTO> insertReservationInformation(ReservationDTO dto) {
+        // ReservationDTO를 Reservation으로 변환
         Reservation reservation = modelMapper.map(dto, Reservation.class);
+
+        // 예약 정보 저장
         reRepo.save(reservation);
+
+        // 저장된 예약 정보를 다시 DTO로 변환
+        ReservationDTO savedDto = modelMapper.map(reservation, ReservationDTO.class);
+
+        // 결과를 리스트에 담아 반환
+        return Collections.singletonList(savedDto);
     }
+
 
 
     // 예약에서 수정을 눌렀을 경우
@@ -85,5 +96,24 @@ public class ReservationImpl implements ReservationService {
 
     }
 
-
+    @Override
+    public List<ReservationDTO> getReservations(String chartNumber, String reservationDate) {
+        List<Reservation> reservations = reRepo.findByChartNumberAndReservationDate(chartNumber, reservationDate);
+        return reservations.stream()
+                .map(reservation -> new ReservationDTO(
+                        reservation.getSeq(),
+                        reservation.getReservationDate(),
+                        reservation.getDepartment(),
+                        reservation.isSnsNotification(),
+                        reservation.getChartNumber(),
+                        reservation.getDoctor(),
+                        reservation.getTreatmentType(),
+                        reservation.getPatientNote(),
+                        reservation.getReservationStatusCheck()
+                ))
+                .collect(Collectors.toList());
+    }
 }
+
+
+
