@@ -2,12 +2,15 @@ package kroryi.his.controller;
 
 import kroryi.his.domain.ChartMemo;
 import kroryi.his.domain.MedicalChart;
+import kroryi.his.dto.ChartPaData;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.repository.ChartMemoRepository;
 import kroryi.his.service.ChartService;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +22,28 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 @RestController
+@Data
 public class ChartController {
     @Autowired
     private final ChartService chartService;
     @Autowired
     private final ChartMemoRepository chartMemoRepository;
+
+    String paName;
+    String chartNum;
+    @PostMapping("/savePaList")
+    private ResponseEntity<?> savePaList(@RequestBody ChartPaData paData) {
+        paName = paData.getPaName();
+        chartNum = paData.getChartNum();
+
+        log.info("chartNum:{} ", chartNum + ", paName:{} ", paName);
+
+
+
+        return ResponseEntity.ok(paName);
+
+
+    }
 
 
     // 메모 추가. 추후 계정 연동 시 계정에 따라 저장되도록 수정 필요.
