@@ -1,7 +1,6 @@
 <!--진료예약-->
 <!DOCTYPE html>
 <html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout.html}">
 
@@ -395,7 +394,7 @@
 
         function rReset(reset) {
 
-            if(reset) {
+            if (reset) {
                 const IndexElement = document.getElementById('index-number');
                 IndexElement.innerHTML = '';
             }
@@ -443,7 +442,7 @@
 
         }
 
-        function rReset2(responseData){
+        function rReset2(responseData) {
             const reservationDateElement = document.getElementById('reservation-date');
             const departmentElement = document.getElementById('department');
             const snsNotificationElement = document.getElementById('sns-notification');
@@ -513,7 +512,16 @@
 
         // 저장 버튼 눌렀을 때 업데이트 혹은 저장이 이루어지게 하기
         function saveUpdate() {
+// 권한 체크를 직접 수행합니다.
+            const hasPermission = globalUserData.authorities.some(auth =>
+                auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+            );
 
+            // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+            if (!hasPermission) {
+                alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+                return; // 등록 과정 중단
+            }
             // 에약 일자
             let reservationDate = document.getElementById('reservation-date').value;
 
@@ -619,6 +627,17 @@
         }
 
         function deleteReservation() {
+            // 권한 체크를 직접 수행합니다.
+            const hasPermission = globalUserData.authorities.some(auth =>
+                auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+            );
+
+            // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+            if (!hasPermission) {
+                alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+                return; // 등록 과정 중단
+            }
+
             const indexNumber = document.getElementById('index-number').innerHTML.trim();
             const reservationDate = document.getElementById('reservation-date').value;
 
