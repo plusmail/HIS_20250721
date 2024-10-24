@@ -1,41 +1,47 @@
 package kroryi.his.controller;
 
-import kroryi.his.domain.Member;
+
 import kroryi.his.dto.ChatMessageDTO;
-import kroryi.his.dto.MemberJoinDTO;
-import kroryi.his.dto.MessageDTO;
+import kroryi.his.dto.ChatRoomDTO;
 import kroryi.his.service.ChatRoomService;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
+@Log4j2
 public class ChatController {
 
     private final MemberService memberService;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomService chatRoomService;
 
-    // 사용자 목록을 반환하는 API
-    @GetMapping("/members")
-    public ResponseEntity<List<MemberJoinDTO>> getAllMembers() {
-        List<MemberJoinDTO> members = memberService.getAllUserIdAndName();
-        List<MemberJoinDTO> memberJoinDTOs = members.stream()
-                .map(member -> new MemberJoinDTO(member.getMid(), member.getName()))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(memberJoinDTOs);  // JSON으로 사용자 목록 반환
+    @PostMapping("/rooms")
+    public ResponseEntity<ChatRoomDTO> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
+        // Set<String>을 List<String>으로 변환
+        List<String> memberNamesList = new ArrayList<>(chatRoomDTO.getMemberNames());
+
+        // 변환된 List를 사용하여 채팅방 생성
+        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberNamesList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
+    }
+
+    // 채팅방 목록 반환
+    @GetMapping("/rooms")
+    public ResponseEntity<List<ChatRoomDTO>> getAllChatRooms() {
+        List<ChatRoomDTO> rooms = chatRoomService.getAllChatRooms();
+        return ResponseEntity.ok(rooms);
     }
 
     @MessageMapping("/chat.send")

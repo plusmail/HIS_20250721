@@ -30,4 +30,6 @@ public interface MemberRepository extends JpaRepository<Member, String>, MemberS
 
     @Query("select m.mid, m.name from Member m")
     List<Object[]> findUserIdsAndNames();
+
+    Optional<Member> findFirstByName(String name);
 }

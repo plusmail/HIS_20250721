@@ -23,6 +23,11 @@ public class ChatRoom {
     private String roomName;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "chat_room_members",  // 조인 테이블 이름
+            joinColumns = @JoinColumn(name = "chat_room_id"),  // ChatRoom 쪽의 외래키
+            inverseJoinColumns = @JoinColumn(name = "member_mid")  // Member 쪽의 외래키
+    )
     private Set<Member> members = new HashSet<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
