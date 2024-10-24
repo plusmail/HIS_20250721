@@ -1,66 +1,118 @@
 // HTML 요소들 가져오기
 const chatButton = document.getElementById('chatButton');
 const chatPanel = document.getElementById('chatPanel');
+const createRoomBtn = document.getElementById('createRoomBtn');
 const roomList = document.getElementById('roomList');
+const userList = document.getElementById('userList');
+const startChatBtn = document.getElementById('startChatBtn');
+const chatModalLabel = document.getElementById('chatModalLabel');
 const messageList = document.getElementById('messageList');
 const messageInput = document.getElementById('messageInput');
 const sendMessageButton = document.getElementById('sendMessageButton');
-const chatModalLabel = document.getElementById('chatModalLabel');
 
+let selectedUser = null;  // 선택된 사용자
+let chatRooms = [];
 let currentRoomId = null;
-let ws = null;
 
-// 채팅 패널 슬라이드 토글
+// 채팅 버튼 클릭 시 패널 열기/닫기
 chatButton.addEventListener('click', () => {
     chatPanel.classList.toggle('open');
 });
 
-// 새로운 WebSocket 연결 생성
-function connectWebSocket(roomId) {
-    if (ws) {
-        ws.close(); // 기존 연결이 있다면 닫기
-    }
-
-    ws = new WebSocket(`ws://localhost:8080/ws/chat/${roomId}`);
-
-    ws.onopen = () => {
-        console.log(`Connected to chat room ${roomId}`);
-    };
-
-    ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        displayMessage(message.sender, message.content);
-    };
-
-    ws.onclose = () => {
-        console.log(`Disconnected from chat room ${roomId}`);
-    };
+// 사용자 선택 모달에서 사용자 목록 로드
+function loadUsers() {
+    const users = [
+        { id: 'user1', name: '사용자1' },
+        { id: 'user2', name: '사용자2' },
+        { id: 'user3', name: '사용자3' }
+    ];
+    renderUserList(users);
 }
 
-// 메시지 표시
-function displayMessage(sender, content) {
-    const li = document.createElement('li');
-    li.classList.add('message-item');
-    li.textContent = `${sender}: ${content}`;
-    messageList.appendChild(li);
+// 사용자 목록 렌더링
+function renderUserList(users) {
+    userList.innerHTML = '';
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.textContent = user.name;
+        li.addEventListener('click', () => selectUser(user));
+        userList.appendChild(li);
+    });
+}
+
+// 사용자 선택
+function selectUser(user) {
+    selectedUser = user;
+    userList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+// 채팅방 생성
+startChatBtn.addEventListener('click', () => {
+    if (!selectedUser) {
+        alert('사용자를 선택하세요.');
+        return;
+    }
+
+    const roomName = `${selectedUser.name}와의 1:1 채팅`;
+    const roomId = `room-${chatRooms.length + 1}`;
+
+    chatRooms.push({
+        id: roomId,
+        name: roomName,
+        users: [selectedUser],
+        messages: []
+    });
+
+    renderChatRooms();
+    selectedUser = null;
+
+    const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
+    userSelectionModal.hide();
+});
+
+// 채팅방 목록 렌더링
+function renderChatRooms() {
+    roomList.innerHTML = '';
+    chatRooms.forEach(room => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.textContent = room.name;
+        li.addEventListener('click', () => openChatRoom(room.id));
+        roomList.appendChild(li);
+    });
+}
+
+// 채팅방 열기
+function openChatRoom(roomId) {
+    currentRoomId = roomId;
+    const room = chatRooms.find(r => r.id === roomId);
+    chatModalLabel.textContent = room.name;
+    renderMessages(room.messages);
+
+    const chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
+    chatModal.show();
+}
+
+// 메시지 렌더링
+function renderMessages(messages) {
+    messageList.innerHTML = '';
+    messages.forEach(message => {
+        const li = document.createElement('li');
+        li.classList.add('message-item');
+        li.textContent = message;
+        messageList.appendChild(li);
+    });
 }
 
 // 메시지 전송
 sendMessageButton.addEventListener('click', () => {
-    const message = messageInput.value;
-    if (message && ws) {
-        ws.send(JSON.stringify({
-            sender: '사용자1', // 사용자 ID 또는 이름
-            content: message
-        }));
-        messageInput.value = ''; // 입력창 초기화
-    }
-});
+    const message = messageInput.value.trim();
+    if (!message || !currentRoomId) return;
 
-// 채팅방 선택 시 WebSocket 연결
-function openChatRoom(roomId) {
-    currentRoomId = roomId;
-    connectWebSocket(roomId);  // WebSocket 연결
-    const chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
-    chatModal.show();
-}
+    const room = chatRooms.find(r => r.id === currentRoomId);
+    room.messages.push(message);
+    renderMessages(room.messages);
+    messageInput.value = '';
+});

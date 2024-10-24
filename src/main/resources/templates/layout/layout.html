@@ -15,14 +15,7 @@
 <link rel="stylesheet" href="/css/layout.css">
 
 <style>
-    /* 기본 레이아웃 스타일 */
-    body, html {
-        height: 100%;
-        margin: 0;
-        font-family: Arial, sans-serif;
-    }
-
-    /* 왼쪽 아래에 고정된 채팅 버튼 */
+    /* 채팅 버튼 */
     .chat-button {
         position: fixed;
         bottom: 20px;
@@ -44,7 +37,7 @@
     /* 패널 슬라이딩 애니메이션 */
     .chat-panel {
         position: fixed;
-        left: -300px; /* 처음엔 화면 밖에 위치 */
+        left: -300px;
         top: 0;
         bottom: 0;
         width: 300px;
@@ -53,19 +46,17 @@
         border-right: 1px solid #ccc;
         z-index: 999;
         transition: transform 0.3s ease;
-        transform: translateX(0); /* 이동 효과를 위한 transform */
     }
 
-    .open {
+    .chat-panel.open {
         transform: translateX(300px); /* 패널을 오른쪽으로 슬라이드 */
     }
 
-    /* 중앙 채팅창 스타일 */
-    .chat-room {
-        display: none;
+    /* 사용자 목록 */
+    .user-list .list-group-item {
+        cursor: pointer;
     }
 
-    /* 메시지 리스트 */
     .message-list {
         list-style: none;
         padding: 0;
@@ -73,20 +64,15 @@
         overflow-y: scroll;
     }
 
-    .message-item {
-        margin-bottom: 10px;
-    }
-
-    /* 메시지 입력창 스타일 */
     .message-input {
         display: flex;
-        margin-top: 20px;
     }
 
     .message-input input {
         flex-grow: 1;
         margin-right: 10px;
     }
+
 </style>
 
 <body>
@@ -212,22 +198,47 @@
     </div>
 </div>
 
-<!-- 왼쪽 채팅 패널 -->
-<div id="chatPanel" class="chat-panel">
-    <!-- 채팅방 목록 패널 -->
-    <div id="chatRoomListPanel" class="chat-room-list">
-        <h5>채팅방 목록</h5>
-        <ul id="roomList" class="list-group">
-            <!-- 채팅방 목록이 동적으로 생성됩니다. -->
-        </ul>
-        <button id="createChatRoomBtn" class="btn btn-primary mt-3">새로운 채팅방 생성</button>
-    </div>
-</div>
-
 <!-- 왼쪽 아래에 떠 있는 채팅 버튼 -->
 <button id="chatButton" class="chat-button">
     <i class="bi bi-chat"></i>
 </button>
+
+<!-- 왼쪽 채팅 패널 -->
+<div id="chatPanel" class="chat-panel">
+    <!-- 채팅방 목록 패널 -->
+    <div id="chatRoomListPanel" class="chat-room-list">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>채팅방 목록</h5>
+            <!-- + 버튼 추가 (새로운 채팅방 생성) -->
+            <button id="createChatRoomBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
+                <i class="bi bi-plus"></i>
+            </button>
+        </div>
+        <ul id="roomList" class="list-group">
+            <!-- 채팅방 목록이 동적으로 생성됩니다. -->
+        </ul>
+    </div>
+</div>
+
+<!-- 사용자 선택 모달 -->
+<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userSelectionModalLabel">1:1 대화할 사용자 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="userList" class="list-group">
+                    <!-- 사용자가 동적으로 추가됩니다 -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="startChatBtn">선택</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 채팅 모달 -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
@@ -250,7 +261,8 @@
     </div>
 </div>
 
-<!--home-->
+
+    <!--home-->
 <div layout:fragment="home" style="width: 100%"></div>
 <!--사용자관리-->
 <div layout:fragment="admin_management" style="width: 100%"></div>

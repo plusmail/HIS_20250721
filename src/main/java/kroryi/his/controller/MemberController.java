@@ -1,6 +1,8 @@
 package kroryi.his.controller;
 
 import jakarta.servlet.http.HttpSession;
+import kroryi.his.domain.Member;
+import kroryi.his.dto.MemberJoinDTO;
 import kroryi.his.dto.MemberSecurityDTO;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +12,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/member")
@@ -59,6 +61,17 @@ public class MemberController {
             log.error("Authentication failed: {}", e.getMessage());
             return "redirect:/member/login?error"; // Redirect back to login with error
         }
+    }
+
+    // 사용자 목록을 채팅에서 사용하기 위해 추가
+    @GetMapping("/list")
+    @ResponseBody
+    public List<MemberJoinDTO> getAllMembers() {
+        log.info("전체 사용자 목록 조회");
+        List<Member> members = memberService.getAllMembers();
+        return members.stream()
+                .map(member -> new MemberJoinDTO(member.getMid(), member.getName()))
+                .collect(Collectors.toList());
     }
 
 }
