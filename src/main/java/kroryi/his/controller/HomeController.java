@@ -78,9 +78,9 @@ public class HomeController {
         return "inventory_management";
     }
 
-    @GetMapping("/list")
+    @GetMapping("/board/list")
     public String list() {
-        return "board/list";
+        return "/board/list";
     }
 
     @GetMapping("/api/user/session")
