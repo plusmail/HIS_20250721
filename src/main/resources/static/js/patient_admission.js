@@ -16,6 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const receptionBtn = document.querySelector(".ReceptionBtn");
     receptionBtn.addEventListener("click", function () {
         console.log("접수 버튼이 클릭되었습니다.");
+        // 권한 체크를 직접 수행합니다.
+        const hasPermission = globalUserData.authorities.some(auth =>
+            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+        );
+
+        // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+        if (!hasPermission) {
+            alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+            return; // 등록 과정 중단
+        }
 
         // 세션에서 환자 데이터 가져오기
         const selectedPatient = JSON.parse(sessionStorage.getItem('selectedPatient'));
@@ -54,9 +64,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // 예약 시간도 포함된 환자 데이터 추가
                     patientData.rvTime = data.rvTime; // 서버에서 반환된 예약 시간
+                    console.log("2222 ", data.data.pid)
 
                     // 대기 중 테이블에 추가
                     addPatientToWaitingTable({
+                        pid : data.data.pid,
                         chartNum: patientData.chartNum, // 차트 번호
                         paName: patientData.paName, // 환자 이름
                         treatStatus: "1", // 대기 상태
@@ -106,6 +118,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 진료 시작 버튼 클릭 이벤트
     startTreatmentButton.addEventListener("click", function () {
+        // 권한 체크를 직접 수행합니다.
+        const hasPermission = globalUserData.authorities.some(auth =>
+            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+        );
+
+        // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+        if (!hasPermission) {
+            alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+            return; // 등록 과정 중단
+        }
+
         const selectedRow = waitingPatientsTable.querySelector('tr.selected')
         console.log(selectedRow)
 
@@ -167,13 +190,15 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("디비에 저장되는 viTime", viTime)
 
             console.log('저장할 환자 데이터:', patientData)
+            console.log(`환자 정보 - 차트 번호: ${chartNum}, 이름: ${paName}, 접수 시간: ${receptionTime}, 의사: ${selectedDoctor}`);
 
             fetch("/api/patient-admission/treatment/start", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(patientData)
+
             })
                 .then(response => {
                     if (!response.ok) {
@@ -289,6 +314,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 진료 완료 버튼 클릭 시 모달 표시
     completeTreatmentButton.addEventListener("click", function () {
+        // 권한 체크를 직접 수행합니다.
+        const hasPermission = globalUserData.authorities.some(auth =>
+            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+        );
+
+        // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+        if (!hasPermission) {
+            alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+            return; // 등록 과정 중단
+        }
         const selectedRow = treatmentPatientsTable.querySelector('tr.selected');
         console.log(selectedRow);
 
@@ -374,7 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // API 호출
             fetch("/api/patient-admission/completeTreatment", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -554,6 +589,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const formattedRvTime = formatRvTime(patient.rvTime);
 
+        console.log("11111111111->", patient)
 
 
         row.innerHTML = `
@@ -572,6 +608,8 @@ document.addEventListener("DOMContentLoaded", function () {
             hour: '2-digit',
             minute: '2-digit'
         }) : 'N/A'}</td>
+        <td>${patient.pid}</td>
+       
         
         
     `;
@@ -610,7 +648,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     mainDoc: patient.mainDoc || null,
                     rvTime: patient.rvTime || null,
                     receptionTime: patient.receptionTime || new Date().toISOString(),
-                    treatStatus: "1" // 대기 상태
+                    treatStatus: "1", // 대기 상태
+                    pid:patient.pid
+
                 });
             }
         });
@@ -702,6 +742,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${patient.selectedDoctor || 'N/A'}</td>
         <td>${formattedReceptionTime || 'N/A'}</td><!-- 포맷된 접수 시간 -->
         <td>${treatmentStartTime || 'N/A'}</td> <!-- 포맷된 진료 시작 시간 -->
+        <td style="display: none;">${patient.pid}</td>
     `;
         console.log('환자의 receptionTime:', patient.receptionTime);
         console.log('포맷된 receptionTime:', formattedReceptionTime);
@@ -877,6 +918,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${patient.selectedDoctor || 'N/A'}</td>
         <td>${formattedReceptionTime || 'N/A'}</td>
         <td>${formattedCpTime || 'N/A'}</td>
+        <td style="display: none;">${patient.pid}</td>
     `;
 
         console.log("테아블에 표시되는 진료완료시간: ",formattedCpTime);
@@ -939,13 +981,6 @@ document.addEventListener("DOMContentLoaded", function () {
         header.textContent = `진료 완료 환자: ${completePatientCount}명`;
     }
 
-
-    // // 매 5초마다 환자 목록 갱신
-    // setInterval(() => {
-    //     const selectedDate = new Date(document.getElementById('currentDate').value);
-    //     fetchAndDisplayPatients(selectedDate); // 현재 선택된 날짜의 환자 목록 갱신
-    // }, 5000);
-
 });
 
 
@@ -989,10 +1024,22 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedRow.classList.add("clicked");
 
         console.log("Selected patient:", selectedRow.cells[2].textContent);
+        console.log("11111111111",selectedRow.cells[6].textContent);
     });
 
     // 접수 취소 버튼 클릭 시 모달 표시
     cancelReceptionButton.addEventListener("click", function () {
+        // 권한 체크를 직접 수행합니다.
+        const hasPermission = globalUserData.authorities.some(auth =>
+            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
+        );
+
+        // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
+        if (!hasPermission) {
+            alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
+            return; // 등록 과정 중단
+        }
+
         if (selectedRow) {
             const patientName = selectedRow.cells[2].textContent;
             patientNameElement.textContent = `환자 이름: ${patientName}`;
@@ -1002,17 +1049,37 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // 모달에서 '예' 버튼 클릭 시 행 삭제
+    // 모달에서 '예' 버튼 클릭 시 행 삭제 및 데이터베이스에서 삭제
     confirmCancelBtn.addEventListener("click", function () {
-        if (selectedRow) {
-            selectedRow.remove(); // 선택된 행 삭제
-            updateRowIndexes(); // 행 번호 업데이트
-            updateWaitingPatientCount(); // 환자 수 업데이트
-            selectedRow = null; // 선택된 행 초기화
-        }
 
-        // 모달 닫기
-        cancelModal.hide();
+        if (selectedRow) {
+
+            const pid = selectedRow.cells[6].textContent; // 숨겨진 pid 가져오기
+            console.log(selectedRow.cells[6].textContent);
+            console.log("Selected PID:", pid);
+            // 데이터베이스에서 환자 접수 취소 요청
+            fetch(`/api/patient-admission/${pid}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        selectedRow.remove(); // 선택된 행 삭제
+                        updateRowIndexes(); // 행 번호 업데이트
+                        updateWaitingPatientCount(); // 환자 수 업데이트
+                        selectedRow = null; // 선택된 행 초기화
+                        console.log('Admission cancelled successfully.');
+                    } else {
+                        alert('환자 접수 취소 실패. 다시 시도하세요.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('서버와의 통신 중 오류가 발생했습니다.');
+                });
+
+            // 모달 닫기
+            cancelModal.hide();
+        }
     });
 
     // '아니요' 버튼 클릭 시 모달 닫기

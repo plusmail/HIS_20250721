@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -60,6 +61,42 @@ public class chartTest {
             log.info(memo.getCheckDoc());
             log.info(memo.getPaName());
             log.info(memo.getMedicalContent());
+        }
+    }
+
+    @Test
+    public void deleteChartTest(){
+       medicalRepo
+                .deleteByChartNumAndPaNameAndTeethNumAndMedicalDivisionAndMdTime("240912043",
+                        "김유신",
+                        "28,41",
+                        "레진",
+                        LocalDate.ofEpochDay((2024-10-22)));
+    }
+
+    @Test
+    public void findData(){
+        List<MedicalChart> records = medicalRepo.findByChartNumAndPaNameAndTeethNumAndMedicalDivisionAndMdTime(
+                "240912043",
+                "김유신",
+                "28, 41",
+                "레진",
+                LocalDate.of(2024,10,22)
+        );
+
+
+        if (records.isEmpty()) {
+            System.out.println("No matching records found");
+        } else {
+            System.out.println("Found records: " + records.size());
+            medicalRepo.deleteByChartNumAndPaNameAndTeethNumAndMedicalDivisionAndMdTime(
+                    "240912043",
+                    "김유신",
+                    "28,41",
+                    "레진",
+                    LocalDate.ofEpochDay((2024-10-22)));
+
+            System.out.println("Records deleted");
         }
     }
 

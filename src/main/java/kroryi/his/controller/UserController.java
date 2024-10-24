@@ -3,22 +3,24 @@ package kroryi.his.controller;
 import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import kroryi.his.domain.Member;
-import kroryi.his.dto.MemberJoinDTO;
-import kroryi.his.dto.MemberRoleSetDTO;
+import kroryi.his.domain.MemberRoleSet;
+import kroryi.his.dto.*;
 import kroryi.his.repository.MemberRepository;
+import kroryi.his.repository.MemberRoleSetRepository;
+import kroryi.his.service.MemberRoleSetService;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Controller
@@ -28,11 +30,25 @@ import java.util.Map;
 public class UserController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final MemberRoleSetService memberRoleSetService;
+    private final MemberRoleSetRepository memberRoleSetRepository;
 
     @GetMapping("/")
     @ResponseBody
     public List<MemberJoinDTO> getMembers() {
         return memberService.getMembers(); // DTO 리스트 반환
+    }
+
+    @GetMapping("/paginglist")
+    @ResponseBody
+    public PageResponseDTO<MemberListAllDTO> getPagingList(PageRequestDTO pageRequestDTO, Model model,@RequestParam("page") int page) {
+        if (pageRequestDTO.getPage() < 1) {
+            pageRequestDTO.setPage(1);
+        }
+        log.info("Paging------> {}", pageRequestDTO);
+        PageResponseDTO<MemberListAllDTO> responseDTO =
+                memberService.listWithAll(pageRequestDTO);
+        return responseDTO; // DTO 리스트 반환
     }
 
 
@@ -60,22 +76,88 @@ public class UserController {
         return response;
     }
 
-    @RequestMapping("/admin/admin_management")
-    public String main() {
+    //사용자 정보 수정
+    @ApiOperation(value = "회원 수정 POST", notes = "POST 방식으로 회원 수정")
+    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> updateUser(@Valid @RequestBody MemberJoinDTO memberJoinDTO, BindingResult bindingResult) throws BindException, MemberService.MidExistException {
 
-        return "admin_management";
-    }
+        log.info("update1---> {}", memberJoinDTO);
 
-    //등록된 사용자 삭제
-    @RequestMapping("/admin/saveUserInfoRemove.do")
-    @ResponseBody
-    public Map<String, Object> saveUserInfoRemove(@RequestBody List<Map<String, Object>> param) {
+        String id = memberJoinDTO.getMid();
 
-        memberService.saveUserInfoRemove(param);
+        Member member = memberRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("해당 사용자가 없습니다. id=" + id)
+        );
+        // 2. 기존 역할 세트를 가져옴
+        Set<MemberRoleSet> existingRoleSets = member.getRoleSet();
+
+        memberRoleSetService.deleteRolesByMemberId(member.getMid());
+
+        // 3. 새로운 역할 세트 가져오기
+        Set<MemberRoleSet> newRoleSetsFrom = memberJoinDTO.getRoles();
+
+        // 4. 역할 업데이트 처리
+        for (MemberRoleSet newRole : newRoleSetsFrom) {
+            Optional<MemberRoleSet> existingRoleSet = existingRoleSets.stream()
+                    .filter(roleSet -> roleSet.getRoleSet().equals(newRole.getRoleSet()))
+                    .findFirst();
+
+            if (existingRoleSet.isPresent()) {
+                // 기존 역할이 존재할 경우 추가적으로 수정이 필요하면 여기에 처리
+                MemberRoleSet roleSetToUpdate = existingRoleSet.get();
+                roleSetToUpdate.setRoleSet(newRole.getRoleSet()); // 필요한 경우 필드 업데이트
+                memberRoleSetRepository.save(roleSetToUpdate);
+            } else {
+                // 기존 역할이 없을 경우 추가
+                MemberRoleSet newRoleSet = new MemberRoleSet();
+                newRoleSet.setRoleSet(newRole.getRoleSet());
+                newRoleSet.setMember(member);
+                memberRoleSetRepository.save(newRoleSet);  // 새로운 역할 세트 저장
+                existingRoleSets.add(newRoleSet);
+            }
+        }
+
+        // 5. 불필요한 역할 제거 (DTO에 없는 역할은 삭제)
+        existingRoleSets.removeIf(existingRole ->
+                newRoleSetsFrom.stream().noneMatch(newRole ->
+                        newRole.getRoleSet().equals(existingRole.getRoleSet())));
+
+
+        ModelMapper modelMapper = new ModelMapper();
+        // 기본 필드 자동 매핑
+        Member memberMapper = modelMapper.map(memberJoinDTO, Member.class);
+
+        memberRepository.save(memberMapper);
+
+
+        log.info("update---1> {}", memberMapper);
+
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("success", true);
 
         return result;
+    }
+
+    //등록된 사용자 삭제
+    //사용자 정보 수정
+    @ApiOperation(value = "회원 삭제 POST", notes = "POST 방식으로 회원 삭제")
+    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> delete(@RequestBody MemberJoinDTO memberJoinDTO, BindingResult bindingResult) throws MemberService.MidExistException {
+
+        memberService.deleteUser(memberJoinDTO);
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("success", true);
+
+        return result;
+    }
+
+
+
+
+    @RequestMapping("/admin/admin_management")
+    public String main() {
+
+        return "admin_management";
     }
 
 
@@ -93,35 +175,26 @@ public class UserController {
     }
 
 
-    //사용자 정보 수정
-    @RequestMapping("/admin/saveModifyUserInfo.do")
-    @ResponseBody
-    public Map<String, Object> saveModifyUserInfo(@RequestBody Map<String, Object> param) {
-
-        memberService.saveModifyUserInfo(param);
-
-        Map<String, Object> result = new HashMap<String, Object>();
-        result.put("success", true);
-
-        return result;
-    }
 
     @GetMapping("/edit/{id}")
-    public String showUpdateUserForm(@PathVariable("id") Long id, Model model) {
-        Member member = memberService.getUserById(id);
+    public String showUpdateUserForm(@PathVariable("id") String id, Model model) {
+        Optional<Member> member = memberService.getUserById(id);
         model.addAttribute("member");
         return "member-form";
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        memberService.deleteUser(id);
-        return "redirect:/users";
+    @GetMapping("/editform/{id}")
+    @ResponseBody
+    public Optional<Member> getEditUserForm(@PathVariable("id") String id) {
+        Optional<Member> member = memberService.getUserById(id);
+        log.info("getEditUserForm -> {}", member);
+        return member;
     }
+
 
     @PostMapping("/searchUsers")
     @ResponseBody
-    public List<Member> searchUsers(@RequestBody Map<String, String> params) {
+    public List<Member> searchUsers(@RequestBody Map<String, String> params,@RequestParam("page") int page) {
         String userId = params.get("mid");
         String userName = params.get("username");
         String userRole = params.get("role");
@@ -130,4 +203,11 @@ public class UserController {
         // 검색 조건을 사용해 사용자 목록 필터링
         return memberRepository.findByIdOrUsernameOrEmailAndRolesIn(userId, userName, userRole);
     }
+
+    @GetMapping("/checkId")
+    public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String mid) {
+        boolean isDuplicate = memberService.isDuplicateMemberId(mid);
+        return ResponseEntity.ok(isDuplicate);  // true: 중복, false: 사용 가능
+    }
+
 }

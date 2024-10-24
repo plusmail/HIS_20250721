@@ -32,6 +32,12 @@ public class Reservation {
     @Column(name = "chart_number")
     private String chartNumber;
 
+    @Column(name = "doctor")
+    private String doctor;
+
+    @Column(name = "treatment_type")
+    private String treatmentType;
+
     @Column(name = "patient_note")
     private String patientNote;
 
@@ -44,7 +50,7 @@ public class Reservation {
     }
 
     public Reservation(long seq, String reservationDate,
-                       String department, boolean snsNotification, String chartNumber, String patientNote,
+                       String department, boolean snsNotification, String chartNumber, String doctor, String treatmentType, String patientNote,
                        String reservationStatusCheck) {
         super();
         this.seq = seq;
@@ -52,6 +58,8 @@ public class Reservation {
         this.department = department;
         this.snsNotification = snsNotification;
         this.chartNumber = chartNumber;
+        this.doctor = doctor;
+        this.treatmentType = treatmentType;
         this.patientNote = patientNote;
         this.reservationStatusCheck = reservationStatusCheck;
     }

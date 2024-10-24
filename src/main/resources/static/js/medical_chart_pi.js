@@ -322,10 +322,11 @@ function toothTerminal(id) {
 
 // 모달 테이블 행에 클릭 이벤트 추가
 modalData.forEach(function (row) {
+    console.log("1112121212")
     row.addEventListener('click', function () {
         if (this.classList.contains("selected-row")) {
             this.classList.remove("selected-row")
-            this.querySelectorAll("td").forEach(function (cell, index) {
+            this.querySelectorAll(".rowMemo").forEach(function (cell, index) {
                 if (index === 1) {
                     frequentlyUsedPhrases = frequentlyUsedPhrases.filter(item => item !== cell.textContent)
                 }
@@ -345,6 +346,21 @@ modalData.forEach(function (row) {
 });
 
 modalInMemo.addEventListener("click", e => {
+    let k = 1;
+    const selectedRows = document.querySelectorAll('tr.selected-row');  // 'selected-row' 클래스를 가진 모든 <tr> 선택
+
+    frequentlyUsedPhrases=[];
+    // 선택된 <tr>들에서 데이터 추출
+    selectedRows.forEach(function(row) {
+        row.querySelectorAll('td').forEach(function(cell) {
+            if(k%2===0) {
+                frequentlyUsedPhrases.push(cell.textContent);  // 각 <td>의 텍스트를 배열에 저장
+            }
+            k++
+        });
+    });
+
+
     memo.textContent = frequentlyUsedPhrases
     const closeModal = document.querySelector("#piModal")
     let modalInstance = bootstrap.Modal.getInstance(closeModal)
@@ -355,29 +371,34 @@ modalInMemo.addEventListener("click", e => {
 })
 
 // 서버에서 Medical Charts 데이터를 가져오는 함수
-function fetchMedicalCharts() {
-    fetch('/medical_chart/chartMemo') // API 호출
-        .then(response => response.json())
-        .then(data => {
-            // 가져온 데이터를 리스트로 표시
-            medicalChartList.innerHTML = ''; // 기존 리스트 초기화
-            data.forEach(chart => {
-                const li = document.createElement('li');
-                li.textContent = `ID: ${chart.id}, Name: ${chart.patientName}`;
-                medicalChartList.appendChild(li);
-            });
-        })
-        .catch(error => console.error('Error fetching medical charts:', error));
-}
 
 piModalBtn.addEventListener("click", e => {
     readChartMemo()
 });
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tableBody = document.getElementById('pi_modal_table'); // <tbody> 요소의 ID가 'table-body'인 경우
+
+    if (tableBody) {  // tableBody가 null이 아닌 경우에만 addEventListener 호출
+        tableBody.addEventListener('click', function(event) {
+            if (event.target && event.target.closest('tr')) {
+                const clickedRow = event.target.closest('tr');
+
+
+                // 클릭된 tr에 'selected-row' 클래스 추가
+                clickedRow.classList.toggle('selected-row');
+            }
+        });
+    } else {
+        console.error("tableBody가 존재하지 않습니다. 확인해보세요.");
+    }
+});
+
 function readChartMemo() {
     let k = 1;
     $.ajax({
-        url: '/medical_chart/getChartData?${part}',  // 서버에서 데이터를 가져올 API 경로
+        url: '/medical_chart/getMemo',  // 서버에서 데이터를 가져올 API 경로
         type: 'GET',  // GET 요청
         dataType: 'json',  // 서버에서 JSON 응답을 기대
         success: function (data) {
@@ -386,7 +407,7 @@ function readChartMemo() {
 
             // 데이터를 순회하여 테이블에 추가
             data.forEach(memo => {
-                let row = `<tr>
+                let row = `<tr class="modal-tr">
                               <td>${k}</td>
                               <td>${memo.memo}</td>
                            </tr>`;
@@ -412,7 +433,10 @@ piMemoAddBtn.addEventListener("click", e => {
         success: function (response) {
             console.log('Success:', response);  // 성공 시 서버의 응답 처리
             // 서버에서 데이터를 다시 불러와서 테이블 갱신하거나 다른 작업 수행
+            readChartMemo()
+
             piMemoAdd.value === '';
+
         },
         error: function (xhr, status, error) {
             console.error('Error:', error);  // 오류 처리
@@ -428,7 +452,7 @@ function readPaChart() {
         dataType: 'json',  // 서버에서 JSON 응답을 기대
         success: function (data) {
 
-            console.log("클릭시 불러온다")
+            console.log("차트 보여주는 메소드 실행")
             let tableBody = $("#paChart-list");
             tableBody.empty();  // 기존 내용을 비움
 

@@ -24,4 +24,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
 
     Optional<Reservation> findByChartNumber(String chartNumber);
+
+    List<Reservation> findByChartNumberAndReservationDate(String chartNumber, String reservationDate);
 }
