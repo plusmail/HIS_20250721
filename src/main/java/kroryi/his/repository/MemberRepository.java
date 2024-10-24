@@ -27,4 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, String>, MemberS
     List<Member> findByIdOrUsernameOrEmailAndRolesIn(@Param("mid") String id, @Param("username") String username, @Param("roles") String roles);
 
     boolean existsByMid(String mid);
+
+    @Query("select m.mid, m.name from Member m")
+    List<Object[]> findUserIdsAndNames();
 }

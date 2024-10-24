@@ -67,11 +67,7 @@ public class MemberController {
     @GetMapping("/list")
     @ResponseBody
     public List<MemberJoinDTO> getAllMembers() {
-        log.info("전체 사용자 목록 조회");
-        List<Member> members = memberService.getAllMembers();
-        return members.stream()
-                .map(member -> new MemberJoinDTO(member.getMid(), member.getName()))
-                .collect(Collectors.toList());
+        return memberService.getAllUserIdAndName();
     }
 
 }
