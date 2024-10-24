@@ -2,7 +2,7 @@ package kroryi.his.repository;
 
 import kroryi.his.domain.Member;
 import kroryi.his.domain.MemberRole;
-import kroryi.his.repository.search.MemberSearch;
+import kroryi.his.service.MemberSearch;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,8 +23,12 @@ public interface MemberRepository extends JpaRepository<Member, String>, MemberS
 
     @Query("SELECT m FROM Member m JOIN m.roleSet r WHERE " +
             "(m.mid = :mid OR m.name = :username OR m.email = :email) " +
-            "AND r.roleSet IN :roles")
-    List<Member> findByIdOrUsernameOrEmailAndRolesIn(@Param("mid") String id, @Param("username") String username, @Param("roles") String roles);
+            "OR r.roleSet IN :roles")
+    List<Member> findByIdOrUsernameOrEmailAndRolesIn(
+            @Param("mid") String id,
+            @Param("username") String username,
+            @Param("email") String email,
+            @Param("roles") String roles);
 
     boolean existsByMid(String mid);
 }
