@@ -46,36 +46,36 @@
                     </ul>
                 </div>
                 <div class="card-footer">
+                    <form id="userSearchForm" >
                     <div class="row">
-                        <div class="col">
-                            <small>사용자 아이디</small>
-                            <input type="text" class="form-control txtCondition" id="txtSearchId" value="" placeholder=""
-                                   required>
-                        </div>
-                        <div class="col">
-                            <small>이름</small>
-                            <input type="text" class="form-control txtCondition" id="txtSearchName" value="" placeholder="">
-                        </div>
-                        <div class="col">
-                            <small>E-mail</small>
-                            <input type="text" class="form-control txtCondition" id="txtSearchEmail" value="" placeholder="">
-                        </div>
-                        <div class="col">
-                            <small>권한</small>
-                            <select id="cmbSearchAuth" class="form-control">
-                                <option value="">------</option>
-                                <option value="0">관리자</option>
-                                <option value="1">의사</option>
-                                <option value="2">간호사</option>
-                                <option value="3">일반사용자</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <small>날짜</small>
-                            <input type="date" name="transactionStartDate" class="form-control"
-                                   id="transactionSearchStartDate">
-                        </div>
+                            <div class="col">
+                                <small>사용자 아이디</small>
+                                <input type="text" class="form-control txtCondition" id="txtSearchId" value=""
+                                       placeholder=""
+                                       required>
+                            </div>
+                            <div class="col">
+                                <small>이름</small>
+                                <input type="text" class="form-control txtCondition" id="txtSearchName" value=""
+                                       placeholder="">
+                            </div>
+                            <div class="col">
+                                <small>E-mail</small>
+                                <input type="text" class="form-control txtCondition" id="txtSearchEmail" value=""
+                                       placeholder="">
+                            </div>
+                            <div class="col">
+                                <small>권한</small>
+                                <select id="cmbSearchAuth" class="form-control">
+                                    <option value="">------</option>
+                                    <option value="0">관리자</option>
+                                    <option value="1">의사</option>
+                                    <option value="2">간호사</option>
+                                    <option value="3">일반사용자</option>
+                                </select>
+                            </div>
                     </div>
+                    </form>
                     <div class="row m-3 ">
                         <div class="col d-flex align-items-center justify-content-end">
                             <button type="button" id="btnSearch" class="btn btn-primary">조회</button>
@@ -96,12 +96,14 @@
                             <form id="UserFormData">
                                 <small class="mr-2">아이디</small>
                                 <div class="form-inline">
-                                    <input type="text" class="form-control mr-2" id="txtPopId" name="mid" value="" size="20"
+                                    <input type="text" class="form-control mr-2" id="txtPopId" name="mid" value=""
+                                           size="20"
                                            placeholder="아이디 입력"
                                            required
                                            style="display: inline-block; width: auto;"
                                     >
-                                    <button type="button" id="duplicateBtn" class="btn btn-primary mr-2" onclick="checkDuplicateId()">
+                                    <button type="button" id="duplicateBtn" class="btn btn-primary mr-2"
+                                            onclick="checkDuplicateId()">
                                         중복체크
                                     </button>
                                     <input type="checkbox" id="idCheckStatus" disabled unchecked>
