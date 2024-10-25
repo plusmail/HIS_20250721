@@ -25,106 +25,14 @@ window.onload = function () {
     loadPage(1);
 };
 
-
 function loadPage(pageNumber) {
-
-    axios.get(`/admin_management/paginglist?page=${pageNumber}`) // 적절한 API 엔드포인트를 사용
+    axios.get(`/admin_management/paginglist?page=${pageNumber}`) // 적절한 API 엔드포인트 사용
         .then(response => {
-            let members = response.data; // 서버에서 가져온 데이터
-            // console.log(members)
-            const tbody = document.querySelector('#membersTable tbody');
-            // 기존 tbody의 모든 tr 요소 삭제
-            tbody.innerHTML = '';
-            // members가 배열이 아닐 경우 배열로 변환
-            if (!Array.isArray(members)) {
-                members = [members];
-            }
-
-            members[0].dtoList.forEach(user => {
-
-                const row = document.createElement('tr');
-                const roles = user.roles.map(role => role).join(', ');
-                row.setAttribute("data-mid", user.mid);
-                row.addEventListener('click', function () {
-                    const memberId = this.getAttribute('data-mid');  // 클릭한 행의 data-mid 값을 가져옴
-                    console.log("Selected member ID:", memberId);
-                    // 회원 정보 조회 API 호출 (예시 API)
-                    axios.get(`/admin_management/editform/${memberId}`)
-                        .then(response => {
-
-                            userFormData.reset();
-                            const memberInfo = response.data;
-                            // 회원 정보 처리 로직 (예: 모달 창에 정보 표시 등)
-                            console.log(memberInfo);
-                            txtPopId.value = memberInfo.mid
-                            txtPopId.setAttribute("disabled", 'true')
-                            duplicateBtn.setAttribute("disabled", 'true')
-                            txtPopName.value = memberInfo.name
-                            txtPopPwd.value = ''
-                            txtPopMail.value = memberInfo.email
-                            zipCode.value = memberInfo.zipCode
-                            streetAdr.value = memberInfo.address
-                            detailAdr.value = memberInfo.detailAddress
-                            note.value = memberInfo.note
-                            if (memberInfo.tel !== null) {
-                                txtPopTel.value = formatPhoneNumber(memberInfo.tel);
-                            }
-                            if (memberInfo.phone !== null) {
-                                txtPopHandPhone.value = formatPhoneNumber(memberInfo.phone);
-                            }
-
-                            // cmbPopUserAuth.value = memberInfo.role
-
-                            // 역할 배열과 <select> 옵션 간의 매핑 테이블
-                            const roleMap = {
-                                "EMP": "0",    // 일반사용자
-                                "ADMIN": "1",  // 관리자
-                                "DOCTOR": "2", // 의사
-                                "NURSE": "3"   // 간호사
-                            };
-
-
-                            // 모든 <option>의 선택을 초기화
-                            const options = cmbPopUserAuth.options;
-                            for (let i = 0; i < options.length; i++) {
-                                options[i].selected = false;  // 모든 옵션 선택 해제
-                            }
-
-                            // memberInfo.roleSet 배열을 순회하여 해당하는 옵션을 선택
-                            memberInfo.roleSet.forEach(role => {
-                                const optionValue = roleMap[role.roleSet];  // role을 매핑 테이블에서 찾아봄
-                                if (optionValue !== undefined) {
-                                    for (let i = 0; i < options.length; i++) {
-                                        if (options[i].value === optionValue) {
-                                            options[i].selected = true;  // 해당 옵션을 선택 상태로 설정
-                                        }
-                                    }
-                                }
-                            });
-
-
-                        })
-                        .catch(error => {
-                            console.error('Error fetching member info:', error);
-                        });
-                });
-                console.log(roles)
-                row.innerHTML = `
-                        <td>${user.mid}</td>
-                        <td>${user.name}</td>
-                        <td>${user.phone}</td>
-                        <td>${user.email}</td>
-                        <td>${roles}</td> <!-- Set이나 배열을 문자열로 변환 -->
-                    `;
-                tbody.appendChild(row);
-                renderPagination(members[0])
-            });
-
+            userListRender(response)
         })
         .catch(error => {
             console.error('Error fetching members:', error);
         });
-
 }
 
 function formatPhoneNumber(phoneNumber) {
@@ -336,30 +244,6 @@ userTableDelete.addEventListener("click", e => {
         });
 })
 
-//
-// document.getElementById("btnDelete").addEventListener("click", function () {
-//     const userId = this.getAttribute("data-id");
-//
-//     if (confirm("정말 삭제하시겠습니까?")) {
-//         fetch(`/delete/${userId}`, {
-//             method: 'POST', // DELETE로 하려면 method: 'DELETE' 사용
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRF-TOKEN': document.querySelector('input[name="_csrf"]').value // CSRF 보호
-//             }
-//         })
-//             .then(response => {
-//                 if (response.ok) {
-//                     alert("삭제되었습니다.");
-//                     window.location.href = "/users"; // 삭제 후 리다이렉트
-//                 } else {
-//                     alert("삭제에 실패했습니다.");
-//                 }
-//             })
-//             .catch(error => console.error('Error:', error));
-//     }
-// });
-
 btnSearch.addEventListener("click", function () {
     // 입력된 검색 조건을 가져옴
     const userId = document.getElementById("txtSearchId").value;
@@ -406,146 +290,80 @@ btnSearch.addEventListener("click", function () {
         params: searchParams,
     }) // 적절한 API 엔드포인트를 사용
         .then(response => {
-            let members = response.data; // 서버에서 가져온 데이터
-            console.log(members)
-            const tbody = document.querySelector('#membersTable tbody');
-            // 기존 tbody의 모든 tr 요소 삭제
-            tbody.innerHTML = '';
-            // members가 배열이 아닐 경우 배열로 변환
-            if (!Array.isArray(members)) {
-                members = [members];
-            }
-
-            members[0].dtoList.forEach(user => {
-
-                const row = document.createElement('tr');
-                const roles = user.roles.map(role => role).join(', ');
-                row.setAttribute("data-mid", user.mid);
-                row.addEventListener('click', function () {
-                    const memberId = this.getAttribute('data-mid');  // 클릭한 행의 data-mid 값을 가져옴
-                    console.log("Selected member ID:", memberId);
-                    // 회원 정보 조회 API 호출 (예시 API)
-                    axios.get(`/admin_management/editform/${memberId}`)
-                        .then(response => {
-
-                            userFormData.reset();
-                            const memberInfo = response.data;
-                            // 회원 정보 처리 로직 (예: 모달 창에 정보 표시 등)
-                            console.log(memberInfo);
-                            txtPopId.value = memberInfo.mid
-                            txtPopId.setAttribute("disabled", 'true')
-                            duplicateBtn.setAttribute("disabled", 'true')
-                            txtPopName.value = memberInfo.name
-                            txtPopPwd.value = ''
-                            txtPopMail.value = memberInfo.email
-                            zipCode.value = memberInfo.zipCode
-                            streetAdr.value = memberInfo.address
-                            detailAdr.value = memberInfo.detailAddress
-                            note.value = memberInfo.note
-                            if (memberInfo.tel !== null) {
-                                txtPopTel.value = formatPhoneNumber(memberInfo.tel);
-                            }
-                            if (memberInfo.phone !== null) {
-                                txtPopHandPhone.value = formatPhoneNumber(memberInfo.phone);
-                            }
-
-                            // cmbPopUserAuth.value = memberInfo.role
-
-                            // 역할 배열과 <select> 옵션 간의 매핑 테이블
-                            const roleMap = {
-                                "EMP": "0",    // 일반사용자
-                                "ADMIN": "1",  // 관리자
-                                "DOCTOR": "2", // 의사
-                                "NURSE": "3"   // 간호사
-                            };
-
-
-                            // 모든 <option>의 선택을 초기화
-                            const options = cmbPopUserAuth.options;
-                            for (let i = 0; i < options.length; i++) {
-                                options[i].selected = false;  // 모든 옵션 선택 해제
-                            }
-
-                            // memberInfo.roleSet 배열을 순회하여 해당하는 옵션을 선택
-                            memberInfo.roleSet.forEach(role => {
-                                const optionValue = roleMap[role.roleSet];  // role을 매핑 테이블에서 찾아봄
-                                if (optionValue !== undefined) {
-                                    for (let i = 0; i < options.length; i++) {
-                                        if (options[i].value === optionValue) {
-                                            options[i].selected = true;  // 해당 옵션을 선택 상태로 설정
-                                        }
-                                    }
-                                }
-                            });
-
-
-                        })
-                        .catch(error => {
-                            console.error('Error fetching member info:', error);
-                        });
-                });
-                console.log(roles)
-                row.innerHTML = `
-                        <td>${user.mid}</td>
-                        <td>${user.name}</td>
-                        <td>${user.phone}</td>
-                        <td>${user.email}</td>
-                        <td>${roles}</td> <!-- Set이나 배열을 문자열로 변환 -->
-                    `;
-                tbody.appendChild(row);
-                renderPagination(members[0])
-            });
-
+            userListRender(response)
         })
         .catch(error => {
             console.error('Error fetching members:', error);
         });
 
-
 });
 
-function tableRandering(data) {
-    const tbody = document.querySelector('#membersTable tbody');
-    // 기존 tbody의 모든 tr 요소 삭제
-    tbody.innerHTML = '';
+function userListRender(response){
+    let members = response.data; // 서버에서 가져온 데이터
+    const memberList = document.querySelector('#membersList'); // ul 요소 선택
+
+    // 기존 ul 요소의 모든 li 요소 삭제
+    memberList.innerHTML = '';
+
     // members가 배열이 아닐 경우 배열로 변환
-    if (!Array.isArray(data)) {
-        data = [data];
+    if (!Array.isArray(members)) {
+        members = [members];
     }
 
-    data.forEach(user => {
-        const row = document.createElement('tr');
-        const roles = user.roleSet.map(role => role).join(', ');
-        row.setAttribute("data-mid", user.mid);
-        row.addEventListener('click', function () {
-            const memberId = this.getAttribute('data-mid');  // 클릭한 행의 data-mid 값을 가져옴
+    const listItemHeader = document.createElement('li');
+
+    listItemHeader.classList.add("list-group-item"); // Bootstrap 스타일 적용 (선택 사항)
+    listItemHeader.classList.add("d-flex"); // Bootstrap 스타일 적용 (선택 사항)
+    listItemHeader.classList.add("justify-content-between"); // Bootstrap 스타일 적용 (선택 사항)
+    listItemHeader.classList.add("align-items-center"); // Bootstrap 스타일 적용 (선택 사항)
+    listItemHeader.classList.add('list-group-item', 'bg-primary', 'text-white', 'font-weight-bold'); // Bootstrap 클래스 추가
+    listItemHeader.innerHTML = `
+                    <span class="post-number">ID</span>
+                    <span class="post-number">이름</span>
+                    <span class="post-number">연락처</span>
+                    <span class="post-title">E-mail</span>
+                    <span class="post-author">권한</span>
+                    `
+
+    memberList.insertBefore(listItemHeader, memberList.firstChild)
+
+
+    members[0].dtoList.forEach(user => {
+        const listItem = document.createElement('li');
+        listItem.classList.add("list-group-item"); // Bootstrap 스타일 적용 (선택 사항)
+        listItem.classList.add("d-flex"); // Bootstrap 스타일 적용 (선택 사항)
+        listItem.classList.add("justify-content-between"); // Bootstrap 스타일 적용 (선택 사항)
+        listItem.classList.add("align-items-center"); // Bootstrap 스타일 적용 (선택 사항)
+        const roles = user.roles.map(role => role).join(', ');
+        listItem.setAttribute("data-mid", user.mid);
+        listItem.addEventListener('click', function () {
+            const memberId = this.getAttribute('data-mid'); // 클릭한 항목의 data-mid 값 가져옴
             console.log("Selected member ID:", memberId);
+
             // 회원 정보 조회 API 호출 (예시 API)
             axios.get(`/admin_management/editform/${memberId}`)
                 .then(response => {
-
                     userFormData.reset();
                     const memberInfo = response.data;
+
                     // 회원 정보 처리 로직 (예: 모달 창에 정보 표시 등)
                     console.log(memberInfo);
-                    txtPopId.value = memberInfo.mid
-                    txtPopId.setAttribute("disabled", 'true')
-                    duplicateBtn.setAttribute("disabled", 'true')
-                    txtPopName.value = memberInfo.name
-                    txtPopPwd.value = ''
-                    txtPopMail.value = memberInfo.email
-                    zipCode.value = memberInfo.zipCode
-                    streetAdr.value = memberInfo.address
-                    detailAdr.value = memberInfo.detailAddress
-                    note.value = memberInfo.note
+                    txtPopId.value = memberInfo.mid;
+                    txtPopId.setAttribute("disabled", 'true');
+                    duplicateBtn.setAttribute("disabled", 'true');
+                    txtPopName.value = memberInfo.name;
+                    txtPopPwd.value = '';
+                    txtPopMail.value = memberInfo.email;
+                    zipCode.value = memberInfo.zipCode;
+                    streetAdr.value = memberInfo.address;
+                    detailAdr.value = memberInfo.detailAddress;
+                    note.value = memberInfo.note;
                     if (memberInfo.tel !== null) {
                         txtPopTel.value = formatPhoneNumber(memberInfo.tel);
                     }
                     if (memberInfo.phone !== null) {
                         txtPopHandPhone.value = formatPhoneNumber(memberInfo.phone);
                     }
-
-                    // cmbPopUserAuth.value = memberInfo.role
 
                     // 역할 배열과 <select> 옵션 간의 매핑 테이블
                     const roleMap = {
@@ -555,169 +373,44 @@ function tableRandering(data) {
                         "NURSE": "3"   // 간호사
                     };
 
-
                     // 모든 <option>의 선택을 초기화
                     const options = cmbPopUserAuth.options;
                     for (let i = 0; i < options.length; i++) {
-                        options[i].selected = false;  // 모든 옵션 선택 해제
+                        options[i].selected = false; // 모든 옵션 선택 해제
                     }
 
                     // memberInfo.roleSet 배열을 순회하여 해당하는 옵션을 선택
                     memberInfo.roleSet.forEach(role => {
-                        const optionValue = roleMap[role.roleSet];  // role을 매핑 테이블에서 찾아봄
+                        const optionValue = roleMap[role.roleSet];
                         if (optionValue !== undefined) {
                             for (let i = 0; i < options.length; i++) {
                                 if (options[i].value === optionValue) {
-                                    options[i].selected = true;  // 해당 옵션을 선택 상태로 설정
+                                    options[i].selected = true; // 해당 옵션을 선택 상태로 설정
                                 }
                             }
                         }
                     });
-
-
                 })
                 .catch(error => {
                     console.error('Error fetching member info:', error);
                 });
         });
-        console.log(roles)
-        row.innerHTML = `
-                        <td>${user.mid}</td>
-                        <td>${user.name}</td>
-                        <td>${user.phone}</td>
-                        <td>${user.email}</td>
-                        <td>${roles}</td> <!-- Set이나 배열을 문자열로 변환 -->
-                    `;
-        tbody.appendChild(row);
-        renderPagination(data)
+
+        // li 요소의 내용 생성
+        listItem.innerHTML = `
+                    <span class="post-number">${user.mid}</span>
+                    <span class="post-number">${user.name} </span>
+                    <span class="post-number">${user.phone} </span>
+                    <span class="post-title">${user.email} </span>
+                    <span class="post-author">${roles}</span>
+                `;
+
+
+        memberList.appendChild(listItem); // ul 요소에 li 요소 추가
+        renderPagination(members[0]);
     });
 }
 
-function updateUserTable(users) {
-    const tbody = document.querySelector("table tbody");
-    tbody.innerHTML = ""; // 기존 데이터 삭제
-
-    // 새로운 사용자 리스트 추가
-    users.forEach(user => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.username}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
-                <td>${user.password}</td>
-            `;
-        tbody.appendChild(row);
-    });
-}
-
-function saveNote() {
-    const note = document.getElementById('note').value;
-    if (note) {
-        const savedNotesDiv = document.getElementById('savedNotes');
-        const noteElement = document.createElement('div');
-        noteElement.textContent = note;
-        savedNotesDiv.appendChild(noteElement);
-        document.getElementById('note').value = ''; // 입력창 비우기
-    } else {
-        alert('메모를 입력해주세요.');
-    }
-}
-
-function addUser() {
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const role = document.getElementById('role').value;
-
-    const userTable = document.getElementById('userTable').getElementsByTagName('tbody')[0];
-    const newRow = userTable.insertRow();
-    newRow.innerHTML = `<td>${userTable.rows.length}</td><td>${name}</td><td>${email}</td><td>${role}</td><td><button onclick="editUser(${userTable.rows.length - 1})">수정</button> <button onclick="deleteUser(this)">삭제</button></td>`;
-
-    document.getElementById('addUserForm').reset(); // 폼 초기화
-}
-
-function editUser(rowIndex) {
-    // 수정 기능을 구현하는 코드
-}
-
-function deleteUser(button) {
-    const row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-}
-
-function searchUser() {
-    const input = document.getElementById('search').value.toLowerCase();
-    const table = document.getElementById('userTable');
-    const rows = table.getElementsByTagName('tr');
-
-    for (let i = 1; i < rows.length; i++) {
-        const cells = rows[i].getElementsByTagName('td');
-        let match = false;
-
-        for (let j = 0; j < cells.length - 1; j++) {
-            if (cells[j].textContent.toLowerCase().indexOf(input) > -1) {
-                match = true;
-                break;
-            }
-        }
-        rows[i].style.display = match ? "" : "none";
-    }
-}
-
-
-function userUpdateSetForm() {
-    document.getElementById("btnSearch").addEventListener("click", function () {
-        // 검색 조건을 가져옴
-        const userId = document.getElementById("txtId").value;
-        const userName = document.getElementById("txtName").value;
-        const userEmail = document.getElementById("txtPopMail")
-        const userRetirement = document.getElementById("txtRetirement")
-        const userPhone = document.getElementById("txtPhone")
-        const userSocial = document.getElementById("txtSocial")
-
-        const userRole = document.getElementById("cmbAuth").value;
-        const startDate = document.getElementById("transactionStartDate").value;
-
-        // 검색 조건을 객체로 만들기
-        const searchParams = {
-            id: userId,
-            name: userName,
-            role: userRole,
-            startDate: startDate
-        };
-
-        // AJAX 요청을 통해 서버로 검색 조건을 전송
-        fetch("/searchUsers", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(searchParams)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    // 검색된 사용자가 있으면 첫 번째 사용자 정보를 수정 폼에 표시
-                    const user = data[0];  // 예를 들어 첫 번째 사용자 선택
-
-                    // 사용자 정보를 수정 창에 채우기
-                    document.getElementById("txtPopId").value = user.id;
-                    document.getElementById("txtPopPwd").value = "";  // 비밀번호는 보안상 빈칸으로 둠
-                    document.getElementById("cmbPopUserAuth").value = user.role;
-                    document.getElementById("txtPopName").value = user.username;
-                    document.getElementById("txtPopTel").value = user.phone || "";  // 전화번호
-                    document.getElementById("txtPopMail").value = user.email;
-                    document.getElementById("txtPop").value = user.address || "";  // 주소
-                    document.getElementById("note").value = user.note || "";  // 특이사항
-                } else {
-                    alert("검색된 사용자가 없습니다.");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    });
-
-}
 
 function sample4_execDaumPostcode() {
 
@@ -789,8 +482,17 @@ txtPopId.addEventListener("focusin", (e) => {
     idCheckStatus.checked = false;
 })
 
-btnSearchReset.addEventListener("click", e=>{
+btnSearchReset.addEventListener("click", e => {
 
     userSearchForm.reset()
 
 })
+
+function highlightPost(selectedPost) {
+    // 모든 게시물 항목에서 'active' 클래스를 제거
+    const posts = document.querySelectorAll("#postList .list-group-item");
+    posts.forEach(post => post.classList.remove("active"));
+
+    // 클릭된 항목에 'active' 클래스 추가
+    selectedPost.classList.add("active");
+}
