@@ -249,7 +249,8 @@ btnSearch.addEventListener("click", function () {
     const userId = document.getElementById("txtSearchId").value;
     const userName = document.getElementById("txtSearchName").value;
     const email = document.getElementById("txtSearchEmail").value;
-    const userRole = document.getElementById("cmbSearchAuth").selected;
+    const userRole = document.getElementById("cmbSearchAuth").value;
+    console.log("111111111111 ", userRole)
 
     let searchType = '';
     let keyword = '';
@@ -268,7 +269,7 @@ btnSearch.addEventListener("click", function () {
     }
     if (userRole) {
         searchType += 'r'
-        keyword = userRole.selected
+        keyword = userRole
     }
 
 
