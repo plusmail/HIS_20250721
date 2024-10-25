@@ -19,11 +19,11 @@ const userTableAdd = document.getElementById("userTableAdd");
 const duplicateBtn = document.getElementById("duplicateBtn");
 const btnSearch = document.getElementById("btnSearch");
 const btnSearchReset = document.getElementById("btnSearchReset");
+const userSearchForm = document.getElementById("userSearchForm");
 
 window.onload = function () {
     loadPage(1);
 };
-
 
 
 function loadPage(pageNumber) {
@@ -66,10 +66,10 @@ function loadPage(pageNumber) {
                             streetAdr.value = memberInfo.address
                             detailAdr.value = memberInfo.detailAddress
                             note.value = memberInfo.note
-                            if(memberInfo.tel !== null){
+                            if (memberInfo.tel !== null) {
                                 txtPopTel.value = formatPhoneNumber(memberInfo.tel);
                             }
-                            if(memberInfo.phone !== null){
+                            if (memberInfo.phone !== null) {
                                 txtPopHandPhone.value = formatPhoneNumber(memberInfo.phone);
                             }
 
@@ -141,7 +141,6 @@ function formatPhoneNumber(phoneNumber) {
 }
 
 
-
 // 페이지네이션을 동적으로 생성하는 함수
 function renderPagination(responseDTO) {
     const paginationList = document.getElementById('pagination-list');
@@ -188,13 +187,13 @@ userTableAdd.addEventListener('click', function (event) {
         name: txtPopName.value,
         password: txtPopPwd.value,
         roles: getSelectedRoles(),
-        tel : txtPopTel.value,
-        phone : txtPopHandPhone.value,
+        tel: txtPopTel.value,
+        phone: txtPopHandPhone.value,
         email: txtPopMail.value,
         address: streetAdr.value,
         detailAddress: detailAdr.value,
         zipCode: zipCode.value,
-        note : note.value
+        note: note.value
     };
 
     console.log(userDataAdd)
@@ -234,33 +233,33 @@ function getSelectedRoles() {
     const roles = [];
 
     for (let option of selectedOptions) {
-        roles.push({ roleSet: option.value });  // 선택된 각 값을 배열에 추가
+        roles.push({roleSet: option.value});  // 선택된 각 값을 배열에 추가
     }
 
     return roles;
 }
 
-userTableUpdate.addEventListener("click", e=>{
+userTableUpdate.addEventListener("click", e => {
     e.preventDefault()
 
     const txtPipIdDisabled = txtPopId.getAttribute("disabled")
     const txtDupBtnDisabled = duplicateBtn.getAttribute("disabled")
-    if(!txtPipIdDisabled || !txtDupBtnDisabled) return;
+    if (!txtPipIdDisabled || !txtDupBtnDisabled) return;
     const userDataUpdate = {
         // 사용자 입력값 가져오기
         mid: txtPopId.value,
         name: txtPopName.value,
         roles: getSelectedRoles(),
-        tel : txtPopTel.value,
-        phone : txtPopHandPhone.value,
+        tel: txtPopTel.value,
+        phone: txtPopHandPhone.value,
         email: txtPopMail.value,
         address: streetAdr.value,
         detailAddress: detailAdr.value,
         zipCode: zipCode.value,
-        note : note.value
+        note: note.value
     };
 
-    if(txtPopPwd.value){
+    if (txtPopPwd.value) {
         userDataUpdate.password = txtPopPwd.value
     }
     console.log("userDataUpdate:", userDataUpdate)
@@ -294,7 +293,7 @@ userTableUpdate.addEventListener("click", e=>{
         });
 })
 
-userTableDelete.addEventListener("click", e=>{
+userTableDelete.addEventListener("click", e => {
     e.preventDefault()
 
     const userDataDelete = {
@@ -302,8 +301,8 @@ userTableDelete.addEventListener("click", e=>{
         mid: txtPopId.value,
         name: txtPopName.value,
         roles: getSelectedRoles(),
-        tel : txtPopTel.value,
-        phone : txtPopHandPhone.value,
+        tel: txtPopTel.value,
+        phone: txtPopHandPhone.value,
         email: txtPopMail.value,
     };
     console.log("userDataDelete:", userDataDelete)
@@ -367,35 +366,44 @@ btnSearch.addEventListener("click", function () {
     const userName = document.getElementById("txtSearchName").value;
     const email = document.getElementById("txtSearchEmail").value;
     const userRole = document.getElementById("cmbSearchAuth").selected;
-    const startDate = document.getElementById("transactionSearchStartDate").value;
 
-    let searchType='';
+    let searchType = '';
+    let keyword = '';
 
-    if(userName.value){
-        searchType='n'
+    if (userId) {
+        searchType += 'm'
+        keyword = userId
     }
-    if(email.value){
-        searchType='e'
+    if (userName) {
+        searchType += 'n'
+        keyword = userName
     }
+    if (email) {
+        searchType += 'e'
+        keyword = email
+    }
+    if (userRole) {
+        searchType += 'r'
+        keyword = userRole.selected
+    }
+
+
+    console.log(searchType)
 
     // 검색 조건을 객체로 만들기
     const searchParams = {
 
-        page:1,
-        size:10,
-        type: searchType ,
-        keyword:'최영민'
+        page: 1,
+        size: 10,
+        type: searchType,
+        keyword: keyword
     };
 
     console.log(searchParams)
 
 
-    axios.get(`/admin_management/paginglist?page=1`,{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(searchParams),
+    axios.get(`/admin_management/paginglist?page=1`, {
+        params: searchParams,
     }) // 적절한 API 엔드포인트를 사용
         .then(response => {
             let members = response.data; // 서버에서 가져온 데이터
@@ -434,10 +442,10 @@ btnSearch.addEventListener("click", function () {
                             streetAdr.value = memberInfo.address
                             detailAdr.value = memberInfo.detailAddress
                             note.value = memberInfo.note
-                            if(memberInfo.tel !== null){
+                            if (memberInfo.tel !== null) {
                                 txtPopTel.value = formatPhoneNumber(memberInfo.tel);
                             }
-                            if(memberInfo.phone !== null){
+                            if (memberInfo.phone !== null) {
                                 txtPopHandPhone.value = formatPhoneNumber(memberInfo.phone);
                             }
 
@@ -494,10 +502,9 @@ btnSearch.addEventListener("click", function () {
         });
 
 
-
 });
 
-function tableRandering(data){
+function tableRandering(data) {
     const tbody = document.querySelector('#membersTable tbody');
     // 기존 tbody의 모든 tr 요소 삭제
     tbody.innerHTML = '';
@@ -531,10 +538,10 @@ function tableRandering(data){
                     streetAdr.value = memberInfo.address
                     detailAdr.value = memberInfo.detailAddress
                     note.value = memberInfo.note
-                    if(memberInfo.tel !== null){
+                    if (memberInfo.tel !== null) {
                         txtPopTel.value = formatPhoneNumber(memberInfo.tel);
                     }
-                    if(memberInfo.phone !== null){
+                    if (memberInfo.phone !== null) {
                         txtPopHandPhone.value = formatPhoneNumber(memberInfo.phone);
                     }
 
@@ -744,7 +751,7 @@ function checkDuplicateId() {
 
     // 서버로 중복 체크 요청
     axios.get(`/admin_management/checkId`, {
-        params: { mid: memberId }
+        params: {mid: memberId}
     })
         .then(response => {
             if (response.data) {
@@ -768,7 +775,7 @@ function checkDuplicateId() {
         });
 }
 
-userTableRest.addEventListener("click", (e)=>{
+userTableRest.addEventListener("click", (e) => {
     txtPopId.removeAttribute('disabled')
     duplicateBtn.removeAttribute('disabled')
     userFormData.reset();
@@ -777,7 +784,13 @@ userTableRest.addEventListener("click", (e)=>{
 
 })
 
-txtPopId.addEventListener("focusin", (e)=>{
+txtPopId.addEventListener("focusin", (e) => {
     idCheckMsg.innerText = ''
     idCheckStatus.checked = false;
+})
+
+btnSearchReset.addEventListener("click", e=>{
+
+    userSearchForm.reset()
+
 })
