@@ -1,6 +1,6 @@
 package kroryi.his.controller;
 
-
+import jakarta.servlet.http.HttpSession;
 import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
 import kroryi.his.service.ChatRoomService;
@@ -27,13 +27,14 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomService chatRoomService;
 
+    // 채팅방 생성
     @PostMapping("/rooms")
     public ResponseEntity<ChatRoomDTO> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
-        // Set<String>을 List<String>으로 변환
-        List<String> memberNamesList = new ArrayList<>(chatRoomDTO.getMemberNames());
+        // Set<String> memberMids를 List<String>으로 변환
+        List<String> memberMidsList = new ArrayList<>(chatRoomDTO.getMemberMids());
 
         // 변환된 List를 사용하여 채팅방 생성
-        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberNamesList);
+        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
     }
 
@@ -44,12 +45,29 @@ public class ChatController {
         return ResponseEntity.ok(rooms);
     }
 
+    // 채팅방 메시지 가져오기
+    @GetMapping("/rooms/{roomId}/messages")
+    public ResponseEntity<List<ChatMessageDTO>> getMessages(@PathVariable Long roomId) {
+        List<ChatMessageDTO> messages = chatRoomService.getMessagesByRoomId(roomId);
+        return ResponseEntity.ok(messages);
+    }
+
+    // 채팅방 메시지 저장
+    @PostMapping("/rooms/{roomId}/messages")
+    public ResponseEntity<ChatMessageDTO> postMessage(@PathVariable Long roomId, @RequestBody ChatMessageDTO messageDTO) {
+        ChatMessageDTO savedMessage = chatRoomService.saveMessage(roomId, messageDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
+    }
+
+
+    // WebSocket에서 메시지 전송 처리
     @MessageMapping("/chat.send")
     public void sendMessage(ChatMessageDTO message) {
         chatRoomService.sendMessageToRoom(message.getRoomId(), message);
         messagingTemplate.convertAndSend("/topic/rooms/" + message.getRoomId(), message);
     }
 
+    // WebSocket에서 사용자 추가 처리
     @MessageMapping("/chat.addUser")
     public void addUser(ChatMessageDTO message) {
         messagingTemplate.convertAndSend("/topic/rooms/" + message.getRoomId(), message);

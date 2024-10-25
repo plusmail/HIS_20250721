@@ -29,13 +29,13 @@ function loadChatRooms() {
     axios.get('/api/chat/rooms')
         .then(response => {
             const rooms = response.data;
+            chatRooms = rooms;  // 서버에서 받은 채팅방 목록 저장
             renderChatRooms(rooms);  // 받아온 채팅방 목록 렌더링
         })
         .catch(error => {
             console.error('채팅방 목록 불러오기 실패:', error);
         });
 }
-
 
 // 사용자 선택 모달이 열릴 때 사용자 목록 로드 (서버에서 axios 사용)
 createChatRoomBtn.addEventListener('click', () => {
@@ -61,42 +61,43 @@ function renderUserList(users) {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
         li.textContent = user.name;  // 사용자 이름 출력
-        li.addEventListener('click', () => selectUser(user, li));  // 사용자 선택 시 해당 요소 강조
+        li.addEventListener('click', () => selectUser(user, li));  // 사용자 객체 전체 전달
         userList.appendChild(li);
     });
 }
 
-// 사용자 선택
+// 사용자 선택 함수 수정
 function selectUser(user, listItem) {
-    selectedUser = user;
-    userList.querySelectorAll('li').forEach(li => li.classList.remove('active'));  // 모든 요소에서 active 제거
-    listItem.classList.add('active');  // 선택된 사용자에 active 클래스 추가
+    selectedUser = user; // user 객체 전체를 저장하여 name과 mid 사용 가능하게 함
+    userList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+    listItem.classList.add('active');
 }
 
-// 채팅방 생성
+// 채팅방 생성 요청 (memberMids와 roomName 설정 확인)
 startChatBtn.addEventListener('click', () => {
-    if (!selectedUser) {
+    if (!selectedUser || !selectedUser.mid) { // 사용자와 mid 확인
         alert('사용자를 선택하세요.');
         return;
     }
 
     const roomName = `${selectedUser.name}와의 1:1 채팅`;
 
+    // Axios로 POST 요청 보내기
     axios.post('/api/chat/rooms', {
         roomName: roomName,
-        memberNames: [selectedUser.name]
+        memberMids: [selectedUser.mid] // memberMids로 수정하여 mid를 전달
     })
         .then(response => {
-            const createdRoom = response.data;  // 서버에서 생성된 채팅방 정보
-            chatRooms.push({
-                id: createdRoom.id,
-                name: createdRoom.roomName,
-                users: [selectedUser],
-                messages: []
-            });
-            renderChatRooms();  // 채팅방 목록 업데이트
-            selectedUser = null;
+            console.log('채팅방 생성 성공:', response.data);
 
+            const newRoom = response.data;
+            chatRooms.push(newRoom);  // 생성된 채팅방을 목록에 추가
+            renderChatRooms();  // 채팅방 목록 업데이트
+
+            // 생성된 채팅방으로 바로 이동
+            openChatRoom(newRoom.id);  // 방 ID를 이용해 생성된 방으로 이동
+
+            selectedUser = null;
             const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
             userSelectionModal.hide();
         })
@@ -105,8 +106,6 @@ startChatBtn.addEventListener('click', () => {
         });
 });
 
-
-
 // 채팅방 목록 렌더링
 function renderChatRooms() {
     roomList.innerHTML = '';  // 기존 목록 비우기
@@ -114,7 +113,10 @@ function renderChatRooms() {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
         li.textContent = room.roomName;
-        li.addEventListener('click', () => openChatRoom(room.id));  // 클릭하면 채팅방 열기
+        li.addEventListener('click', () => {
+            console.log(`채팅방 클릭됨: ${room.id}`);  // 로그 추가
+            openChatRoom(room.id);  // 클릭하면 채팅방 열기
+        });
         roomList.appendChild(li);
     });
 }
@@ -126,7 +128,7 @@ function openChatRoom(roomId) {
     chatModalLabel.textContent = room.roomName;  // 모달 제목을 채팅방 이름으로 설정
 
     // 서버에서 채팅방 메시지 불러오기
-    axios.get(`/api/chat-rooms/${roomId}/messages`)
+    axios.get(`/api/chat/rooms/${roomId}/messages`)
         .then(response => {
             const messages = response.data;  // 서버에서 받은 메시지 목록
             renderMessages(messages);  // 메시지 렌더링
@@ -145,7 +147,7 @@ function renderMessages(messages) {
     messages.forEach(message => {
         const li = document.createElement('li');
         li.classList.add('message-item');
-        li.textContent = message;  // 메시지 내용 출력
+        li.textContent = `${message.sender}: ${message.content}`;  // 메시지 내용 출력
         messageList.appendChild(li);
     });
 }
@@ -156,7 +158,7 @@ sendMessageButton.addEventListener('click', () => {
     if (!message || !currentRoomId) return;
 
     // 서버에 메시지 전송
-    axios.post(`/api/chat-rooms/${currentRoomId}/messages`, { content: message })
+    axios.post(`/api/chat/rooms/${currentRoomId}/messages`, { content: message })
         .then(response => {
             const room = chatRooms.find(r => r.id === currentRoomId);
             room.messages.push(response.data);  // 서버에서 받은 메시지 추가

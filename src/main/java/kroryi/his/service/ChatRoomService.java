@@ -13,5 +13,9 @@ public interface ChatRoomService {
 
     List<ChatMessageDTO> getMessagesByRoomId(Long roomId);
 
+    ChatMessageDTO saveMessage(Long roomId, ChatMessageDTO messageDTO);
+
     void sendMessageToRoom(Long roomId, ChatMessageDTO messageDTO);
+
+
 }

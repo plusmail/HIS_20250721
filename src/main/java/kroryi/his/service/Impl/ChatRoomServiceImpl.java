@@ -5,69 +5,61 @@ import kroryi.his.domain.ChatRoom;
 import kroryi.his.domain.Member;
 import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
+import kroryi.his.repository.ChatMessageRepository;
 import kroryi.his.repository.ChatRoomRepository;
 import kroryi.his.repository.MemberRepository;
 import kroryi.his.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static kroryi.his.domain.QChatRoom.chatRoom;
 
 @Service
 @RequiredArgsConstructor
 public class ChatRoomServiceImpl implements ChatRoomService {
 
-    private final ChatRoomRepository roomRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final MemberRepository memberRepository;
-    private final SimpMessagingTemplate messagingTemplate; // WebSocket 메시지 전송을 위한 템플릿
 
     @Override
-    public ChatRoomDTO createChatRoom(String roomName, List<String> memberNames) {
-        // 새로운 채팅방 생성
-        ChatRoom chatRoom = new ChatRoom(roomName);
-
-        // 먼저 채팅방을 저장하여 room_id가 생성되도록 함
-        chatRoom = roomRepository.save(chatRoom);
+    public ChatRoomDTO createChatRoom(String roomName, List<String> memberMids) {
+        // 채팅방을 먼저 생성 후 저장
+        ChatRoom chatRoom = ChatRoom.builder()
+                .roomName(roomName)
+                .build();
+        chatRoom = chatRoomRepository.save(chatRoom);
 
         // 멤버 추가
         Set<Member> members = new HashSet<>();
-        for (String name : memberNames) {
-            Optional<Member> optionalMember = memberRepository.findFirstByName(name);
-            Member member = optionalMember.orElseThrow(() -> new IllegalArgumentException("Member not found for name: " + name));
+        for (String mid : memberMids) {
+            Member member = memberRepository.findById(mid)
+                    .orElseThrow(() -> new IllegalArgumentException("Member not found for ID: " + mid));
             members.add(member);
         }
 
-        // 멤버가 추가된 채팅방을 다시 저장
         chatRoom.setMembers(members);
-        roomRepository.save(chatRoom);
+        chatRoom = chatRoomRepository.save(chatRoom); // 업데이트된 멤버와 함께 다시 저장
 
-        // DTO로 변환하여 반환
         return ChatRoomDTO.builder()
                 .id(chatRoom.getId())
                 .roomName(chatRoom.getRoomName())
-                .memberNames(members.stream().map(Member::getName).collect(Collectors.toSet()))
+                .memberMids(members.stream().map(Member::getMid).collect(Collectors.toSet()))
                 .build();
     }
-
-
-
-
+    
     @Override
     public List<ChatRoomDTO> getAllChatRooms() {
-        return roomRepository.findAll().stream()
+        return chatRoomRepository.findAll().stream()
                 .map(room -> ChatRoomDTO.builder()
                         .id(room.getId())
                         .roomName(room.getRoomName())
-                        .memberNames(room.getMembers().stream()
-                                .map(Member::getName)
+                        .memberMids(room.getMembers().stream()
+                                .map(Member::getMid)  // member의 mid를 가져옴
                                 .collect(Collectors.toSet()))
                         .build())
                 .collect(Collectors.toList());
@@ -75,11 +67,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatMessageDTO> getMessagesByRoomId(Long roomId) {
-        ChatRoom chatRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found"));
-        return chatRoom.getMessages().stream()
+        List<ChatMessage> messages = chatMessageRepository.findByChatRoomId(roomId);
+        return messages.stream()
                 .map(message -> ChatMessageDTO.builder()
-                        .senderId(message.getSenderId().getName())
+                        .senderId(message.getSenderId().getMid())
                         .content(message.getContent())
                         .timestamp(message.getTimestamp())
                         .build())
@@ -87,21 +78,48 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public void sendMessageToRoom(Long roomId, ChatMessageDTO messageDTO) {
-        ChatRoom chatRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found"));
+    public ChatMessageDTO saveMessage(Long roomId, ChatMessageDTO messageDTO) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Chat room not found for ID: " + roomId));
 
-        // 메시지 엔티티 생성 후 저장하는 로직 (예시)
-        ChatMessage chatMessage = new ChatMessage(
-                messageDTO.getContent(),
-                messageDTO.getTimestamp(),
-                memberRepository.findById(messageDTO.getSenderId())  // Assuming you send senderId in DTO
-                        .orElseThrow(() -> new IllegalArgumentException("Sender not found")),
-                chatRoom
-        );
+        Member sender = memberRepository.findById(messageDTO.getSenderId())
+                .orElseThrow(() -> new IllegalArgumentException("Member not found for ID: " + messageDTO.getSenderId()));
 
-        chatRoom.getMessages().add(chatMessage);
-        roomRepository.save(chatRoom);
+        // 메시지 저장
+        ChatMessage message = ChatMessage.builder()
+                .content(messageDTO.getContent())
+                .timestamp(LocalDateTime.now())
+                .senderId(sender)
+                .chatRoom(chatRoom)
+                .build();
+
+        ChatMessage savedMessage = chatMessageRepository.save(message);
+
+        return ChatMessageDTO.builder()
+                .senderId(savedMessage.getSenderId().getMid())
+                .content(savedMessage.getContent())
+                .timestamp(savedMessage.getTimestamp())
+                .build();
     }
 
+    @Override
+    public void sendMessageToRoom(Long roomId, ChatMessageDTO messageDTO) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Chat room not found for ID: " + roomId));
+
+        Member sender = memberRepository.findById(messageDTO.getSenderId())
+                .orElseThrow(() -> new IllegalArgumentException("Member not found for ID: " + messageDTO.getSenderId()));
+
+        // 메시지 저장 로직 (필요에 따라 추가)
+        ChatMessage message = ChatMessage.builder()
+                .content(messageDTO.getContent())
+                .timestamp(LocalDateTime.now())
+                .senderId(sender)
+                .chatRoom(chatRoom)
+                .build();
+
+        chatMessageRepository.save(message);
+    }
 }
+
+
