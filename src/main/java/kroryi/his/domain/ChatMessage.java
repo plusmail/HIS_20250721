@@ -18,20 +18,21 @@ public class ChatMessage {
     private Long id;
 
     private String content;
-
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member senderId;
+    @JoinColumn(name = "sender_id")
+    private Member sender; // Member 타입으로 선언
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
     // 매개변수 있는 생성자
     public ChatMessage(String content, LocalDateTime timestamp, Member senderId, ChatRoom chatRoom) {
         this.content = content;
         this.timestamp = timestamp;
-        this.senderId = senderId;
+        this.sender = senderId;
         this.chatRoom = chatRoom;
     }
 }

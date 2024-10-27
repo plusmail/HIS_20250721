@@ -75,27 +75,31 @@ function selectUser(user, listItem) {
 
 // 채팅방 생성 요청 (memberMids와 roomName 설정 확인)
 startChatBtn.addEventListener('click', () => {
-    if (!selectedUser || !selectedUser.mid) { // 사용자와 mid 확인
+    if (!selectedUser || !selectedUser.mid) {
         alert('사용자를 선택하세요.');
         return;
     }
 
     const roomName = `${selectedUser.name}와의 1:1 채팅`;
 
-    // Axios로 POST 요청 보내기
     axios.post('/api/chat/rooms', {
         roomName: roomName,
-        memberMids: [selectedUser.mid] // memberMids로 수정하여 mid를 전달
+        memberMids: [selectedUser.mid]
     })
         .then(response => {
             console.log('채팅방 생성 성공:', response.data);
 
             const newRoom = response.data;
-            chatRooms.push(newRoom);  // 생성된 채팅방을 목록에 추가
-            renderChatRooms();  // 채팅방 목록 업데이트
 
-            // 생성된 채팅방으로 바로 이동
-            openChatRoom(newRoom.id);  // 방 ID를 이용해 생성된 방으로 이동
+            if (!newRoom.id) {  // 방 ID가 제대로 생성되었는지 확인
+                console.error('생성된 채팅방의 ID가 null입니다.');
+                return;
+            }
+
+            chatRooms.push(newRoom);
+            renderChatRooms();
+
+            openChatRoom(newRoom.id);
 
             selectedUser = null;
             const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
@@ -105,6 +109,7 @@ startChatBtn.addEventListener('click', () => {
             console.error('채팅방 생성 실패:', error);
         });
 });
+
 
 // 채팅방 목록 렌더링
 function renderChatRooms() {
@@ -155,17 +160,22 @@ function renderMessages(messages) {
 // 메시지 전송
 sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
-    if (!message || !currentRoomId) return;
+    if (!message || !currentRoomId) {
+        console.error("현재 방 ID가 null이거나 메시지가 비어 있습니다.");
+        return;
+    }
 
-    // 서버에 메시지 전송
     axios.post(`/api/chat/rooms/${currentRoomId}/messages`, { content: message })
         .then(response => {
             const room = chatRooms.find(r => r.id === currentRoomId);
-            room.messages.push(response.data);  // 서버에서 받은 메시지 추가
-            renderMessages(room.messages);  // 메시지 렌더링
-            messageInput.value = '';  // 입력창 비우기
+            room.messages.push(response.data);
+            renderMessages(room.messages);
+            messageInput.value = '';
         })
         .catch(error => {
             console.error('메시지 전송 실패:', error);
         });
 });
+
+
+

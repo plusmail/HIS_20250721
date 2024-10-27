@@ -30,13 +30,17 @@ public class ChatController {
     // 채팅방 생성
     @PostMapping("/rooms")
     public ResponseEntity<ChatRoomDTO> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
-        // Set<String> memberMids를 List<String>으로 변환
         List<String> memberMidsList = new ArrayList<>(chatRoomDTO.getMemberMids());
-
-        // 변환된 List를 사용하여 채팅방 생성
         ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList);
+
+        if (createdRoom.getId() == null) {
+            log.error("채팅방 생성 실패 - 방 ID가 null입니다.");
+            throw new IllegalStateException("채팅방 생성 실패 - 방 ID가 null입니다.");
+        }
+        log.info("채팅방 생성 성공 - 방 ID: {}", createdRoom.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
     }
+
 
     // 채팅방 목록 반환
     @GetMapping("/rooms")

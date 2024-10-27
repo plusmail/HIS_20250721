@@ -70,7 +70,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomId(roomId);
         return messages.stream()
                 .map(message -> ChatMessageDTO.builder()
-                        .senderId(message.getSenderId().getMid())
+                        .senderId(message.getSender().getMid())
                         .content(message.getContent())
                         .timestamp(message.getTimestamp())
                         .build())
@@ -79,28 +79,35 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public ChatMessageDTO saveMessage(Long roomId, ChatMessageDTO messageDTO) {
+        // roomId로 채팅방 찾기
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found for ID: " + roomId));
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다. roomId: " + roomId));
 
+        // senderId (String)를 Member 객체로 변환
         Member sender = memberRepository.findById(messageDTO.getSenderId())
                 .orElseThrow(() -> new IllegalArgumentException("Member not found for ID: " + messageDTO.getSenderId()));
 
-        // 메시지 저장
-        ChatMessage message = ChatMessage.builder()
+        // ChatMessage 생성
+        ChatMessage chatMessage = ChatMessage.builder()
                 .content(messageDTO.getContent())
                 .timestamp(LocalDateTime.now())
-                .senderId(sender)
-                .chatRoom(chatRoom)
+                .chatRoom(chatRoom)  // ChatRoom 설정
+                .sender(sender)      // Member 타입으로 설정
                 .build();
 
-        ChatMessage savedMessage = chatMessageRepository.save(message);
+        // 메시지 저장
+        ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
 
+        // ChatMessageDTO로 변환 후 반환
         return ChatMessageDTO.builder()
-                .senderId(savedMessage.getSenderId().getMid())
+                .id(savedMessage.getId())  // savedMessage의 id 사용
                 .content(savedMessage.getContent())
                 .timestamp(savedMessage.getTimestamp())
+                .roomId(savedMessage.getChatRoom().getId())  // roomId 설정 확인
+                .senderId(savedMessage.getSender().getMid()) // Member의 mid 사용
                 .build();
     }
+
 
     @Override
     public void sendMessageToRoom(Long roomId, ChatMessageDTO messageDTO) {
@@ -114,7 +121,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatMessage message = ChatMessage.builder()
                 .content(messageDTO.getContent())
                 .timestamp(LocalDateTime.now())
-                .senderId(sender)
+                .sender(sender)
                 .chatRoom(chatRoom)
                 .build();
 
