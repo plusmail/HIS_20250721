@@ -5,7 +5,7 @@ import kroryi.his.domain.Reservation;
 import kroryi.his.dto.ReservationDTO;
 import kroryi.his.mapper.ReservationMapper;
 import kroryi.his.repository.ReservationRepository;
-import kroryi.his.service.ReservationService;
+import kroryi.his.service.ReservationRegisterService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ReservationImpl implements ReservationService {
+public class ReservationRegisterServiceImpl implements ReservationRegisterService {
 
     private final ModelMapper modelMapper;
 
@@ -27,7 +27,7 @@ public class ReservationImpl implements ReservationService {
     private ReservationRepository reRepo;
 
     @Autowired
-    public ReservationImpl(ModelMapper modelMapper) {
+    public ReservationRegisterServiceImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
