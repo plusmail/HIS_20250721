@@ -95,7 +95,7 @@
 <!--네비바-->
 <nav class="navbar navbar-expand-lg bg-dark py-1" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="home">HIS 병원업무관리시스템</a>
+        <a class="navbar-brand" href="/home">HIS 병원업무관리시스템</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02"
                 aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -109,7 +109,7 @@
                                readonly>
                 </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                    <a class="nav-link" href="admin_management" id="admin_management">
+                    <a class="nav-link" href="/admin_management" id="admin_management">
                         <i class="bi bi-gear"></i> 사용자관리
                     </a>
                 </li>
