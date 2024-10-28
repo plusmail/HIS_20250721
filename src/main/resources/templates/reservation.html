@@ -17,25 +17,237 @@
     </ul>
 
     <div id="myTabContent" class="tab-content mt-3">
-        <div id="body" class="tab-pane fade show active" role="tabpanel"></div>
-    </div>
+        <div id="body" class="tab-pane fade show active" role="tabpanel">
+            <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+                <!-- 예약-->
+                <div class="card m-2 mb-1">
+                    <div class="card-header text-center">
+                        예약
+                    </div>
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row d-flex justify-content-center">
+                                <!-- 왼쪽 구간 (캘린더) -->
+                                <div class="col-md-4">
 
+                                    <!-- 캘린더 구간 -->
+                                    <div class="calendar">
+                                        <div class="calendar-header">
+                                            <button onclick="prevMonth()">이전</button>
+                                            <span id="monthYear"></span>
+                                            <button onclick="nextMonth()">다음</button>
+                                        </div>
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th>일</th>
+                                                <th>월</th>
+                                                <th>화</th>
+                                                <th>수</th>
+                                                <th>목</th>
+                                                <th>금</th>
+                                                <th>토</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="calendar-body">
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- 예약목록, 개인 예약 현황 구간 -->
+                                    <div class="d-flex mt-2">
+                                        <button class="btn btn-primary me-2 button_test_1" type="button">예약 목록</button>
+                                        <button class="btn btn-secondary button_test_2" type="submit">개인 예약 현황</button>
+                                    </div>
+
+                                    <!-- 해당 날짜 테이블 ? -->
+                                    <table id="reservationTable" class="table table-hover mt-2">
+                                        <thead>
+                                        <tr>
+                                            <th>시간</th>
+                                            <th>환자이름</th>
+                                            <th>내용</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="reservation-body">
+                                        </tbody>
+                                    </table>
+
+                                    <!-- 날짜 선택시 환자 데이터가 들어올 테이블 -->
+                                    <table id="reservationTableList" class="table table-hover">
+
+                                    </table>
+
+                                </div>
+                                <div id="bodyContent"  class="col-md-8">
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
+        const reservationTimes = [
+            "9:00", "9:30", "10:00", "10:30", "11:00",
+            "11:30", "12:00", "12:30", "13:00", "13:30",
+            "14:00", "14:30", "15:00", "15:30", "16:00",
+            "16:30", "17:00", "17:30", "18:00", "18:30",
+            "19:00", "19:30"
+        ];
+
+
+        loadContent('/reservation_view');
+
+        // 페이지가 처음 로드되었을 때 예약현황 페이지 로드
+        $(document).ready(function () {
+            loadContent('/reservation_view');
+            renderCalendar();
+        });
+
+
         function loadContent(page) {
-            $("#body").load(page, function(response, status, xhr) {
+            $("#bodyContent").load(page, function (response, status, xhr) {
                 if (status === "error") {
-                    $("#body").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
+                    $("#bodyContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
                 } else {
-                    $("#body").html(response);
+                    $("#bodyContent").html(response);
                 }
             });
         }
 
-        // 페이지가 처음 로드되었을 때 예약현황 페이지 로드
-        $(document).ready(function() {
-            loadContent('/reservation_view');
-        });
+        const currentDate = new Date();
+
+
+        function renderCalendar() {
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const monthYear = document.getElementById('monthYear');
+            const calendarBody = document.getElementById('calendar-body');
+            monthYear.innerText = `${year}년 ${month + 1}월`;
+            calendarBody.innerHTML = '';
+
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+                    cell.classList.add('calendarDate');
+                    if (i === 0 && j < firstDay) {
+                        cell.innerHTML = '';
+                    } else if (date > lastDate) {
+                        break;
+                    } else {
+                        cell.innerHTML = date;
+                        date++;
+                    }
+                    row.appendChild(cell);
+                }
+
+                calendarBody.appendChild(row);
+            }
+
+
+            // 캘린더 날짜 선택시 오늘 날짜 정보 받아오기
+            document.querySelectorAll('.calendarDate').forEach(function (calendarDate) {
+                calendarDate.addEventListener('click', function () {
+                    // 클릭된 날짜의 텍스트 가져오기
+                    const day = this.textContent;
+
+                    // 저장한 날짜 텍스트, 날짜 형식으로 재변환
+                    const selectedDate = `${year}-${month + 1}-${day}`;
+                    console.log(selectedDate)
+
+                    dateReservationList(selectedDate);
+                });
+            });
+
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+
+        function dateReservationList(selectedDate) {
+            fetch('reservation/selectedDatePatientList', {
+
+                method: 'POST', // POST 요청
+                headers: {
+                    'Content-Type': 'application/json' // JSON 형식으로 데이터 전송
+                },
+                body: JSON.stringify({
+                    reservationDate: selectedDate
+                }) // JSON 객체로 전송
+            })
+                .then(response => {
+                    // 응답 상태가 성공적인 경우 JSON으로 변환
+                    if (!response.ok) {
+                        throw new Error('네트워크 응답이 실패했습니다.');
+                    }
+                    return response.json(); // JSON 데이터로 변환
+                })
+                .then(data => {
+
+                    // 환자 데이터가 들어갈 ID값 보관
+                    const tableBody = document.querySelector('#reservationTableList');
+
+                    // 테이블의 기존 데이터를 지우고 새 데이터를 추가
+                    // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
+                    tableBody.innerHTML = ''; // 기존 내용 제거
+
+
+                    // 데이터 배열을 순회하여 테이블에 추가
+                    data.forEach(item => {
+
+                        // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
+                        const time = new Date(item.reservationDate).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+
+                        const row = document.createElement('tr'); // 새로운 행 생성
+                        row.id = 'reservationTableListParent'; // ID 추가
+                        row.innerHTML = `
+    <td>${time}</td>
+    <td>${item.department}</td>
+    <td>${item.patientNote}</td>
+`; // 각 열에 데이터 삽입
+
+                        //
+                        row.onclick = function () {
+                            selectList(item.seq);
+                        };
+
+                        tableBody.appendChild(row); // tbody에 행 추가
+                    });
+                })
+                .catch(error => {
+                    // 에러 처리
+                    console.error('에러 발생:', error);
+                });
+        }
+
+
     </script>
+
 </div>
 </html>
