@@ -1,4 +1,4 @@
-package kroryi.his.repository.search;
+package kroryi.his.service.Impl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
@@ -6,6 +6,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kroryi.his.domain.*;
 import kroryi.his.dto.MemberListAllDTO;
+import kroryi.his.service.MemberSearch;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,8 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -138,18 +137,29 @@ public class MemberSearchImpl extends
         QMember member = QMember.member;
         QMemberRoleSet roleSet = QMemberRoleSet.memberRoleSet;
 
+        log.info("searchWithAll1 --> {}", types);
+        log.info("searchWithAll2 --> {}", keyword);
+
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if ((types != null && types.length > 0) && keyword != null) {
+        if (types != null && types.length > 0 && keyword != null) {
             for (String type : types) {
                 switch (type) {
+                    case "m":
+                        booleanBuilder.or(member.mid.like("%" + keyword + "%")); // mid 검색
+                        break;
                     case "n":
-                        booleanBuilder.or(member.name.contains(keyword));
+                        booleanBuilder.or(member.name.like("%" + keyword + "%")); // 이름 검색
                         break;
                     case "e":
-                        booleanBuilder.or(member.email.contains(keyword));
+                        booleanBuilder.or(member.email.like("%" + keyword + "%")); // 이메일 검색
                         break;
                     case "r":
-                        booleanBuilder.or(member.roleSet.any().roleSet.eq(MemberRole.valueOf(keyword)));
+                        try {
+                            booleanBuilder.or(member.roleSet.any().roleSet.eq(MemberRole.valueOf(keyword))); // 역할 검색
+                        } catch (IllegalArgumentException ex) {
+                            // MemberRole에 없는 값이 들어오면 예외가 발생하므로 이를 방지합니다.
+                            System.out.println("Invalid role value: " + keyword);
+                        }
                         break;
                 }
             }
