@@ -548,15 +548,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentRowCount = waitingPatientsTable.rows.length; // 현재 행 수
         const formattedRvTime = formatRvTime(patient.rvTime);
 
+        // doctorNames 배열을 사용해 <option> 요소 생성
+        const doctorOptions = doctorNames.map(name => `<option value="${name}">${name}</option>`).join('');
+
         row.innerHTML = `
         <td>${currentRowCount}</td>
         <td>${patient.chartNum || 'N/A'}</td>
         <td>${patient.paName || 'N/A'}</td>
         <td>
             <select>
-                <option value="의사1">의사1</option>
-                <option value="의사2">의사2</option>
-                <option value="의사3">의사3</option>
+                ${doctorOptions} <!-- 동적으로 생성된 옵션을 select에 추가 -->
             </select>
         </td>
         <td>${formattedRvTime || ''}</td>
@@ -565,8 +566,8 @@ document.addEventListener("DOMContentLoaded", function () {
             minute: '2-digit'
         }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
-       
     `;
+
         row.addEventListener('click', () => {
             const previouslySelected = waitingPatientsTable.querySelector('tr.selected');
             if (previouslySelected) {

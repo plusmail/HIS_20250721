@@ -76,11 +76,6 @@ public class PatientAdmissionController {
     }
 
 
-
-
-
-
-
     // 대기 환자 목록 반환
     @GetMapping("/waiting")
     public ResponseEntity<List<PatientAdmission>> getWaitingPatients() {
@@ -98,11 +93,12 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setReceptionTime(receptionDateTime);
 
         // 차트 번호와 접수 시간이 일치하는 환자 조회
-        Optional<PatientAdmission> existingPatient = patientAdmissionService.findByChartNumAndReceptionTime(
-                patientAdmissionDTO.getChartNum(), receptionDateTime);
+        List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
+                Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())), receptionDateTime);
 
-        if (existingPatient.isPresent()) {
-            PatientAdmission patient = existingPatient.get();
+        if (!existingPatients.isEmpty()) {
+            // 첫 번째 환자를 선택 (중복 처리)
+            PatientAdmission patient = existingPatients.get(0);
 
 //            System.out.println("조회된 환자: 차트 번호: " + patient.getChartNum() + ", 진료 상태: " + patient.getTreatStatus());
 
@@ -135,8 +131,6 @@ public class PatientAdmissionController {
     //    진료완료
     @PutMapping("/completeTreatment")
     public ResponseEntity<Map<String, String>> completeTreatment(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
-//        System.out.println("진료 완료 요청 수신: " + patientAdmissionDTO);
-
         Map<String, String> response = new HashMap<>(); // 응답 메시지를 위한 Map 생성
 
         // 진료 완료 시간 처리
@@ -153,11 +147,12 @@ public class PatientAdmissionController {
         }
 
         // 환자 정보 조회: 차트 번호와 접수 시간을 기준으로
-        Optional<PatientAdmission> existingPatient = patientAdmissionService.findByChartNumAndReceptionTime(
-                patientAdmissionDTO.getChartNum(), patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
+        List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
+                Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())),
+                patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
 
-        if (existingPatient.isPresent()) {
-            PatientAdmission patient = existingPatient.get();
+        if (!existingPatients.isEmpty()) { // 비어 있지 않을 경우
+            PatientAdmission patient = existingPatients.get(0); // 첫 번째 환자 선택
 
             // 치료 상태가 2인지 확인
             if (patient.getTreatStatus().equals("2")) {
@@ -178,6 +173,7 @@ public class PatientAdmissionController {
         response.put("message", "환자를 찾을 수 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 
 

@@ -156,6 +156,9 @@
 
     <div th:fragment="reception_js">
         <script th:src="@{/js/patient_admission.js}"></script>
+        <script th:inline="javascript">
+            const doctorNames = /*[[${doctorNames}]]*/ [];
+        </script>
     </div>
 </div>
 

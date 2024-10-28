@@ -33,39 +33,40 @@ function goToMaterialManagementPage() {
 }
 
 
-
-
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const socket = new SockJS('/patientCount');
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function(frame) {
-        // console.log('WebSocket connected:', frame);
+        console.log('WebSocket connected:', frame);
 
         // 환자 수 업데이트 메시지 구독
-        stompClient.subscribe('/topic/patientCount', function(message) {
-
+        stompClient.subscribe('/patientCount', function (message) {
             const data = JSON.parse(message.body);
-            const { status, count } = data;
+            const {status, count} = data;
 
             // 상태 및 카운트를 출력하여 확인
-            // console.log(`Status: ${status}, Count: ${count}`);
+            console.log(`Status: ${status}, Count: ${count}`); // 수정된 부분
 
             // UI 업데이트
-            if (status === "1") {
-                document.getElementById('home-waitingCount').textContent = count;
-            } else if (status === "2") {
-                document.getElementById('home-inTreatmentCount').textContent = count;
-            } else if (status === "3") {
-                document.getElementById('home-completedCount').textContent = count;
+            switch(status) {
+                case "1":
+                    document.getElementById('home-waitingCount').textContent = count;
+                    break;
+                case "2":
+                    document.getElementById('home-inTreatmentCount').textContent = count;
+                    break;
+                case "3":
+                    document.getElementById('home-completedCount').textContent = count;
+                    break;
+                default:
+                    console.warn(`Unknown status: ${status}`); // 알 수 없는 상태에 대한 경고
             }
         });
-
     }, function(error) {
         console.error('WebSocket connection error:', error); // 연결 실패 시
     });
 });
-
 
 // 페이지 로드 시 호출
 function goToReception() {

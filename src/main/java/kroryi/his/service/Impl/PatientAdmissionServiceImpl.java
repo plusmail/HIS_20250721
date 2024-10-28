@@ -9,13 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,6 +23,7 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     private PatientAdmissionRepository patientAdmissionRepository;
 
 
+    @Transactional
     @Override
     public PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) {
             PatientAdmission patientAdmission = new PatientAdmission();
@@ -42,6 +41,10 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
             patientAdmission.setCompletionTime(patientAdmissionDTO.getCompletionTime());
             patientAdmission.setTreatStatus(patientAdmissionDTO.getTreatStatus());
 
+        if (patientAdmission.getPid() != null ) {
+            throw new IllegalArgumentException("ID는 null이 아니어야 합니다."); // 예외 처리
+        }
+
             return  patientAdmissionRepository.save(patientAdmission);
     }
 
@@ -54,20 +57,33 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
 
 
 
+    @Transactional
     @Override
     public long getCompleteTreatmentCount(String count, LocalDate date) {
         LocalDateTime startDate = date.atStartOfDay(); // 입력된 날짜의 00시 00분 00초
         LocalDateTime endDate = date.atTime(23, 59, 59);
-
-        return patientAdmissionRepository.countByTreatStatusAndReceptionTimeBetween(count,startDate, endDate);
+        try {
+            // 환자 정보 처리
+            return patientAdmissionRepository.countByTreatStatusAndReceptionTimeBetween(count,startDate, endDate);
+        } catch (Exception e) {
+            // 예외 처리 시 세션 플러시 방지
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new RuntimeException("처리 중 오류 발생", e);
+        }
     }
 
     @Override
-    public Optional<PatientAdmission> findByChartNumAndReceptionTime(Integer chartNum, LocalDateTime receptionTime) {
+    public List<PatientAdmission> findByChartNumAndReceptionTime(Integer chartNum, LocalDateTime receptionTime) {
         // receptionTime에서 날짜만 추출하여 LocalDate로 변환
         LocalDate receptionDate = LocalDate.from(receptionTime);
-        return patientAdmissionRepository.findByChartNumAndReceptionDate(chartNum, receptionDate);
+
+        // 차트 번호와 날짜를 기준으로 환자 리스트 조회
+        List<PatientAdmission> patientAdmissions = patientAdmissionRepository.findByChartNumAndReceptionDate(chartNum, receptionDate);
+
+        // 중복된 환자 정보를 처리하여 필요한 경우에 맞게 리턴
+        return patientAdmissions; // 여기에 추가적인 로직을 넣어도 됩니다. (예: 가장 최근 환자만 선택)
     }
+
 
 
 

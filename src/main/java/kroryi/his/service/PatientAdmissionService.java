@@ -6,7 +6,6 @@ import kroryi.his.dto.PatientAdmissionDTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 
 public interface PatientAdmissionService {
@@ -16,7 +15,8 @@ public interface PatientAdmissionService {
 
     long getCompleteTreatmentCount(String count, LocalDate date);
 
-    Optional<PatientAdmission> findByChartNumAndReceptionTime(Integer chartNum, LocalDateTime receptionTime);
+    List<PatientAdmission> findByChartNumAndReceptionTime(Integer chartNum, LocalDateTime receptionTime);
+
 
     void updatePatientAdmission(PatientAdmission patientAdmission);
 

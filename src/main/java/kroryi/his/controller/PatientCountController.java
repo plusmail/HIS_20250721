@@ -5,6 +5,8 @@ import kroryi.his.domain.PatientAdmission;
 import kroryi.his.repository.PatientAdmissionRepository;
 import kroryi.his.service.PatientAdmissionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,14 +44,16 @@ public class PatientCountController {
     }
 
     // 웹소켓을 통해 실시간 업데이트 전송
+//    @GetMapping("/topic/patientCount")
+    @MessageMapping("/patientCount")
     public void sendPatientCountUpdate(String status, long count) {
 
-        Map<String, Object> patientCountUpdate = new HashMap<>();
-        patientCountUpdate.put("status", status);
-        patientCountUpdate.put("count", count);
-//        System.out.println("Sending update - Status: " + status + ", Count: " + count);
+//        Map<String, Object> patientCountUpdate = new HashMap<>();
+//        patientCountUpdate.put("status", status);
+//        patientCountUpdate.put("count", count);
+        System.out.println("Sending update - Status: " + status + ", Count: " + count);
 
-        messagingTemplate.convertAndSend("/topic/patientCount", patientCountUpdate);
+//        messagingTemplate.convertAndSend("/topic/patientCount", patientCountUpdate);
     }
 }
 
