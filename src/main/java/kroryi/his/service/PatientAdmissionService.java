@@ -2,6 +2,7 @@ package kroryi.his.service;
 
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.dto.PatientAdmissionDTO;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,4 +26,7 @@ public interface PatientAdmissionService {
     void cancelAdmission(Integer pid);
 
     PatientAdmission getLatestCompletionTime(Integer chartNum);
+
+    RedisTemplate<String, String> redisTemplate = null;
+    void registerAdmission(PatientAdmission patientAdmission);
 }

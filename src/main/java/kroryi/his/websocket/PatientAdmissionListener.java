@@ -5,6 +5,7 @@ import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.service.PatientAdmissionService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
@@ -17,39 +18,23 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@Log4j2
 @Component
-public class PatientAdmissionListener  implements ApplicationListener<PatientAdmissionEvent> {
-    private final SimpMessagingTemplate messagingTemplate;
-    private final PatientAdmissionService patientAdmissionService;
+public class PatientAdmissionListener {
+
+    private static SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public PatientAdmissionListener(SimpMessagingTemplate messagingTemplate, PatientAdmissionService patientAdmissionService) {
-        this.messagingTemplate = messagingTemplate;
-        this.patientAdmissionService = patientAdmissionService;
+    public void init(SimpMessagingTemplate template) {
+        PatientAdmissionListener.messagingTemplate = template;
     }
 
-    private void sendPatientCounts(Long patientId) {
-        for (String status : Arrays.asList("1", "2", "3")) {
-            long count = patientAdmissionService.getCompleteTreatmentCount(status, LocalDate.now());
-            Map<String, Object> patientCountUpdate = new HashMap<>();
-            patientCountUpdate.put("status", status);
-            patientCountUpdate.put("count", count);
-
-            messagingTemplate.convertAndSend("/topic/patientCount", patientCountUpdate); // 메시지 전송
-        }
+    @PostPersist
+    @PostRemove
+    @PostUpdate
+    public void onPostPersist(PatientAdmission admission) {
+        // 데이터 등록 후 WebSocket으로 메시지 전송
+        log.info("1111111111");
+        messagingTemplate.convertAndSend("/topic/admission", "새로운 입원 등록: " + admission.getPid());
     }
-
-    @Override
-    public void onApplicationEvent(PatientAdmissionEvent event) {
-        // 환자 수 업데이트 로직
-        System.out.println("9999999999999999999->" + event);
-        sendPatientCounts(event.getPatientId());
-    }
-//    @PostPersist
-//    @PostUpdate
-//    @PostRemove
-//    public void handlePatientAdmissionChange(PatientAdmission patientAdmission) {
-//        System.out.println("4444444444444->" + patientAdmission);
-//        patientCountScheduler.sendPatientCounts();
-//    }
 }

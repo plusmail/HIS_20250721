@@ -36,7 +36,7 @@ public class PatientAdmissionController {
         Map<String, Object> response = new HashMap<>();
 
         // 차트 번호로 예약 정보를 가져오기
-        Optional<Reservation> reservation = reservationRepository.findByChartNumber(String.valueOf(patientAdmissionDTO.getChartNum()));
+        Optional<Reservation> reservation = reservationRepository.findFirstByChartNumber(String.valueOf(patientAdmissionDTO.getChartNum()));
 
         // 예약 정보가 존재하면 rvTime(예약 날짜)을 설정
         if (reservation.isPresent()) {

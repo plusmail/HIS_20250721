@@ -7,6 +7,7 @@ import kroryi.his.service.PatientAdmissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -22,39 +23,41 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     @Autowired
     private PatientAdmissionRepository patientAdmissionRepository;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     @Override
     public PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) {
-            PatientAdmission patientAdmission = new PatientAdmission();
-            patientAdmission.setChartNum(patientAdmissionDTO.getChartNum());
-            patientAdmission.setPaName(patientAdmissionDTO.getPaName());
-            patientAdmission.setMainDoc(patientAdmissionDTO.getMainDoc());
-            patientAdmission.setReceptionTime(patientAdmissionDTO.getReceptionTime());
-            patientAdmission.setRvTime(patientAdmissionDTO.getRvTime());
-            patientAdmission.setViTime(patientAdmissionDTO.getViTime());
+        PatientAdmission patientAdmission = new PatientAdmission();
+        patientAdmission.setChartNum(patientAdmissionDTO.getChartNum());
+        patientAdmission.setPaName(patientAdmissionDTO.getPaName());
+        patientAdmission.setMainDoc(patientAdmissionDTO.getMainDoc());
+        patientAdmission.setReceptionTime(patientAdmissionDTO.getReceptionTime());
+        patientAdmission.setRvTime(patientAdmissionDTO.getRvTime());
+        patientAdmission.setViTime(patientAdmissionDTO.getViTime());
 
 
-            if ("2".equals(patientAdmissionDTO.getTreatStatus())) {
-                patientAdmission.setViTime(LocalDateTime.now());
-            }
-            patientAdmission.setCompletionTime(patientAdmissionDTO.getCompletionTime());
-            patientAdmission.setTreatStatus(patientAdmissionDTO.getTreatStatus());
+        if ("2".equals(patientAdmissionDTO.getTreatStatus())) {
+            patientAdmission.setViTime(LocalDateTime.now());
+        }
+        patientAdmission.setCompletionTime(patientAdmissionDTO.getCompletionTime());
+        patientAdmission.setTreatStatus(patientAdmissionDTO.getTreatStatus());
 
-        if (patientAdmission.getPid() != null ) {
+        if (patientAdmission.getPid() != null) {
             throw new IllegalArgumentException("ID는 null이 아니어야 합니다."); // 예외 처리
         }
 
-            return  patientAdmissionRepository.save(patientAdmission);
+        PatientAdmission savedAdmission = patientAdmissionRepository.save(patientAdmission);
+        redisTemplate.convertAndSend("admission", "새로운 환자 등록" + savedAdmission);
+        return savedAdmission;
     }
-
 
 
     @Override
     public List<PatientAdmission> getWaitingPatients() {
         return patientAdmissionRepository.findByTreatStatus("1");
     }
-
 
 
     @Transactional
@@ -64,7 +67,7 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         LocalDateTime endDate = date.atTime(23, 59, 59);
         try {
             // 환자 정보 처리
-            return patientAdmissionRepository.countByTreatStatusAndReceptionTimeBetween(count,startDate, endDate);
+            return patientAdmissionRepository.countByTreatStatusAndReceptionTimeBetween(count, startDate, endDate);
         } catch (Exception e) {
             // 예외 처리 시 세션 플러시 방지
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -83,9 +86,6 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         // 중복된 환자 정보를 처리하여 필요한 경우에 맞게 리턴
         return patientAdmissions; // 여기에 추가적인 로직을 넣어도 됩니다. (예: 가장 최근 환자만 선택)
     }
-
-
-
 
 
     @Override
@@ -120,6 +120,12 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         PatientAdmission admissions = patientAdmissionRepository.findLatestByChartNum(chartNum);
         log.info(admissions != null ? admissions.toString() : "chartNum {}에 대한 환자 데이터가 없습니다.", chartNum);
         return admissions; // 데이터가 없으면 null을 반환
+    }
+
+    @Override
+    public void registerAdmission(PatientAdmission admission) {
+        redisTemplate.convertAndSend("admission", "새로운 입원 등록: " + admission.getPaName());
+
     }
 
 

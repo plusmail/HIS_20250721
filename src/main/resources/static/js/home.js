@@ -34,14 +34,13 @@ function goToMaterialManagementPage() {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const socket = new SockJS('/patientCount');
+    const socket = new SockJS("http://localhost:8080/ws");
     const stompClient = Stomp.over(socket);
-
     stompClient.connect({}, function(frame) {
         console.log('WebSocket connected:', frame);
 
         // 환자 수 업데이트 메시지 구독
-        stompClient.subscribe('/patientCount', function (message) {
+        stompClient.subscribe('/topic/admission', function (message) {
             const data = JSON.parse(message.body);
             const {status, count} = data;
 
