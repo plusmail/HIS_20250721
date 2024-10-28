@@ -32,6 +32,7 @@ public class HomeController {
         log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
         log.info("세선 값 {}", session.getAttribute("user"));
+        log.info("User authorities: {}", user.getUsername());
         log.info("User authorities: {}", user.getAuthorities());
         return "home";
     }

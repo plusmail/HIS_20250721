@@ -10,13 +10,27 @@ const messageList = document.getElementById('messageList');
 const messageInput = document.getElementById('messageInput');
 const sendMessageButton = document.getElementById('sendMessageButton');
 
-let selectedUser = null;  // 선택된 사용자
+let selectedUser = null;
+let currentUser = {};  // 실제 사용자 정보 초기 설정
 let chatRooms = [];
 let currentRoomId = null;
 
-// 페이지가 로드되면 서버에서 채팅방 목록 불러오기
+// 서버에서 로그인된 사용자 정보 가져오기
+function fetchCurrentUser() {
+    axios.get('/api/chat/auth/currentUser')
+        .then(response => {
+            currentUser = response.data;
+            console.log("현재 사용자 정보:", currentUser);
+        })
+        .catch(error => {
+            console.error("현재 사용자 정보 불러오기 실패:", error);
+        });
+}
+
+// 페이지가 로드되면 서버에서 현재 사용자와 채팅방 목록 불러오기
 document.addEventListener('DOMContentLoaded', function () {
-    loadChatRooms();  // 채팅방 목록 로드
+    fetchCurrentUser();  // 로그인한 사용자 설정
+    loadChatRooms();     // 채팅방 목록 로드
 });
 
 // 채팅 버튼 클릭 시 패널 열기/닫기
@@ -30,24 +44,24 @@ function loadChatRooms() {
         .then(response => {
             const rooms = response.data;
             chatRooms = rooms;  // 서버에서 받은 채팅방 목록 저장
-            renderChatRooms(rooms);  // 받아온 채팅방 목록 렌더링
+            renderChatRooms(rooms);  // 채팅방 목록 렌더링
         })
         .catch(error => {
             console.error('채팅방 목록 불러오기 실패:', error);
         });
 }
 
-// 사용자 선택 모달이 열릴 때 사용자 목록 로드 (서버에서 axios 사용)
+// 사용자 선택 모달이 열릴 때 사용자 목록 로드
 createChatRoomBtn.addEventListener('click', () => {
-    loadUsers();  // 채팅방 생성 모달이 열릴 때 사용자 목록 로드
+    loadUsers();
 });
 
-// 사용자 목록 로드 (서버에서 axios 사용)
+// 사용자 목록 로드
 function loadUsers() {
-    axios.get('/member/list')  // 서버로부터 사용자 목록 가져오기
+    axios.get('/api/chat/member/list')
         .then(response => {
-            const users = response.data;  // 받은 데이터를 저장
-            renderUserList(users);  // 사용자 목록 렌더링
+            const users = response.data;
+            renderUserList(users);
         })
         .catch(error => {
             console.error('사용자 목록 불러오기 실패:', error);
@@ -56,27 +70,27 @@ function loadUsers() {
 
 // 사용자 목록 렌더링
 function renderUserList(users) {
-    userList.innerHTML = '';  // 기존 목록 비우기
+    userList.innerHTML = '';
     users.forEach(user => {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
-        li.textContent = user.name;  // 사용자 이름 출력
-        li.addEventListener('click', () => selectUser(user, li));  // 사용자 객체 전체 전달
+        li.textContent = user.name;
+        li.addEventListener('click', () => selectUser(user, li));
         userList.appendChild(li);
     });
 }
 
-// 사용자 선택 함수 수정
+// 사용자 선택 함수
 function selectUser(user, listItem) {
-    selectedUser = user; // user 객체 전체를 저장하여 name과 mid 사용 가능하게 함
+    selectedUser = user;
     userList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
     listItem.classList.add('active');
 }
 
-// 채팅방 생성 요청 (memberMids와 roomName 설정 확인)
+// 채팅방 생성 요청
 startChatBtn.addEventListener('click', () => {
-    if (!selectedUser || !selectedUser.mid) {
-        alert('사용자를 선택하세요.');
+    if (!selectedUser) {
+        alert('메시지를 보내기 전에 사용자를 선택해주세요.');
         return;
     }
 
@@ -87,20 +101,10 @@ startChatBtn.addEventListener('click', () => {
         memberMids: [selectedUser.mid]
     })
         .then(response => {
-            console.log('채팅방 생성 성공:', response.data);
-
             const newRoom = response.data;
-
-            if (!newRoom.id) {  // 방 ID가 제대로 생성되었는지 확인
-                console.error('생성된 채팅방의 ID가 null입니다.');
-                return;
-            }
-
             chatRooms.push(newRoom);
             renderChatRooms();
-
             openChatRoom(newRoom.id);
-
             selectedUser = null;
             const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
             userSelectionModal.hide();
@@ -110,17 +114,27 @@ startChatBtn.addEventListener('click', () => {
         });
 });
 
-
 // 채팅방 목록 렌더링
 function renderChatRooms() {
-    roomList.innerHTML = '';  // 기존 목록 비우기
+    roomList.innerHTML = '';
     chatRooms.forEach(room => {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
         li.textContent = room.roomName;
         li.addEventListener('click', () => {
-            console.log(`채팅방 클릭됨: ${room.id}`);  // 로그 추가
-            openChatRoom(room.id);  // 클릭하면 채팅방 열기
+            if (!room.memberMids || room.memberMids.length === 0) {
+                alert('채팅방에 사용자가 없습니다.');
+                return;
+            }
+
+            openChatRoom(room.id);
+
+            const recipientId = room.memberMids.find(mid => mid !== currentUser.mid);
+            if (!recipientId) {
+                alert('해당 방에 유효한 상대방이 없습니다.');
+                return;
+            }
+            selectedUser = { mid: recipientId };
         });
         roomList.appendChild(li);
     });
@@ -130,13 +144,11 @@ function renderChatRooms() {
 function openChatRoom(roomId) {
     currentRoomId = roomId;
     const room = chatRooms.find(r => r.id === roomId);
-    chatModalLabel.textContent = room.roomName;  // 모달 제목을 채팅방 이름으로 설정
+    chatModalLabel.textContent = room.roomName;
 
-    // 서버에서 채팅방 메시지 불러오기
     axios.get(`/api/chat/rooms/${roomId}/messages`)
         .then(response => {
-            const messages = response.data;  // 서버에서 받은 메시지 목록
-            renderMessages(messages);  // 메시지 렌더링
+            renderMessages(response.data);
         })
         .catch(error => {
             console.error('메시지 불러오기 실패:', error);
@@ -152,7 +164,10 @@ function renderMessages(messages) {
     messages.forEach(message => {
         const li = document.createElement('li');
         li.classList.add('message-item');
-        li.textContent = `${message.sender}: ${message.content}`;  // 메시지 내용 출력
+
+        // message.senderName 또는 message.senderId 사용 확인
+        const sender = message.senderName || message.senderId || "알 수 없음";
+        li.textContent = `${sender}: ${message.content}`;  // 메시지 내용 출력
         messageList.appendChild(li);
     });
 }
@@ -160,22 +175,25 @@ function renderMessages(messages) {
 // 메시지 전송
 sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
-    if (!message || !currentRoomId) {
-        console.error("현재 방 ID가 null이거나 메시지가 비어 있습니다.");
+
+    if (!message || !currentRoomId || !selectedUser) {
+        alert('메시지를 보내기 전에 사용자를 선택하세요.');
         return;
     }
 
-    axios.post(`/api/chat/rooms/${currentRoomId}/messages`, { content: message })
+    axios.post(`/api/chat/rooms/${currentRoomId}/messages`, {
+        content: message,
+        senderId: currentUser.mid,
+        recipientId: selectedUser.mid
+    })
         .then(response => {
-            const room = chatRooms.find(r => r.id === currentRoomId);
-            room.messages.push(response.data);
-            renderMessages(room.messages);
+            const newMessage = response.data;
+            renderMessages([...Array.from(messageList.querySelectorAll('li')), newMessage]);  // 기존 메시지와 새 메시지를 배열로 전달
             messageInput.value = '';
+            console.log("메시지 전송 성공:", response.data);
         })
         .catch(error => {
             console.error('메시지 전송 실패:', error);
         });
 });
-
-
 

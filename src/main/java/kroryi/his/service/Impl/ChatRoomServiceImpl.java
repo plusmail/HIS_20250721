@@ -77,36 +77,41 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .collect(Collectors.toList());
     }
 
+    // 메시지 저장
     @Override
     public ChatMessageDTO saveMessage(Long roomId, ChatMessageDTO messageDTO) {
-        // roomId로 채팅방 찾기
+        if (messageDTO.getSenderId() == null || messageDTO.getRecipientId() == null) {
+            throw new IllegalArgumentException("Sender ID와 Recipient ID는 null일 수 없습니다.");
+        }
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다. roomId: " + roomId));
+                .orElseThrow(() -> new IllegalArgumentException("Chat room not found for ID: " + roomId));
 
-        // senderId (String)를 Member 객체로 변환
         Member sender = memberRepository.findById(messageDTO.getSenderId())
-                .orElseThrow(() -> new IllegalArgumentException("Member not found for ID: " + messageDTO.getSenderId()));
+                .orElseThrow(() -> new IllegalArgumentException("Sender not found for ID: " + messageDTO.getSenderId()));
 
-        // ChatMessage 생성
+        Member recipient = memberRepository.findById(messageDTO.getRecipientId())
+                .orElseThrow(() -> new IllegalArgumentException("Recipient not found for ID: " + messageDTO.getRecipientId()));
+
         ChatMessage chatMessage = ChatMessage.builder()
                 .content(messageDTO.getContent())
                 .timestamp(LocalDateTime.now())
-                .chatRoom(chatRoom)  // ChatRoom 설정
-                .sender(sender)      // Member 타입으로 설정
+                .sender(sender)
+                .recipient(recipient)
+                .chatRoom(chatRoom)
                 .build();
 
-        // 메시지 저장
         ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
 
-        // ChatMessageDTO로 변환 후 반환
         return ChatMessageDTO.builder()
-                .id(savedMessage.getId())  // savedMessage의 id 사용
+                .id(savedMessage.getId())
                 .content(savedMessage.getContent())
                 .timestamp(savedMessage.getTimestamp())
-                .roomId(savedMessage.getChatRoom().getId())  // roomId 설정 확인
-                .senderId(savedMessage.getSender().getMid()) // Member의 mid 사용
+                .roomId(savedMessage.getChatRoom().getId())
+                .senderId(savedMessage.getSender().getMid())
+                .recipientId(savedMessage.getRecipient().getMid())
                 .build();
     }
+
 
 
     @Override

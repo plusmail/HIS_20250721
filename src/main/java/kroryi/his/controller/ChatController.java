@@ -1,8 +1,10 @@
 package kroryi.his.controller;
 
 import jakarta.servlet.http.HttpSession;
+import kroryi.his.domain.Member;
 import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
+import kroryi.his.dto.MemberJoinDTO;
 import kroryi.his.service.ChatRoomService;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,6 +30,16 @@ public class ChatController {
     private final MemberService memberService;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomService chatRoomService;
+
+    @GetMapping("/auth/currentUser")
+    public ResponseEntity<MemberJoinDTO> getCurrentUser(HttpSession session) {
+        UserDetails currentUser = (UserDetails) session.getAttribute("user");  // 세션에서 사용자 정보 가져오기
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        MemberJoinDTO memberDTO = new MemberJoinDTO(currentUser.getUsername(), currentUser.getAuthorities().toString());
+        return ResponseEntity.ok(memberDTO);
+    }
 
     // 채팅방 생성
     @PostMapping("/rooms")
@@ -56,13 +70,15 @@ public class ChatController {
         return ResponseEntity.ok(messages);
     }
 
-    // 채팅방 메시지 저장
+    // 채팅 메시지 저장
     @PostMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<ChatMessageDTO> postMessage(@PathVariable Long roomId, @RequestBody ChatMessageDTO messageDTO) {
+    public ResponseEntity<ChatMessageDTO> postMessage(
+            @PathVariable Long roomId,
+            @RequestBody ChatMessageDTO messageDTO) {
+        messageDTO.setRoomId(roomId);
         ChatMessageDTO savedMessage = chatRoomService.saveMessage(roomId, messageDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
     }
-
 
     // WebSocket에서 메시지 전송 처리
     @MessageMapping("/chat.send")
