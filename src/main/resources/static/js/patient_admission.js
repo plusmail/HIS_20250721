@@ -548,25 +548,43 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentRowCount = waitingPatientsTable.rows.length; // 현재 행 수
         const formattedRvTime = formatRvTime(patient.rvTime);
 
+        // 드롭다운을 생성합니다.
+        let doctorSelect = `
+        <select class="doctor-select" name="doctor"> <!-- class를 doctor-select로 설정 -->
+            <option value="-----">-----</option>
+            ${doctorNames.map(doctor => `<option value="${doctor}">${doctor}</option>`).join('')}
+        </select>
+    `;
+
         row.innerHTML = `
         <td>${currentRowCount}</td>
         <td>${patient.chartNum || 'N/A'}</td>
         <td>${patient.paName || 'N/A'}</td>
         <td>
-            <select>
-                <option value="의사1">의사1</option>
-                <option value="의사2">의사2</option>
-                <option value="의사3">의사3</option>
-            </select>
-        </td>
+            
+           </td> <!-- 드롭다운을 포함 -->
         <td>${formattedRvTime || ''}</td>
         <td>${patient.receptionTime ? new Date(patient.receptionTime).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit'
         }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
-       
     `;
+
+        const doctorSelectElement = row.querySelector('.doctor-select'); // 현재 행의 드롭다운 선택 요소
+
+        // doctorSelectElement가 null이 아닐 경우에만 이벤트 리스너 추가
+        if (doctorSelectElement) {
+            doctorSelectElement.addEventListener('change', function() {
+                const selectedDoctor = this.value;
+                console.log('선택된 의사:', selectedDoctor);
+                // 여기에 추가적인 로직을 작성할 수 있습니다.
+            });
+        } else {
+            console.warn("의사 선택 드롭다운 요소를 찾을 수 없습니다."); // 디버깅을 위한 경고 메시지
+        }
+
+        console.log(doctorNames); // 의사 목록을 출력
         row.addEventListener('click', () => {
             const previouslySelected = waitingPatientsTable.querySelector('tr.selected');
             if (previouslySelected) {
@@ -579,8 +597,9 @@ document.addEventListener("DOMContentLoaded", function () {
         existingPatients.push(patient); // 새로운 환자 추가
         sessionStorage.setItem('waitingPatients', JSON.stringify(existingPatients));
 
-        updateWaitingPatientCount();
+        updateWaitingPatientCount(); // 대기 환자 수 업데이트
     }
+
 
     // 페이지가 로드될 때 기존 환자 정보 로드
     window.addEventListener('load', () => {
@@ -690,6 +709,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td style="display: none;">${patient.pid}</td>
     `;
 
+
         updateTreatmentPatientCount(); // 환자 수 업데이트
 
         // 행 선택 기능 추가
@@ -701,6 +721,7 @@ document.addEventListener("DOMContentLoaded", function () {
             row.classList.add('selected'); // 현재 클릭된 행에 클래스를 추가
         });
     }
+
 
 
     window.addEventListener('load', () => {
