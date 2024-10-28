@@ -16,62 +16,109 @@
 <link rel="stylesheet" href="/css/layout.css">
 
 <style>
-    /* 채팅 버튼 */
+    /* 채팅 패널 스타일 */
+    .chat-panel {
+        position: fixed;
+        bottom: 80px;
+        left: 20px;
+        width: 300px;
+        max-height: 400px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        display: none; /* 기본적으로 숨김 */
+        overflow: hidden;
+        z-index: 1000; /* 배너보다 앞쪽에 오도록 z-index를 높게 설정 */
+    }
+
+    .chat-button:hover {
+        background-color: #0a58ca;
+    }
+
+    /* 채팅 버튼 스타일 */
     .chat-button {
         position: fixed;
         bottom: 20px;
         left: 20px;
-        background-color: #4CAF50;
+        background-color: #007bff;
         color: white;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 24px;
         border: none;
-        cursor: pointer;
-        z-index: 1000;
-    }
-
-    /* 패널 슬라이딩 애니메이션 */
-    .chat-panel {
-        position: fixed;
-        left: -300px;
-        top: 0;
-        bottom: 0;
-        width: 300px;
-        background-color: #f1f1f1;
-        padding: 10px;
-        border-right: 1px solid #ccc;
-        z-index: 999;
-        transition: transform 0.3s ease;
-    }
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000; /* 채팅 버튼도 배너보다 앞쪽에 위치하도록 설정 */
 
     .chat-panel.open {
-        transform: translateX(300px); /* 패널을 오른쪽으로 슬라이드 */
+        display: block;
     }
 
-    /* 사용자 목록 */
-    .user-list .list-group-item {
-        cursor: pointer;
-    }
-
+    /* 메시지 리스트 스타일 */
     .message-list {
-        list-style: none;
+        list-style-type: none;
         padding: 0;
-        height: 400px;
-        overflow-y: scroll;
+        margin: 0;
+        max-height: 400px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
     }
 
+    /* 각 메시지 아이템 스타일 */
+    .message-item {
+        margin: 5px 0;
+        padding: 10px 15px;
+        border-radius: 15px;
+        max-width: 60%;
+        word-wrap: break-word;
+    }
+
+    /* 상대방 메시지 스타일 (왼쪽) */
+    .message-item.left {
+        background-color: #f1f0f0;
+        align-self: flex-start;
+        text-align: left;
+    }
+
+    /* 내 메시지 스타일 (오른쪽) */
+    .message-item.right {
+        background-color: #007bff;
+        color: white;
+        align-self: flex-end;
+        text-align: right;
+    }
+
+    /* 메시지 입력 스타일 */
     .message-input {
         display: flex;
+        margin-top: 10px;
     }
 
     .message-input input {
-        flex-grow: 1;
-        margin-right: 10px;
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-right: 5px;
+    }
+
+    .message-input button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* 시간 표시 스타일 */
+    .message small {
+        font-size: 0.8em;
+        color: #6c757d;
+        align-self: flex-end;
     }
 
 </style>
@@ -88,10 +135,10 @@
         <div class="collapse navbar-collapse" id="navbarColor02">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                        <input type="text" class="form-control" name="name" style="width: 80px"
-                               th:if="${#authentication.principal instanceof T(org.springframework.security.core.userdetails.UserDetails)}"
-                               th:value="${#authentication.principal.Username}"
-                               readonly>
+                    <input type="text" class="form-control" name="name" style="width: 80px"
+                           th:if="${#authentication.principal instanceof T(org.springframework.security.core.userdetails.UserDetails)}"
+                           th:value="${#authentication.principal.Username}"
+                           readonly>
                 </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                     <a class="nav-link" href="admin_management" id="admin_management">
@@ -125,8 +172,8 @@
                         <div class="input-group col">
                             <input type="text" class="form-control" id="patient_name_keyword" placeholder="환자성명 입력">
                             <button type="button" class="btn btn-secondary" id="resetBtn">
-                            <i class="bi bi-x-circle" style="padding: 0.5rem;"></i>
-                        </button>
+                                <i class="bi bi-x-circle" style="padding: 0.5rem;"></i>
+                            </button>
                         </div>
                         <div class="col">
 
@@ -211,7 +258,8 @@
         <div class="d-flex justify-content-between align-items-center">
             <h5>채팅방 목록</h5>
             <!-- + 버튼 추가 (새로운 채팅방 생성) -->
-            <button id="createChatRoomBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
+            <button id="createChatRoomBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#userSelectionModal">
                 <i class="bi bi-plus"></i>
             </button>
         </div>
@@ -222,7 +270,8 @@
 </div>
 
 <!-- 사용자 선택 모달 -->
-<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel" aria-hidden="true">
+<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -250,10 +299,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ul id="messageList" class="message-list">
+                <div id="messageList" class="message-list">
                     <!-- 채팅 메시지가 여기에 표시됩니다. -->
-                </ul>
-                <div class="message-input">
+                </div>
+                <div class="input-group mt-3">
                     <input id="messageInput" type="text" placeholder="메시지를 입력하세요" class="form-control">
                     <button id="sendMessageButton" class="btn btn-primary">전송</button>
                 </div>
@@ -262,8 +311,7 @@
     </div>
 </div>
 
-
-    <!--home-->
+<!--home-->
 <div layout:fragment="home" style="width: 100%"></div>
 <!--사용자관리-->
 <div layout:fragment="admin_management" style="width: 100%"></div>

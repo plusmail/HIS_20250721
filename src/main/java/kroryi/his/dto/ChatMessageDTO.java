@@ -17,6 +17,7 @@ public class ChatMessageDTO {
     private LocalDateTime timestamp;
     private Long roomId;
     private String senderId;
+    private String senderName;
     private String recipientId;  // 수신자 ID 추가
 }
 

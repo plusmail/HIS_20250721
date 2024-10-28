@@ -78,29 +78,20 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     // 메시지 저장
-    @Override
     public ChatMessageDTO saveMessage(Long roomId, ChatMessageDTO messageDTO) {
-        if (messageDTO.getSenderId() == null || messageDTO.getRecipientId() == null) {
-            throw new IllegalArgumentException("Sender ID와 Recipient ID는 null일 수 없습니다.");
-        }
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found for ID: " + roomId));
-
         Member sender = memberRepository.findById(messageDTO.getSenderId())
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found for ID: " + messageDTO.getSenderId()));
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found for ID: " + roomId));
 
-        Member recipient = memberRepository.findById(messageDTO.getRecipientId())
-                .orElseThrow(() -> new IllegalArgumentException("Recipient not found for ID: " + messageDTO.getRecipientId()));
-
-        ChatMessage chatMessage = ChatMessage.builder()
+        ChatMessage message = ChatMessage.builder()
                 .content(messageDTO.getContent())
                 .timestamp(LocalDateTime.now())
                 .sender(sender)
-                .recipient(recipient)
-                .chatRoom(chatRoom)
+                .chatRoom(room)
                 .build();
 
-        ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
+        ChatMessage savedMessage = chatMessageRepository.save(message);
 
         return ChatMessageDTO.builder()
                 .id(savedMessage.getId())
@@ -108,9 +99,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .timestamp(savedMessage.getTimestamp())
                 .roomId(savedMessage.getChatRoom().getId())
                 .senderId(savedMessage.getSender().getMid())
-                .recipientId(savedMessage.getRecipient().getMid())
+                .senderName(savedMessage.getSender().getName()) // senderName 설정
                 .build();
     }
+
 
 
 

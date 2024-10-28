@@ -162,14 +162,26 @@ function openChatRoom(roomId) {
 function renderMessages(messages) {
     messageList.innerHTML = '';  // 기존 메시지 비우기
     messages.forEach(message => {
-        const li = document.createElement('li');
-        li.classList.add('message-item');
-
-        // message.senderName 또는 message.senderId 사용 확인
-        const sender = message.senderName || message.senderId || "알 수 없음";
-        li.textContent = `${sender}: ${message.content}`;  // 메시지 내용 출력
-        messageList.appendChild(li);
+        addMessageToChat(message);
     });
+}
+
+// 메시지 추가 함수
+function addMessageToChat(message) {
+    const li = document.createElement('li');
+    li.classList.add('message-item');
+
+    // 현재 사용자의 ID와 비교해 메시지 보낸 사람이 상대방인지 확인
+    if (message.senderId !== currentUser.mid) {
+        li.classList.add('left'); // 상대방 메시지 스타일
+        li.textContent = `${message.senderName}: ${message.content}`; // 상대방 이름과 메시지 표시
+    } else {
+        li.classList.add('right'); // 내 메시지 스타일
+        li.textContent = `${message.content}`; // 내 메시지는 내용만 표시
+    }
+
+    messageList.appendChild(li);
+    messageList.scrollTop = messageList.scrollHeight;  // 자동 스크롤
 }
 
 // 메시지 전송
@@ -188,7 +200,7 @@ sendMessageButton.addEventListener('click', () => {
     })
         .then(response => {
             const newMessage = response.data;
-            renderMessages([...Array.from(messageList.querySelectorAll('li')), newMessage]);  // 기존 메시지와 새 메시지를 배열로 전달
+            addMessageToChat(newMessage);  // 새 메시지를 추가
             messageInput.value = '';
             console.log("메시지 전송 성공:", response.data);
         })
@@ -196,4 +208,3 @@ sendMessageButton.addEventListener('click', () => {
             console.error('메시지 전송 실패:', error);
         });
 });
-
