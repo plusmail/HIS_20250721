@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
@@ -32,6 +33,7 @@ public class UserController {
     private final MemberRepository memberRepository;
     private final MemberRoleSetService memberRoleSetService;
     private final MemberRoleSetRepository memberRoleSetRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
     @ResponseBody
@@ -88,6 +90,18 @@ public class UserController {
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 사용자가 없습니다. id=" + id)
         );
+
+        // 1. 비밀번호 처리
+        if (memberJoinDTO.getPassword() == null || memberJoinDTO.getPassword().isEmpty()) {
+            // 비밀번호가 null이거나 비어 있을 경우 기존 비밀번호 유지
+            memberJoinDTO.setPassword(member.getPassword());
+        } else {
+            // 비밀번호가 변경된 경우 필요에 따라 암호화 처리
+            String encodedPassword = passwordEncoder.encode(memberJoinDTO.getPassword());
+            memberJoinDTO.setPassword(encodedPassword);
+        }
+
+
         // 2. 기존 역할 세트를 가져옴
         Set<MemberRoleSet> existingRoleSets = member.getRoleSet();
 
@@ -194,14 +208,16 @@ public class UserController {
 
     @PostMapping("/searchUsers")
     @ResponseBody
-    public List<Member> searchUsers(@RequestBody Map<String, String> params,@RequestParam("page") int page) {
+    public List<Member> searchUsers(@RequestBody Map<String, String> params) {
         String userId = params.get("mid");
-        String userName = params.get("username");
+        String userName = params.get("name");
+        String email = params.get("email");
         String userRole = params.get("role");
         String startDate = params.get("startDate");
+        log.info("searchUsers--> {}", userId);
 
         // 검색 조건을 사용해 사용자 목록 필터링
-        return memberRepository.findByIdOrUsernameOrEmailAndRolesIn(userId, userName, userRole);
+        return memberRepository.findByIdOrUsernameOrEmailAndRolesIn(userId, userName, email, userRole);
     }
 
     @GetMapping("/checkId")
