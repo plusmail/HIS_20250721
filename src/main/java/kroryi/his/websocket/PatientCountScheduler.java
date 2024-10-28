@@ -20,7 +20,7 @@ public class PatientCountScheduler {
         this.patientAdmissionService = patientAdmissionService;
     }
 
-    @Scheduled(fixedRate = 5000) // 5초마다 실행
+    @Scheduled(fixedRate = 5000)
     public void sendPatientCounts() {
 
         LocalDate today = LocalDate.now();
