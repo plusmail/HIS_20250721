@@ -14,25 +14,97 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <link rel="stylesheet" href="/css/layout.css">
-
 <style>
     /* 채팅 패널 스타일 */
     .chat-panel {
         position: fixed;
         bottom: 80px;
         left: 20px;
-        width: 300px;
-        max-height: 400px;
+        width: 350px; /* 패널 너비 확대 */
+        max-height: 600px; /* 패널 높이 확대 */
         background-color: white;
         border-radius: 10px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        display: none; /* 기본적으로 숨김 */
+        display: none;
         overflow: hidden;
-        z-index: 1000; /* 배너보다 앞쪽에 오도록 z-index를 높게 설정 */
+        z-index: 1000;
+        pointer-events: auto;
     }
 
-    .chat-button:hover {
-        background-color: #0a58ca;
+    /* 채팅 패널이 열릴 때 위치 */
+    .chat-panel.open {
+        display: block;
+    }
+
+    /* 채팅방 목록 헤더 */
+    .chat-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        font-weight: bold;
+        font-size: 18px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    /* 채팅방 목록 패널 스타일 */
+    .chat-room-list {
+        padding: 15px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    /* 채팅방 목록 아이템 스타일 */
+    .chat-room-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 채팅방 목록에 최근 메시지 표시 스타일 */
+    .chat-room-item .recent-message {
+        font-size: 12px;
+        color: #6c757d;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    /* 중앙에 위치한 커스텀 모달 */
+    .chat-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        max-height: 600px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1050;
+        display: none; /* 기본적으로 숨김 */
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chat-modal.open {
+        display: flex; /* 중앙에 보이도록 설정 */
+    }
+
+    /* 모달 헤더 스타일 */
+    .chat-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
     }
 
     /* 채팅 버튼 스타일 */
@@ -46,21 +118,31 @@
         border-radius: 50%;
         width: 50px;
         height: 50px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         font-size: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 1000; /* 채팅 버튼도 배너보다 앞쪽에 위치하도록 설정 */
+        z-index: 1000;
+        cursor: pointer;
+    }
 
-    .chat-panel.open {
-        display: block;
+    /* 채팅방 아이템 스타일 */
+    .chat-room-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        margin-bottom: 10px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
     }
 
     /* 메시지 리스트 스타일 */
     .message-list {
         list-style-type: none;
-        padding: 0;
+        padding: 15px;
         margin: 0;
         max-height: 400px;
         overflow-y: auto;
@@ -68,23 +150,23 @@
         flex-direction: column;
     }
 
-    /* 각 메시지 아이템 스타일 */
+    /* 메시지 아이템 스타일 */
     .message-item {
         margin: 5px 0;
-        padding: 10px 15px;
-        border-radius: 15px;
-        max-width: 60%;
+        padding: 8px 12px;
+        border-radius: 10px;
+        max-width: 70%;
         word-wrap: break-word;
     }
 
-    /* 상대방 메시지 스타일 (왼쪽) */
+    /* 상대방 메시지 (왼쪽) */
     .message-item.left {
         background-color: #f1f0f0;
         align-self: flex-start;
         text-align: left;
     }
 
-    /* 내 메시지 스타일 (오른쪽) */
+    /* 내 메시지 (오른쪽) */
     .message-item.right {
         background-color: #007bff;
         color: white;
@@ -92,36 +174,40 @@
         text-align: right;
     }
 
-    /* 메시지 입력 스타일 */
+    /* 메시지 입력창 스타일 */
     .message-input {
         display: flex;
-        margin-top: 10px;
+        padding: 15px;
+        border-top: 1px solid #e0e0e0;
     }
 
     .message-input input {
         flex: 1;
-        padding: 10px;
+        padding: 12px;
         border: 1px solid #ccc;
         border-radius: 5px;
         margin-right: 5px;
     }
 
     .message-input button {
-        padding: 10px 20px;
+        padding: 12px 20px;
         border: none;
         border-radius: 5px;
         background-color: #007bff;
         color: white;
+        cursor: pointer;
     }
 
-    /* 시간 표시 스타일 */
-    .message small {
-        font-size: 0.8em;
-        color: #6c757d;
-        align-self: flex-end;
+    .message-input button:hover {
+        background-color: #0056b3;
     }
 
+    /* 사용자 정의 모달 크기 */
+    .modal-dialog.modal-sm {
+        max-width: 600px; /* 원하는 크기로 조정 */
+    }
 </style>
+
 
 <body>
 <!--네비바-->
@@ -253,16 +339,15 @@
 
 <!-- 왼쪽 채팅 패널 -->
 <div id="chatPanel" class="chat-panel">
-    <!-- 채팅방 목록 패널 -->
+    <!-- 채팅방 목록 헤더 -->
+    <div class="chat-panel-header">
+        <span>채팅방 목록</span>
+        <button id="createChatRoomBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
+            <i class="bi bi-plus"></i>
+        </button>
+    </div>
+    <!-- 채팅방 목록 -->
     <div id="chatRoomListPanel" class="chat-room-list">
-        <div class="d-flex justify-content-between align-items-center">
-            <h5>채팅방 목록</h5>
-            <!-- + 버튼 추가 (새로운 채팅방 생성) -->
-            <button id="createChatRoomBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                    data-bs-target="#userSelectionModal">
-                <i class="bi bi-plus"></i>
-            </button>
-        </div>
         <ul id="roomList" class="list-group">
             <!-- 채팅방 목록이 동적으로 생성됩니다. -->
         </ul>
@@ -270,8 +355,7 @@
 </div>
 
 <!-- 사용자 선택 모달 -->
-<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -290,19 +374,19 @@
     </div>
 </div>
 
-<!-- 채팅 모달 -->
+<!-- 중앙에 위치할 Bootstrap 채팅 모달 -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-sm"> <!-- modal-sm 클래스 추가로 모달 크기 줄임 -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="chatModalLabel">채팅방</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="messageList" class="message-list">
+                <ul id="messageList" class="message-list">
                     <!-- 채팅 메시지가 여기에 표시됩니다. -->
-                </div>
-                <div class="input-group mt-3">
+                </ul>
+                <div class="message-input">
                     <input id="messageInput" type="text" placeholder="메시지를 입력하세요" class="form-control">
                     <button id="sendMessageButton" class="btn btn-primary">전송</button>
                 </div>
@@ -310,6 +394,8 @@
         </div>
     </div>
 </div>
+
+
 
 <!--home-->
 <div layout:fragment="home" style="width: 100%"></div>
