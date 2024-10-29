@@ -1,5 +1,6 @@
 package kroryi.his.config;
 
+import kroryi.his.websocket.RedisMessageListener;
 import kroryi.his.websocket.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,33 +29,37 @@ public class RedisConfig {
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory,
-            MessageListenerAdapter messageListenerAdapter,
-            ChannelTopic channelTopic
+            MessageListenerAdapter messageListenerAdapter
     ) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
-        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, channelTopic);
+        redisMessageListenerContainer.addMessageListener(messageListenerAdapter,   new ChannelTopic("patientStatusUpdate"));
 
         return redisMessageListenerContainer;
     }
 
 //    @Bean
-//    public RedisConnectionFactory redisConnectionFactory() {
-//        return new LettuceConnectionFactory(redisHost, redisPort);
+//    public MessageListenerAdapter messageListenerAdapter(RedisSubscriber subscriber) {
+//        return new MessageListenerAdapter(subscriber, "onMessage");
 //    }
-//
-
-
-    @Bean
-    public MessageListenerAdapter messageListenerAdapter(RedisSubscriber subscriber) {
-        log.info("3333333333333333333333333333");
-        return new MessageListenerAdapter(subscriber, "onMessage");
-    }
 
     @Bean
     public ChannelTopic channelTopic() {
-        return new ChannelTopic("admission");
+        return new ChannelTopic("/redis/admission");
     }
+
+//    @Bean
+//    public MessageListenerAdapter listenerAdapter(RedisSubscriber redisSubscriber) {
+//        return new MessageListenerAdapter(redisSubscriber, "receiveMessage");
+//    }
+
+    // MessageListenerAdapter에 리스너 메서드 등록
+    @Bean
+    public MessageListenerAdapter listenerAdapter(RedisMessageListener redisMessageListener) {
+        // receiveMessage 메서드를 Redis 메시지 수신 메서드로 설정
+        return new MessageListenerAdapter(redisMessageListener, "receiveMessage");
+    }
+
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {

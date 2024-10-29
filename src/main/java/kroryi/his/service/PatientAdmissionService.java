@@ -1,5 +1,6 @@
 package kroryi.his.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.dto.PatientAdmissionDTO;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,7 +11,7 @@ import java.util.List;
 
 
 public interface PatientAdmissionService {
-    PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO);
+    PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException;
 
     List<PatientAdmission> getWaitingPatients();
 

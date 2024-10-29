@@ -1,5 +1,7 @@
 package kroryi.his.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -13,6 +15,13 @@ import jakarta.persistence.EntityManager;
 public class RootConfig {
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());  // Java 8 날짜/시간 모듈 등록
+        return mapper;
+    }
 
     @Bean
     public ModelMapper getMapper(){

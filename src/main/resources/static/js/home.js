@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log('WebSocket connected:', frame);
 
         // 환자 수 업데이트 메시지 구독
-        stompClient.subscribe('/sub/admission', function (message) {
+        stompClient.subscribe('/topic/patientUpdates', function (message) {
             console.log("11111111111111111111")
             const datas = JSON.parse(message.body);
             console.log(datas);

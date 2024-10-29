@@ -1,5 +1,7 @@
 package kroryi.his.service.Impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.dto.PatientAdmissionDTO;
 import kroryi.his.repository.PatientAdmissionRepository;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,15 +44,17 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     private ChannelTopic topic;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private RedisPublisher redisPublisher;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Transactional
     @Override
-    public PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) {
+    public PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException {
         PatientAdmission patientAdmission = new PatientAdmission();
         patientAdmission.setChartNum(patientAdmissionDTO.getChartNum());
         patientAdmission.setPaName(patientAdmissionDTO.getPaName());
@@ -75,9 +80,9 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
         log.info("===============> {}", messageRequest);
 
-        redisPublisher.publish("admission", messageRequest);
-        // Publish to WebSocket
-//        redisTemplate.convertAndSend("/topic/admission", messageRequest);
+        String messageJson = objectMapper.writeValueAsString(messageRequest);
+
+        redisTemplate.convertAndSend("patientStatusUpdate", messageJson);
         return savedAdmission;
     }
 

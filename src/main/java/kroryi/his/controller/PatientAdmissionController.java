@@ -1,11 +1,13 @@
 package kroryi.his.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.domain.Reservation;
 import kroryi.his.dto.PatientAdmissionDTO;
 import kroryi.his.repository.ReservationRepository;
 import kroryi.his.service.PatientAdmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,9 +31,13 @@ public class PatientAdmissionController {
     private ReservationRepository reservationRepository;
     private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+
     // 환자 등록
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> registerPatient(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
+    public ResponseEntity<Map<String, Object>> registerPatient(@RequestBody PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException {
         System.out.println("환자 등록 요청 수신: " + patientAdmissionDTO);
         Map<String, Object> response = new HashMap<>();
 
@@ -74,6 +80,9 @@ public class PatientAdmissionController {
 
         return ResponseEntity.ok(response);
     }
+
+
+
 
 
     // 대기 환자 목록 반환
