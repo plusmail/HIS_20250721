@@ -167,7 +167,6 @@
 
                     // 저장한 날짜 텍스트, 날짜 형식으로 재변환
                     const selectedDate = `${year}-${month + 1}-${day}`;
-                    console.log(selectedDate)
 
                     dateReservationList(selectedDate);
                 });
@@ -213,6 +212,8 @@
                     // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
                     tableBody.innerHTML = ''; // 기존 내용 제거
 
+                    // 선택된 날짜를 화면에 표시
+                    document.getElementById('selectedDate').textContent = `선택된 날짜: ${selectedDate}`;
 
                     // 데이터 배열을 순회하여 테이블에 추가
                     data.forEach(item => {
