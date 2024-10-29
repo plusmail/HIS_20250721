@@ -154,14 +154,27 @@
                     } else if (date > lastDate) {
                         break;
                     } else {
+
+                        // 일요일이면 색갈이 빨간색으로
+                        if([0, 7, 14, 21, 28, 35].includes(j)) {
+                            cell.style.color = 'red'; // 숫자 색상을 빨간색으로 변경
+                        }
+
+                        // 토요일
+                        else if([6, 13, 20, 27, 34].includes(j)) {
+                            cell.style.color = 'blue'; // 숫자 색상을 빨간색으로 변경
+                        }
+
+                        else {
+                            cell.style.color = 'black';
+                        }
+
                         cell.innerHTML = date;
                         date++;
 
-                        if (j === 0) { // j가 0일 경우 일요일
-                            cell.style.color = 'red'; // 숫자 색상을 빨간색으로 변경
-                        }
                     }
                     row.appendChild(cell);
+                    console.log(cell);
                 }
 
                 calendarBody.appendChild(row);
@@ -179,9 +192,15 @@
                         selected.style.color = ''; // 이전 선택의 글자색 초기화
                     }
 
+                    const selectedCells = document.querySelectorAll("td.calendarDate.selected");
+                    selectedCells.forEach(cell => cell.classList.remove("selected"));
+                    tdElement.classList.add("selected");
+
                     // 클릭한 날짜에 배경색 추가
-                    tdElement.style.backgroundColor = 'blue'; // 클릭한 td에 배경색 설정
-                    tdElement.style.color = 'white'; // 클릭한 td의 글자색 설정
+                    // console.log()
+                    // tdElement.style.backgroundColor = 'blue'; // 클릭한 td에 배경색 설정
+                    // tdElement.style.color = 'white'; // 클릭한 td의 글자색 설정
+
                 }
             });
 

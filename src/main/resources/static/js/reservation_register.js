@@ -50,6 +50,9 @@ function rReset(reset) {
     const reservationDateElement = document.getElementById('reservation-date');
     reservationDateElement.value = '';
 
+    const reservationTimeElement = document.getElementById('test_time');
+    reservationTimeElement.value = "9:00";
+
     // 환자이름
     const departmentElement = document.getElementById('departmentInput');
     departmentElement.value = '';
