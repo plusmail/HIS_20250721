@@ -108,7 +108,7 @@ function rReset2(responseData) {
 
     if (responseData.length > 0) {
         // 예약 날짜와 시간 분리하여 설정
-        const combinedDateTime = responseData[0].reservationDate.split(' '); // 공백으로 분리
+        const combinedDateTime = responseData[0].reservationDate.split('T'); // 공백으로 분리
         reservationDateElement.value = combinedDateTime[0]; // 날짜
         reservationTimeElement.value = combinedDateTime[1]; // 시간
 
@@ -145,7 +145,6 @@ function rReset2(responseData) {
 }
 
 
-
 function saveUpdate() {
     // 권한 체크
     const hasPermission = globalUserData.authorities.some(auth =>
@@ -160,14 +159,11 @@ function saveUpdate() {
     // 예약일자 및 예약시간
     const reservationDate = document.getElementById('reservation-date').value;
     const reservationTime = document.getElementById('test_time').value; // 예약시간 추가
-// Pad the hour part with a leading zero if needed
     const timeParts = reservationTime.split(':');
-    const hour = timeParts[0].padStart(2, '0'); // Ensures the hour is two digits
-    const minute = timeParts[1] || '00'; // Defaults to '00' if minutes are not provided
+    const hour = timeParts[0].padStart(2, '0');
+    const minute = timeParts[1] || '00';
 
     const formattedDateTime = `${reservationDate}T${hour}:${minute}`;
-
-    console.log(formattedDateTime); // Outputs: '2024-10-29T09:00'
 
     // 환자 이름
     const department = document.getElementById('departmentInput').value;
@@ -330,5 +326,3 @@ function deleteReservation() {
         });
 
 }
-
-// renderCalendar();
