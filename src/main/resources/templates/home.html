@@ -15,8 +15,6 @@
 </head>
 
 <div layout:fragment="home" class="home-container">
-
-
     <div class="container-fluid mt-4">
         <div class="row">
             <!-- 진료현황 Section -->
@@ -33,24 +31,13 @@
                                 <div class="home-card h-100">
                                     <div class="home-card-header text-center home-card-subheader">
                                         <h5>
-                                            <span class="status-circle waiting-circle"></span> 대기중 (<span id="home-waitingCount">0</span>명)
+                                            <span class="status-circle waiting-circle"></span> 대기중
                                         </h5>
                                     </div>
-                                    <div class="fixed-box">
-                                        <table class="table home-table">
-                                            <thead>
-                                            <tr>
-                                                <th>환자명</th>
-                                                <th>접수시간</th>
-                                                <th>대기시간</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="home-waitingList">
-                                            <tr>
-                                                <td colspan="3">현재 대기중인 환자가 없습니다.</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="fixed-box text-center">
+                                        <div>
+                                            <span id="home-waitingCount">0</span>명
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -59,24 +46,13 @@
                                 <div class="home-card h-100">
                                     <div class="home-card-header text-center home-card-subheader">
                                         <h5>
-                                            <span class="status-circle in-treatment-circle"></span> 진료중 (<span id="home-inTreatmentCount">0</span>명)
+                                            <span class="status-circle in-treatment-circle"></span> 진료중
                                         </h5>
                                     </div>
-                                    <div class="fixed-box">
-                                        <table class="table home-table">
-                                            <thead>
-                                            <tr>
-                                                <th>환자명</th>
-                                                <th>진료시작시간</th>
-                                                <th>진료시간</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="home-inTreatmentList">
-                                            <tr>
-                                                <td colspan="3">현재 진료중인 환자가 없습니다.</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="fixed-box text-center">
+                                        <div>
+                                            <span id="home-inTreatmentCount">0</span>명
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -85,23 +61,13 @@
                                 <div class="home-card h-100">
                                     <div class="home-card-header text-center home-card-subheader">
                                         <h5>
-                                            <span class="status-circle completed-circle"></span> 진료완료 (<span id="home-completedCount">0</span>명)
+                                            <span class="status-circle completed-circle"></span> 진료완료
                                         </h5>
                                     </div>
-                                    <div class="fixed-box">
-                                        <table class="table home-table">
-                                            <thead>
-                                            <tr>
-                                                <th>환자명</th>
-                                                <th>진료완료시간</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="home-completedList">
-                                            <tr>
-                                                <td colspan="2">현재 진료완료된 환자가 없습니다.</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="fixed-box text-center">
+                                        <div>
+                                            <span id="home-completedCount">0</span>명
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -124,23 +90,13 @@
                                 <div class="home-card h-100">
                                     <div class="home-card-header text-center home-card-subheader">
                                         <h5>
-                                            일반진료환자 (<span id="home-generalPatientCount">0</span>명)
+                                            <i class="fas fa-stethoscope me-2"></i>일반진료
                                         </h5>
                                     </div>
-                                    <div class="fixed-box">
-                                        <table class="table home-table">
-                                            <thead>
-                                            <tr>
-                                                <th>환자명</th>
-                                                <th>진료상태</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="home-generalPatientList">
-                                            <tr>
-                                                <td colspan="2">현재 일반진료환자가 없습니다.</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="fixed-box text-center">
+                                        <div>
+                                            <span id="home-generalPatientCount">0</span>명
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -149,23 +105,13 @@
                                 <div class="home-card h-100">
                                     <div class="home-card-header text-center home-card-subheader">
                                         <h5>
-                                            수술 (<span id="home-surgeryCount">0</span>명)
+                                            <i class="fas fa-heartbeat me-2"></i>수술
                                         </h5>
                                     </div>
-                                    <div class="fixed-box">
-                                        <table class="table home-table">
-                                            <thead>
-                                            <tr>
-                                                <th>환자명</th>
-                                                <th>진료상태</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="home-surgeryList">
-                                            <tr>
-                                                <td colspan="2">현재 진행중인 수술이 없습니다.</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="fixed-box text-center">
+                                        <div>
+                                            <span id="home-surgeryCount">0</span>명
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -174,23 +120,13 @@
                                 <div class="home-card h-100">
                                     <div class="home-card-header text-center home-card-subheader">
                                         <h5>
-                                            신규환자 (<span id="home-newPatientCount">0</span>명)
+                                            <i class="fas fa-user-plus me-2"></i>신규환자
                                         </h5>
                                     </div>
-                                    <div class="fixed-box">
-                                        <table class="table home-table">
-                                            <thead>
-                                            <tr>
-                                                <th>환자명</th>
-                                                <th>진료상태</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="home-newPatientList">
-                                            <tr>
-                                                <td colspan="2">현재 신규환자가 없습니다.</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="fixed-box text-center">
+                                        <div>
+                                            <span id="home-newPatientCount">0</span>명
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -233,7 +169,7 @@
             <div class="col-lg-4 mb-4">
                 <div class="home-card">
                     <div class="home-card-header text-center d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 flex-grow-1 text-center">최소보관수량 미달 품목 리스트</h4>
+                        <h4 class="mb-0 flex-grow-1 text-center">재고 미달 현황</h4>
                         <i class="bi bi-box-arrow-in-up-right fs-5 move-to-material-transaction"
                            onclick="goToMaterialManagementPage()"></i>
 

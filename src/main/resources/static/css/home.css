@@ -74,7 +74,6 @@ body {
 .table th {
     background-color: #e9ecef;
     color: #495057;
-
 }
 
 .table tr:hover {
@@ -106,7 +105,6 @@ body {
     margin-bottom: 24px !important;
 }
 
-
 .status-circle {
     width: 12px;
     height: 12px;
@@ -114,16 +112,15 @@ body {
     margin-right: 10px;
 }
 
-
 .waiting-circle {
     background-color: #dc3545;
 }
 
-.in-treatment-circle{
+.in-treatment-circle {
     background-color: #ffcc00;
 }
 
-.completed-circle{
+.completed-circle {
     background-color: #28a745;
 }
 
@@ -136,4 +133,3 @@ body {
     transform: scale(1.1);
     color: #007bff;
 }
-

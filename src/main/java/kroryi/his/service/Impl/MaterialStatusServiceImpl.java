@@ -10,6 +10,7 @@ import kroryi.his.repository.MaterialTransactionRepository;
 import kroryi.his.service.MaterialStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class MaterialStatusServiceImpl implements MaterialStatusService {
     private final MaterialStatusRepository materialStatusRepository;
     private final MaterialStockOutRepository materialStockOutRepository;
     private final MaterialRegisterRepository materialRegisterRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     @Override
@@ -116,6 +118,11 @@ public class MaterialStatusServiceImpl implements MaterialStatusService {
 
                 resultList.add(dto);
             }
+        }
+
+        // 이 부분에서 웹소켓을 통해 클라이언트에 결과를 전송
+        if (!resultList.isEmpty()) {
+            messagingTemplate.convertAndSend("/low-stock-items", resultList); // 직접 메시지를 보냄
         }
 
         return resultList;
