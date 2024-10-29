@@ -6,9 +6,9 @@ import org.springframework.context.ApplicationEvent;
 
 @Getter
 public class PatientAdmissionEvent extends ApplicationEvent {
-    private final Long patientId;
+    private final Integer patientId;
 
-    public PatientAdmissionEvent(Object source, Long patientId) {
+    public PatientAdmissionEvent(Object source, Integer patientId) {
         super(source);
         this.patientId = patientId;
     }

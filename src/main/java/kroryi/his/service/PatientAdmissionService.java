@@ -29,4 +29,6 @@ public interface PatientAdmissionService {
 
     RedisTemplate<String, String> redisTemplate = null;
     void registerAdmission(PatientAdmission patientAdmission);
+
+    void sendPatientCounts();
 }

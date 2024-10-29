@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageRequest {
-    private Long marketId;
-    private Long price;
-    private String amount;
+    private int status1;
+    private int status2;
+    private int status3;
 }

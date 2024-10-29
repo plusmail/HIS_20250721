@@ -4,17 +4,27 @@ import kroryi.his.domain.PatientAdmission;
 import kroryi.his.dto.PatientAdmissionDTO;
 import kroryi.his.repository.PatientAdmissionRepository;
 import kroryi.his.service.PatientAdmissionService;
+import kroryi.his.websocket.MessageRequest;
+import kroryi.his.websocket.PatientAdmissionListener;
+import kroryi.his.websocket.RedisPublisher;
+import kroryi.his.websocket.RedisSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -23,8 +33,19 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     @Autowired
     private PatientAdmissionRepository patientAdmissionRepository;
 
+    private static final String STATUS_WAITING = "1";
+    private static final String STATUS_IN_TREATMENT = "2";
+    private static final String STATUS_COMPLETED = "3";
+
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private ChannelTopic topic;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private RedisPublisher redisPublisher;
+
 
     @Transactional
     @Override
@@ -36,11 +57,6 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         patientAdmission.setReceptionTime(patientAdmissionDTO.getReceptionTime());
         patientAdmission.setRvTime(patientAdmissionDTO.getRvTime());
         patientAdmission.setViTime(patientAdmissionDTO.getViTime());
-
-
-        if ("2".equals(patientAdmissionDTO.getTreatStatus())) {
-            patientAdmission.setViTime(LocalDateTime.now());
-        }
         patientAdmission.setCompletionTime(patientAdmissionDTO.getCompletionTime());
         patientAdmission.setTreatStatus(patientAdmissionDTO.getTreatStatus());
 
@@ -49,7 +65,19 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         }
 
         PatientAdmission savedAdmission = patientAdmissionRepository.save(patientAdmission);
-        redisTemplate.convertAndSend("admission", "새로운 환자 등록" + savedAdmission);
+
+        int status1 = patientAdmissionRepository.countByTreatStatus("1");
+        int status2 = patientAdmissionRepository.countByTreatStatus("2");
+        int status3 = patientAdmissionRepository.countByTreatStatus("3");
+
+
+        // Create a message payload
+        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
+        log.info("===============> {}", messageRequest);
+
+        redisPublisher.publish("admission", messageRequest);
+        // Publish to WebSocket
+//        redisTemplate.convertAndSend("/topic/admission", messageRequest);
         return savedAdmission;
     }
 
@@ -104,6 +132,19 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
                 .map(this::convertToDTO)
                 .toList();
     }
+    private PatientAdmissionDTO convertToDTO(PatientAdmission admission) {
+        PatientAdmissionDTO dto = new PatientAdmissionDTO();
+        dto.setChartNum(admission.getChartNum());
+        dto.setPaName(admission.getPaName());
+        dto.setMainDoc(admission.getMainDoc());
+        dto.setReceptionTime(admission.getReceptionTime());
+        dto.setRvTime(admission.getRvTime());
+        dto.setTreatStatus(admission.getTreatStatus());
+        dto.setViTime(admission.getViTime());
+        dto.setCompletionTime(admission.getCompletionTime());
+        return dto;
+    }
+
 
     @Override
     @Transactional
@@ -113,6 +154,8 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
             throw new RuntimeException("환자를 찾을 수 없습니다."); // 예외 처리
         }
         patientAdmissionRepository.deleteById(Math.toIntExact(pid));
+        redisTemplate.convertAndSend("/topic/admission/", "환자 삭제" + pid);
+
     }
 
     @Override
@@ -128,18 +171,24 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
 
     }
 
+    @Override
+    public void sendPatientCounts() {
+        int waitingCount = patientAdmissionRepository.countByTreatStatus(STATUS_WAITING);
+        int inTreatmentCount = patientAdmissionRepository.countByTreatStatus(STATUS_IN_TREATMENT);
+        int completedCount = patientAdmissionRepository.countByTreatStatus(STATUS_COMPLETED);
 
-    private PatientAdmissionDTO convertToDTO(PatientAdmission admission) {
-        PatientAdmissionDTO dto = new PatientAdmissionDTO();
-        dto.setChartNum(admission.getChartNum());
-        dto.setPaName(admission.getPaName());
-        dto.setMainDoc(admission.getMainDoc());
-        dto.setReceptionTime(admission.getReceptionTime());
-        dto.setRvTime(admission.getRvTime());
-        dto.setTreatStatus(admission.getTreatStatus());
-        dto.setViTime(admission.getViTime());
-        dto.setCompletionTime(admission.getCompletionTime());
-        return dto;
+        // 메시지 객체 생성
+        Map<String, Object> message = new HashMap<>();
+        message.put("waitingCount", waitingCount);
+        message.put("inTreatmentCount", inTreatmentCount);
+        message.put("completedCount", completedCount);
+
+        // WebSocket으로 환자 수 전송
+        redisTemplate.convertAndSend("/pub/admission", message);
+    }
     }
 
-}
+
+
+
+

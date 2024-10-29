@@ -35,6 +35,7 @@ public class PatientAdmissionListener {
     public void onPostPersist(PatientAdmission admission) {
         // 데이터 등록 후 WebSocket으로 메시지 전송
         log.info("1111111111");
-        messagingTemplate.convertAndSend("/topic/admission", "새로운 입원 등록: " + admission.getPid());
+//        messagingTemplate.convertAndSend("/topic/admission", "{\"status\": 1,\"count:11}");
     }
+
 }
