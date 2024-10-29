@@ -49,4 +49,17 @@ table tbody td {
     padding: 20px; /* 카드 내용에 여백 추가 */
 }
 
+.index-number { display: none; }
+
+/* 기본 td 스타일 */
+.calendarDate {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+/* 마우스 오버 시 스타일 */
+.calendarDate:hover {
+    background-color: #f0f0f0;
+}
 
