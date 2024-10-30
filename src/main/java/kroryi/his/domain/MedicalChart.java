@@ -31,7 +31,7 @@ public class MedicalChart {
     @Column(name = "medical_division", nullable = false, length = 255)
     private String medicalDivision;
 
-    @Column(name = "teeth_num", length = 512)
+    @Column(name = "teeth_num", length = 2048)
     private String teethNum;
 
 
