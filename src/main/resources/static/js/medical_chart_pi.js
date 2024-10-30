@@ -50,10 +50,19 @@ let frequentlyUsedPhrases = [];
 // 데이터가 저장될때 배열의 index값을 재 지정하기위한 변수.
 let listIndex = 0;
 // 세션 데이터(환자정보) 를 가지고옴.
+
+
 let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
 
+// 이벤트 리스너 등록
+window.addEventListener('sessionStorageChanged', (event) => {
+    console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
+    patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+    readPaChart()
 
-console.log(patientInfos.name)
+});
+
+
 //세션 시작
 // 세션 데이터 가져오기
 function saveChartNum() {
@@ -446,6 +455,7 @@ piMemoAddBtn.addEventListener("click", e => {
 });
 
 function readPaChart() {
+    console.log("ccccccccccc->"+patientInfos.chartNum)
     $.ajax({
         url: '/medical_chart/getChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
         type: 'GET',  // GET 요청
