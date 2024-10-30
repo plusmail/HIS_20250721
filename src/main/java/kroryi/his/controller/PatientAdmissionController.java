@@ -1,11 +1,15 @@
 package kroryi.his.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.domain.Reservation;
 import kroryi.his.dto.PatientAdmissionDTO;
+import kroryi.his.repository.PatientAdmissionRepository;
 import kroryi.his.repository.ReservationRepository;
 import kroryi.his.service.PatientAdmissionService;
+import kroryi.his.websocket.MessageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -24,40 +28,47 @@ public class PatientAdmissionController {
 
     @Autowired
     private PatientAdmissionService patientAdmissionService;
+    @Autowired
+    private PatientAdmissionRepository patientAdmissionRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
     private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+
     // 환자 등록
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> registerPatient(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
+    public ResponseEntity<Map<String, Object>> registerPatient(@RequestBody PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException {
+        System.out.println("환자 등록 요청 수신: " + patientAdmissionDTO);
         Map<String, Object> response = new HashMap<>();
 
-        // 오늘 날짜를 문자열 형식으로 설정
-        String todayDate = LocalDate.now().toString(); // "2024-10-28" 형식
+        // 차트 번호로 예약 정보를 가져오기
+        Optional<Reservation> reservation = reservationRepository.findFirstByChartNumber(String.valueOf(patientAdmissionDTO.getChartNum()));
 
-        // 차트 번호와 오늘 날짜로 예약 목록 조회
-        List<Reservation> reservations = reservationRepository.findByChartNumberAndReservationDate(
-                String.valueOf(patientAdmissionDTO.getChartNum()), todayDate
-        );
-
-        // 오늘 예약이 존재하는 경우 rvTime 설정, 없으면 null로 남김
-        if (!reservations.isEmpty()) {
-            Reservation reservation = reservations.get(0); // 첫 번째 예약만 사용
+        // 예약 정보가 존재하면 rvTime(예약 날짜)을 설정
+        if (reservation.isPresent()) {
+            String reservationDateString = reservation.get().getReservationDate(); // "2024-10-21T10:30" 형식
 
             try {
                 // 문자열을 LocalDateTime으로 변환
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-                LocalDateTime reservationDateTime = LocalDateTime.parse(reservation.getReservationDate(), formatter);
-                patientAdmissionDTO.setRvTime(reservationDateTime);
+                LocalDateTime reservationDateTime = LocalDateTime.parse(reservationDateString);
+
+                // 오늘 날짜와 예약 날짜 비교
+                LocalDate today = LocalDate.now();
+                if (reservationDateTime.toLocalDate().isEqual(today)) {
+                    patientAdmissionDTO.setRvTime(reservationDateTime); // 예약 시간이 오늘이라면 설정
+                } else {
+                    patientAdmissionDTO.setRvTime(null); // 예약 날짜가 오늘이 아닐 경우 null로 설정
+                }
             } catch (DateTimeParseException e) {
                 response.put("message", "예약 날짜 형식이 잘못되었습니다.");
                 return ResponseEntity.badRequest().body(response);
             }
         } else {
-            // 오늘 예약이 없으면 rvTime을 null로 설정
-            patientAdmissionDTO.setRvTime(null);
+            patientAdmissionDTO.setRvTime(null); // 예약이 없을 경우 null로 설정
         }
 
         // 현재 시간을 접수 시간으로 설정
@@ -65,15 +76,14 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setTreatStatus("1"); // 대기 상태는 1
 
         // DB에 저장
-        PatientAdmission patientAdmission = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+        PatientAdmission patientAdmissionDTO1 = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 
-        response.put("data", patientAdmission);
+        response.put("data", patientAdmissionDTO1);
         response.put("message", "환자가 대기 상태로 등록되었습니다.");
         response.put("rvTime", patientAdmissionDTO.getRvTime());
 
         return ResponseEntity.ok(response);
     }
-
 
 
 
@@ -96,11 +106,12 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setReceptionTime(receptionDateTime);
 
         // 차트 번호와 접수 시간이 일치하는 환자 조회
-        Optional<PatientAdmission> existingPatient = patientAdmissionService.findByChartNumAndReceptionTime(
-                patientAdmissionDTO.getChartNum(), receptionDateTime);
+        List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
+                Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())), receptionDateTime);
 
-        if (existingPatient.isPresent()) {
-            PatientAdmission patient = existingPatient.get();
+        if (!existingPatients.isEmpty()) {
+            // 첫 번째 환자를 선택 (중복 처리)
+            PatientAdmission patient = existingPatients.get(0);
 
 //            System.out.println("조회된 환자: 차트 번호: " + patient.getChartNum() + ", 진료 상태: " + patient.getTreatStatus());
 
@@ -133,8 +144,6 @@ public class PatientAdmissionController {
     //    진료완료
     @PutMapping("/completeTreatment")
     public ResponseEntity<Map<String, String>> completeTreatment(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
-//        System.out.println("진료 완료 요청 수신: " + patientAdmissionDTO);
-
         Map<String, String> response = new HashMap<>(); // 응답 메시지를 위한 Map 생성
 
         // 진료 완료 시간 처리
@@ -151,11 +160,12 @@ public class PatientAdmissionController {
         }
 
         // 환자 정보 조회: 차트 번호와 접수 시간을 기준으로
-        Optional<PatientAdmission> existingPatient = patientAdmissionService.findByChartNumAndReceptionTime(
-                patientAdmissionDTO.getChartNum(), patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
+        List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
+                Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())),
+                patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
 
-        if (existingPatient.isPresent()) {
-            PatientAdmission patient = existingPatient.get();
+        if (!existingPatients.isEmpty()) { // 비어 있지 않을 경우
+            PatientAdmission patient = existingPatients.get(0); // 첫 번째 환자 선택
 
             // 치료 상태가 2인지 확인
             if (patient.getTreatStatus().equals("2")) {
@@ -176,6 +186,7 @@ public class PatientAdmissionController {
         response.put("message", "환자를 찾을 수 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 
 
@@ -210,6 +221,14 @@ public class PatientAdmissionController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // 404 Not Found
         }
+    }
+    @GetMapping("/status")
+    public ResponseEntity<MessageRequest> getPatientStatus() {
+        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
+        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
+        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
+        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
+        return ResponseEntity.ok(messageRequest);
     }
 
 }
