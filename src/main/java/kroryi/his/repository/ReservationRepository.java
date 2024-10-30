@@ -23,7 +23,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
     void deleteById(Long seq);
 
 
-    Optional<Reservation> findByChartNumber(String chartNumber);
+    Optional<Reservation> findFirstByChartNumber(String chartNumber);
 
     List<Reservation> findByChartNumberAndReservationDate(String chartNumber, String reservationDate);
 }

@@ -67,7 +67,10 @@ public class HomeController {
 
     //    진료접수
     @GetMapping("/reception")
-    public String reception() {
+    public String reception(Model model) {
+        List<String> doctorNames = patientRegisterService.getDoctorNames();
+        model.addAttribute("doctorNames", doctorNames); // 의사 이름을 모델에 추가
+
         return "reception";
     }
 

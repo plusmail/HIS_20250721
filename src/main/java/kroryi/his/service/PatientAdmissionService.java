@@ -1,22 +1,24 @@
 package kroryi.his.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.dto.PatientAdmissionDTO;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 
 public interface PatientAdmissionService {
-    PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO);
+    PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException;
 
     List<PatientAdmission> getWaitingPatients();
 
     long getCompleteTreatmentCount(String count, LocalDate date);
 
-    Optional<PatientAdmission> findByChartNumAndReceptionTime(Integer chartNum, LocalDateTime receptionTime);
+    List<PatientAdmission> findByChartNumAndReceptionTime(Integer chartNum, LocalDateTime receptionTime);
+
 
     void updatePatientAdmission(PatientAdmission patientAdmission);
 
@@ -25,4 +27,9 @@ public interface PatientAdmissionService {
     void cancelAdmission(Integer pid);
 
     PatientAdmission getLatestCompletionTime(Integer chartNum);
+
+    RedisTemplate<String, String> redisTemplate = null;
+    void registerAdmission(PatientAdmission patientAdmission);
+
+    void sendPatientCounts();
 }

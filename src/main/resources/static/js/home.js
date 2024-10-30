@@ -33,36 +33,38 @@ function goToMaterialManagementPage() {
 }
 
 
+// WebSocket을 위한 전역 변수 설정
+const socket = new SockJS("http://localhost:8080/ws");
 
-
-document.addEventListener("DOMContentLoaded", function() {
-    const socket = new SockJS('/patientCount');
+document.addEventListener("DOMContentLoaded", function () {
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function(frame) {
-        // console.log('WebSocket connected:', frame);
+        console.log('WebSocket connected:', frame);
 
         // 환자 수 업데이트 메시지 구독
-        stompClient.subscribe('/topic/patientCount', function(message) {
-
-            const data = JSON.parse(message.body);
-            const { status, count } = data;
+        stompClient.subscribe('/topic/patientUpdates', function (message) {
+            console.log("11111111111111111111")
+            const datas = JSON.parse(message.body);
+            console.log(datas);
+            const { status, count } = datas;
 
             // 상태 및 카운트를 출력하여 확인
-            // console.log(`Status: ${status}, Count: ${count}`);
-
-            // UI 업데이트
-            if (status === "1") {
-                document.getElementById('home-waitingCount').textContent = count;
-            } else if (status === "2") {
-                document.getElementById('home-inTreatmentCount').textContent = count;
-            } else if (status === "3") {
-                document.getElementById('home-completedCount').textContent = count;
+            console.log(`Status: ${status}, Count: ${count}`);
+            if(datas.status1 !== undefined){
+                document.getElementById('home-waitingCount').textContent = datas.status1;
             }
-        });
+            if(datas.status2 !== undefined){
+                document.getElementById('home-inTreatmentCount').textContent = datas.status2;
+            }
+            if(datas.status3 !== undefined){
+                document.getElementById('home-completedCount').textContent = datas.status3;
+            }
+            console.warn(`Unknown status: ${datas}`);
 
+        });
     }, function(error) {
-        console.error('WebSocket connection error:', error); // 연결 실패 시
+        console.error('WebSocket connection error:', error);
     });
 });
 
