@@ -1,4 +1,3 @@
-// 예약 테이블 나오는 부분
 // 모든 의사 목록을 가져오는 함수
 async function fetchDoctors() {
     try {
@@ -12,10 +11,7 @@ async function fetchDoctors() {
 
 // 타임테이블 생성 함수
 async function generateTimetable(data) {
-    console.log("입력된 데이터:", data); // 데이터 확인
     const doctors = await fetchDoctors(); // 의사 목록 가져오기
-    console.log("의사 목록:", doctors); // 의사 목록 확인
-
     const tableHead = document.querySelector("#timetable thead tr");
     const tableBody = document.querySelector("#timetable tbody");
 
