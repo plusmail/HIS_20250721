@@ -23,7 +23,7 @@ chatButton.addEventListener('click', () => {
 
 // 서버에서 로그인된 사용자 정보 가져오기
 function fetchCurrentUser() {
-    axios.get('/api/chat/auth/currentUser')
+    axios.get(window.location.origin + '/api/chat/auth/currentUser')
         .then(response => {
             currentUser = response.data;
             console.log("현재 사용자 정보:", currentUser);
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // 채팅방 목록 불러오기
 function loadChatRooms() {
-    axios.get('/api/chat/rooms')
+    axios.get(window.location.origin + '/api/chat/rooms')
         .then(response => {
             const rooms = response.data;
             chatRooms = rooms;
@@ -52,27 +52,67 @@ function loadChatRooms() {
         });
 }
 
-// 채팅방 목록 렌더링
+// 채팅방 목록 렌더링 (최근 메시지 표시)
 function renderChatRooms() {
     roomList.innerHTML = '';
     chatRooms.forEach(room => {
         const li = document.createElement('li');
         li.classList.add('list-group-item', 'chat-room-item');
-        li.setAttribute('data-room-id', room.id);
         li.textContent = room.roomName;
 
         const recentMessage = document.createElement('span');
         recentMessage.classList.add('recent-message');
-        recentMessage.textContent = room.messages && room.messages.length > 0
-            ? room.messages[room.messages.length - 1].content
-            : '메시지가 없습니다.';
+
+        // 최근 메시지 표시
+        const lastMessage = room.lastMessage ? room.lastMessage.content : '메시지가 없습니다.';
+        recentMessage.textContent = lastMessage;
 
         li.appendChild(recentMessage);
 
         li.addEventListener('click', () => openChatRoom(room.id));
+
         roomList.appendChild(li);
     });
 }
+
+// 사용자 목록 불러오기 함수
+function loadUsers() {
+    axios.get('/api/chat/member/list')
+        .then(response => {
+            const users = response.data;
+            renderUserList(users);
+        })
+        .catch(error => {
+            console.error('사용자 목록 불러오기 실패:', error);
+        });
+}
+
+// 사용자 선택 모달이 열릴 때 사용자 목록 로드
+createChatRoomBtn.addEventListener('click', () => {
+    loadUsers();
+});
+
+// 사용자 선택 함수
+function selectUser(user, listItem) {
+    selectedUser = user;  // 선택된 사용자 설정
+    userList.querySelectorAll('li').forEach(li => li.classList.remove('active')); // 모든 목록 아이템에서 active 제거
+    listItem.classList.add('active'); // 선택된 목록 아이템에 active 추가
+}
+
+// 사용자 목록을 렌더링하는 함수
+function renderUserList(users) {
+    const userList = document.getElementById('userList');
+    userList.innerHTML = ''; // 기존 목록 초기화
+
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.textContent = user.name; // 사용자 이름을 표시
+        li.addEventListener('click', () => selectUser(user, li));
+        userList.appendChild(li);
+    });
+}
+
 
 // 채팅방을 클릭하여 모달 열기
 function openChatRoom(roomId) {

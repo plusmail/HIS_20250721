@@ -65,4 +65,6 @@ public interface MemberService {
     void deleteUser(MemberJoinDTO memberJoinDTO) throws MidExistException;
 
     List<MemberJoinDTO> getAllUserIdAndName();
+
+    List<MemberJoinDTO> getAllMembers();
 }

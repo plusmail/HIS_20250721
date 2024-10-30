@@ -33,6 +33,10 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private Set<ChatMessage> messages = new HashSet<>();
 
+    // Set으로 memberMids 필드 추가
+    @ElementCollection
+    private Set<String> memberMids;
+
     public ChatRoom(String roomName) {
         this.roomName = roomName;
     }

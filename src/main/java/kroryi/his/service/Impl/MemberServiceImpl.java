@@ -217,4 +217,13 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.toList());
     }
 
+    // MemberService에 모든 멤버를 가져오는 메서드 추가
+    public List<MemberJoinDTO> getAllMembers() {
+        List<Member> members = memberRepository.findAll(); // 모든 멤버를 가져옴
+        return members.stream()
+                .map(member -> new MemberJoinDTO(member.getMid(), member.getName())) // DTO로 변환
+                .collect(Collectors.toList());
+    }
+
+
 }

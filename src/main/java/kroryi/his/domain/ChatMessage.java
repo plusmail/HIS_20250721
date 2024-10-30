@@ -18,6 +18,7 @@ public class ChatMessage {
     private Long id;
 
     private String content;
+
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)

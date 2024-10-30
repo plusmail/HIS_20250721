@@ -15,26 +15,32 @@
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <link rel="stylesheet" href="/css/layout.css">
 <style>
-    /* 채팅 패널 스타일 */
+    /* 초기 상태 */
     .chat-panel {
         position: fixed;
         bottom: 80px;
         left: 20px;
-        width: 350px; /* 패널 너비 확대 */
-        max-height: 600px; /* 패널 높이 확대 */
+        width: 350px;
+        max-height: 600px;
         background-color: white;
         border-radius: 10px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        display: none;
         overflow: hidden;
         z-index: 1000;
         pointer-events: auto;
+        opacity: 0;            /* 투명하게 시작 */
+        transform: translateY(20px); /* 아래에서 시작 */
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        visibility: hidden;    /* 보이지 않음 */
     }
 
-    /* 채팅 패널이 열릴 때 위치 */
+    /* 패널이 열릴 때 */
     .chat-panel.open {
-        display: block;
+        opacity: 1;
+        transform: translateY(0); /* 원래 위치로 슬라이드 */
+        visibility: visible;      /* 보이도록 설정 */
     }
+
 
     /* 채팅방 목록 헤더 */
     .chat-panel-header {
@@ -75,19 +81,19 @@
         text-overflow: ellipsis;
     }
 
-    /* 중앙에 위치한 커스텀 모달 */
+    /* 중앙에 위치한 채팅 모달 스타일 */
     .chat-modal {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 400px;
-        max-height: 600px;
+        width: 400px; /* 너비 조정 */
+        max-height: 600px; /* 최대 높이 조정 */
         background-color: white;
         border-radius: 10px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 1050;
-        display: none; /* 기본적으로 숨김 */
+        display: flex;
         flex-direction: column;
         overflow: hidden;
     }
@@ -116,15 +122,16 @@
         color: white;
         border: none;
         border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
+        width: 60px; /* 버튼 너비 확대 */
+        height: 60px; /* 버튼 높이 확대 */
+        font-size: 28px; /* 아이콘 크기 확대 */
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 1000;
         cursor: pointer;
     }
+
 
     /* 채팅방 아이템 스타일 */
     .chat-room-item {
@@ -144,7 +151,8 @@
         list-style-type: none;
         padding: 15px;
         margin: 0;
-        max-height: 400px;
+        max-height: 400px; /* 스크롤 높이 제한 */
+        min-height: 400px; /* 최소 높이 추가 - 메시지가 없을 때도 유지 */
         overflow-y: auto;
         display: flex;
         flex-direction: column;
