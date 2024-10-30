@@ -30,7 +30,7 @@ public class PatientCountController {
                 , message.getStatus3()
         );
 
-//        redisPublisher.publish("admission", message);
-        redisTemplate.convertAndSend("admission", message);
+        redisPublisher.publish("admission", message);
+//        redisTemplate.convertAndSend("admission", message);
     }
 }

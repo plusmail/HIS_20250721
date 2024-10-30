@@ -51,13 +51,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 상태 및 카운트를 출력하여 확인
             console.log(`Status: ${status}, Count: ${count}`);
-            if(datas.status1){
+            if(datas.status1 !== undefined){
                 document.getElementById('home-waitingCount').textContent = datas.status1;
             }
-            if(datas.status2){
+            if(datas.status2 !== undefined){
                 document.getElementById('home-inTreatmentCount').textContent = datas.status2;
             }
-            if(datas.status3){
+            if(datas.status3 !== undefined){
                 document.getElementById('home-completedCount').textContent = datas.status3;
             }
             console.warn(`Unknown status: ${datas}`);
