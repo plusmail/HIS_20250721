@@ -8,173 +8,156 @@
 <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">-->
 
 
+
 <div layout:fragment="reception">
-    <link rel="stylesheet" href="/css/patient_admission.css">
-    <div class="reception-wrapper">
+    <link  rel="stylesheet" href="/css/patient_admission.css">
+    <div class="button-container">
 
-        <div class="card m-2 mb-1">
-            <div class="card-header text-center">
-                진료 접수
-            </div>
+        <!-- 날짜 선택 기능 -->
+        <input type="date" class="date-input" id="currentDate">
 
-            <div class="button-container">
+        <!--  접수 버튼-->
+        <button class="btn btn-info ReceptionBtn">접수</button>
 
-                <!-- 날짜 선택 기능 -->
-                <input type="date" class="date-input" id="currentDate">
+        <button id="startTreatmentButton" class="btn btn-secondary">진료중</button>
 
-                <!--  접수 버튼-->
-                <button class="btn btn-info ReceptionBtn">접수</button>
+        <button id="completeTreatmentButton" class="btn btn-success">진료완료</button>
 
-                <button id="startTreatmentButton" class="btn btn-secondary">진료중</button>
-
-                <button id="completeTreatmentButton" class="btn btn-success">진료완료</button>
-
-                <button id="cancelReceptionButton" class="btn btn-warning">접수 취소</button>
-
-            </div>
-
-            <div class="table-container">
-                <!-- 진료대기테이블 -->
-                <table id="waitingPatientsTable" class="table table-hover">
-                    <thead class="table-secondary">
-                    <tr>
-                        <th colspan="6">진료 대기 환자: 0명</th>
-                    </tr>
-                    <tr>
-                        <th>번호</th>
-                        <th>차트번호</th>
-                        <th>환자이름</th>
-                        <th>의사</th>
-                        <th>예약시간</th>
-                        <th>접수시간</th>
-                    </tr>
-                    </thead>
-                    <tbody id="waitingPatientsBody">
-
-                    <tr>
-                        <td colspan="11">현재 대기 중인 환자가 없습니다.</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <!-- 진료중테이블 -->
-                <table id="treatmentPatientsTable" class="table table-hover">
-                    <thead class="table-light">
-                    <tr>
-                        <th colspan="6">진료중환자 : 0명</th>
-                    </tr>
-
-                    <tr>
-                        <th>번호</th>
-                        <th>차트번호</th>
-                        <th>환자이름</th>
-                        <th>의사</th>
-                        <th>접수시간</th>
-                        <th>진료시작시간</th>
-                    </tr>
-                    </thead>
-                    <tbody id="treatmentPatientsBody">
-                    <tr>
-                        <td colspan="11">현재 진료중인 환자가 없습니다.</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <!-- 진료완료테이블 -->
-                <table id="completedPatientsTable" class="table table-hover">
-                    <thead class="table-light">
-                    <tr>
-                        <th colspan="6">진료 완료 환자: 0명</th>
-                    </tr>
-                    <tr>
-                        <th>번호</th>
-                        <th>차트번호</th>
-                        <th>환자이름</th>
-                        <th>의사</th>
-                        <th>접수시간</th>
-                        <th>진료완료시간</th>
-                    </tr>
-                    </thead>
-                    <tbody id="completedPatientsBody">
-                    <tr>
-                        <td colspan="11">현재 진료 완료된 환자가 없습니다.</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="cancelModalLabel">접수 취소</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p>선택한 환자의 접수를 취소하시겠습니까?</p>
-                            <p id="patientName"></p> <!-- 환자 이름 표시 -->
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" id="confirmCancelBtn">예</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">아니오</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 진료 중 모달 -->
-            <div class="modal fade" id="treatmentModal" tabindex="-1" role="dialog"
-                 aria-labelledby="treatmentModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="treatmentModalLabel">진료 중 이동</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p id="treatmentPatientInfo"></p>
-                            <p>진료 중으로 이동하시겠습니까?</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" id="confirmTreatmentBtn">예</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">아니요</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="completeModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="completeModalLabel">진료 완료</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p id="completeInfo"></p>
-                            <p>진료완료로 이동 하시겠습니까?</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="confirmCompleteButton">예</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">아니요</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div th:fragment="reception_js">
-                <script th:src="@{/js/patient_admission.js}"></script>
-            </div>
-        </div>
+        <button id="cancelReceptionButton" class="btn btn-warning">접수 취소</button>
 
     </div>
+    <div class="table-container">
+        <!-- 진료대기테이블 -->
+        <table id="waitingPatientsTable" class="table table-hover">
+            <thead class="table-secondary">
+            <tr>
+                <th colspan="6">진료 대기 환자: 0명</th>
+            </tr>
+            <tr>
+                <th>0</th>
+                <th>차트번호</th>
+                <th>환자이름</th>
+                <th>의사</th>
+                <th>예약시간</th>
+                <th>접수시간</th>
+            </tr>
+            </thead>
+            <tbody id="waitingPatientsBody">
 
+
+            </tbody>
+        </table>
+
+        <!-- 진료중테이블 -->
+        <table id="treatmentPatientsTable" class="table table-hover">
+            <thead class="table-light">
+            <tr>
+                <th colspan="6">진료중환자 : 0명</th>
+            </tr>
+
+            <tr>
+                <th>0</th>
+                <th>차트번호</th>
+                <th>환자이름</th>
+                <th>의사</th>
+                <th>접수시간</th>
+                <th>진료시작시간</th>
+            </tr>
+            </thead>
+            <tbody id="treatmentPatientsBody">
+
+            </tbody>
+        </table>
+
+        <!-- 진료완료테이블 -->
+        <table id="completedPatientsTable" class="table table-hover">
+            <thead class="table-light">
+            <tr>
+                <th colspan="6" >진료 완료 환자: 0명</th>
+            </tr>
+            <tr>
+                <th>0</th>
+                <th>차트번호</th>
+                <th>환자이름</th>
+                <th>의사</th>
+                <th>접수시간</th>
+                <th>진료완료시간</th>
+            </tr>
+            </thead>
+            <tbody id="completedPatientsBody">
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">접수 취소</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>선택한 환자의 접수를 취소하시겠습니까?</p>
+                    <p id="patientName"></p> <!-- 환자 이름 표시 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="confirmCancelBtn">예</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">아니오</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 진료 중 모달 -->
+    <div class="modal fade" id="treatmentModal" tabindex="-1" role="dialog" aria-labelledby="treatmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="treatmentModalLabel">진료 중 이동</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="treatmentPatientInfo"></p>
+                    <p>진료 중으로 이동하시겠습니까?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="confirmTreatmentBtn">예</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">아니요</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="completeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="completeModalLabel">진료 완료</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="completeInfo"></p>
+                    <p>진료완료로 이동 하시겠습니까?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmCompleteButton">예</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">아니요</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div th:fragment="reception_js">
+        <script th:src="@{/js/patient_admission.js}"></script>
+        <script th:inline="javascript">
+            const doctorNames = /*[[${doctorNames}]]*/ [];
+        </script>
+    </div>
 </div>

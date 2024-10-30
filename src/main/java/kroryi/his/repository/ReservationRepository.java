@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
     // 특정 날짜에 해당하는 예약을 조회하는 메서드
-    @Query("SELECT r FROM Reservation r WHERE r.reservationDate LIKE %:date% ORDER BY r.reservationDate ASC")
+    @Query("SELECT r FROM Reservation r WHERE r.reservationDate LIKE %:date%")
     List<Reservation> findByReservationDate(@Param("date") String date);
 
     // 인덱스 번호에 해당하는 예약 정보를 조회하는 메서드
