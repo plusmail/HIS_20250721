@@ -36,11 +36,21 @@ document.addEventListener("DOMContentLoaded", function () {
             // 환자 데이터 객체 생성
             const patientData = {
                 chartNum: selectedPatient.chartNum, // 차트 번호
-                paName: selectedPatient.name, // 환자 이름
+                paName: selectedPatient.name || "N/A", // 환자 이름, 이름이 없으면 "N/A"로 설정
                 mainDoc: null,  // 의사는 null로 설정
                 rvTime: null, // 예약 시간 초기화 (서버에서 가져옴)
                 receptionTime: new Date().toISOString() // 현재 날짜 및 시간
             };
+
+            // 세션 스토리지에서 대기 환자 목록 가져오기
+            const waitingPatients = JSON.parse(sessionStorage.getItem('waitingPatients')) || [];
+
+            // 중복 환자 체크
+            const isPatientAlreadyAdded = waitingPatients.some(patient => patient.chartNum === patientData.chartNum);
+            if (isPatientAlreadyAdded) {
+                alert("이 환자는 이미 대기 중입니다.");
+                return; // 중복 환자일 경우 등록 과정 중단
+            }
 
             // 새로 등록하기
             fetch("/api/patient-admission/register", {
@@ -64,17 +74,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // 예약 시간도 포함된 환자 데이터 추가
                     patientData.rvTime = data.rvTime; // 서버에서 반환된 예약 시간
-                    console.log("2222 ", data.data.pid)
+                    console.log("2222 ", data.data.pid);
 
                     // 대기 중 테이블에 추가
-                    addPatientToWaitingTable({
+                    const newPatient = {
                         pid: data.data.pid,
                         chartNum: patientData.chartNum, // 차트 번호
                         paName: patientData.paName, // 환자 이름
                         treatStatus: "1", // 대기 상태
                         receptionTime: patientData.receptionTime, // 접수 시간
                         rvTime: patientData.rvTime // 예약 시간 추가
-                    });
+                    };
+
+                    // 대기 환자 목록에 추가
+                    waitingPatients.push(newPatient);
+                    sessionStorage.setItem('waitingPatients', JSON.stringify(waitingPatients)); // 세션 스토리지 업데이트
+
+                    // 대기 중 테이블에 추가
+                    addPatientToWaitingTable(newPatient);
                 })
                 .catch(error => {
                     console.error("에러 발생:", error);
@@ -85,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("선택된 환자가 없습니다.");
         }
     });
+
 
 
     const startTreatmentButton = document.getElementById("startTreatmentButton");
@@ -548,15 +566,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentRowCount = waitingPatientsTable.rows.length; // 현재 행 수
         const formattedRvTime = formatRvTime(patient.rvTime);
 
+        // doctorNames 배열을 사용해 <option> 요소 생성
+        const doctorOptions = doctorNames.map(name => `<option value="${name}">${name}</option>`).join('');
+
         row.innerHTML = `
         <td>${currentRowCount}</td>
         <td>${patient.chartNum || 'N/A'}</td>
         <td>${patient.paName || 'N/A'}</td>
         <td>
             <select>
-                <option value="의사1">의사1</option>
-                <option value="의사2">의사2</option>
-                <option value="의사3">의사3</option>
+                ${doctorOptions} <!-- 동적으로 생성된 옵션을 select에 추가 -->
             </select>
         </td>
         <td>${formattedRvTime || ''}</td>
@@ -565,8 +584,8 @@ document.addEventListener("DOMContentLoaded", function () {
             minute: '2-digit'
         }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
-       
     `;
+
         row.addEventListener('click', () => {
             const previouslySelected = waitingPatientsTable.querySelector('tr.selected');
             if (previouslySelected) {
@@ -943,6 +962,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 접수 취소 버튼 클릭 시 모달 표시
+    // 취소 버튼 클릭 이벤트
     cancelReceptionButton.addEventListener("click", function () {
         // 권한 체크를 직접 수행합니다.
         const hasPermission = globalUserData.authorities.some(auth =>
@@ -964,11 +984,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // 모달에서 '예' 버튼 클릭 시 행 삭제 및 데이터베이스에서 삭제
+// 모달에서 '예' 버튼 클릭 시 행 삭제 및 데이터베이스에서 삭제
     confirmCancelBtn.addEventListener("click", function () {
-
         if (selectedRow) {
-
             const pid = selectedRow.cells[6].textContent; // 숨겨진 pid 가져오기
 
             // 데이터베이스에서 환자 접수 취소 요청
@@ -980,6 +998,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         selectedRow.remove(); // 선택된 행 삭제
                         updateRowIndexes(); // 행 번호 업데이트
                         updateWaitingPatientCount(); // 환자 수 업데이트
+
+                        // 세션 스토리지에서 PID가 같은 환자 데이터 제거
+                        const waitingPatients = JSON.parse(sessionStorage.getItem('waitingPatients')) || [];
+
+                        // PID가 같은 환자 제거
+                        const updatedPatients = waitingPatients.filter(patient => patient.pid !== parseInt(pid, 10));
+
+                        // 업데이트된 환자 목록을 다시 세션 스토리지에 저장
+                        sessionStorage.setItem('waitingPatients', JSON.stringify(updatedPatients));
+
+                        console.log(`제거 후 세션 스토리지 상태: patient_${pid}`, sessionStorage.getItem('waitingPatients'));
+
                         selectedRow = null; // 선택된 행 초기화
                     } else {
                         alert('환자 접수 취소 실패. 다시 시도하세요.');
@@ -994,6 +1024,7 @@ document.addEventListener("DOMContentLoaded", function () {
             cancelModal.hide();
         }
     });
+
 
     // '아니요' 버튼 클릭 시 모달 닫기
     closeModalBtn.addEventListener("click", function () {

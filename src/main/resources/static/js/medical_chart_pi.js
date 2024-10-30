@@ -50,10 +50,19 @@ let frequentlyUsedPhrases = [];
 // 데이터가 저장될때 배열의 index값을 재 지정하기위한 변수.
 let listIndex = 0;
 // 세션 데이터(환자정보) 를 가지고옴.
+
+
 let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
 
+// 이벤트 리스너 등록
+window.addEventListener('sessionStorageChanged', (event) => {
+    console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
+    patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+    readPaChart()
 
-console.log(patientInfos.name)
+});
+
+
 //세션 시작
 // 세션 데이터 가져오기
 function saveChartNum() {
@@ -476,21 +485,19 @@ function readPaChart() {
             })
 
 
-            // // 데이터를 순회하여 테이블에 추가
-            // data.forEach(chart => {
-            //     let row = `<tr>
-            //                   <td>${chart.mdTime}</td>
-            //                   <td>${chart.teethNum}</td>
-            //                   <td>${chart.medicalDivision}</td>
-            //                   <td>${chart.medicalContent}</td>
-            //                </tr>`;
-            //     tableBody.append(row);  // 새로운 행을 테이블에 추가
-            // });
-
-
         },
         error: function (xhr, status, error) {
             console.error('Error:', error);  // 에러 처리
         }
     });
 }
+
+// 각 셀을 클릭했을 때 배경색을 변경
+document.querySelectorAll('#plan-data td').forEach(cell => {
+    cell.addEventListener('click', function() {
+        // 모든 셀에서 selected-cell 클래스 제거
+        document.querySelectorAll('#plan-data td').forEach(cell => cell.classList.remove('selected-cell'));
+        // 현재 클릭한 셀에만 selected-cell 클래스 추가
+        this.classList.add('selected-cell');
+    });
+});
