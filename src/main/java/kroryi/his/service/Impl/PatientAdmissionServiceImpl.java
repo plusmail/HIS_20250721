@@ -71,9 +71,9 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
 
         PatientAdmission savedAdmission = patientAdmissionRepository.save(patientAdmission);
 
-        int status1 = patientAdmissionRepository.countByTreatStatus("1");
-        int status2 = patientAdmissionRepository.countByTreatStatus("2");
-        int status3 = patientAdmissionRepository.countByTreatStatus("3");
+        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
+        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
+        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
 
 
         // Create a message payload
@@ -123,7 +123,25 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
 
     @Override
     public void updatePatientAdmission(PatientAdmission patientAdmission) {
-        patientAdmissionRepository.save(patientAdmission);
+        // 상태 업데이트
+        PatientAdmission updatedPatient = patientAdmissionRepository.save(patientAdmission);
+
+        // 현재 상태 카운트 집계
+        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
+        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
+        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
+
+        // 메시지 발송
+        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
+
+        try {
+            // JSON 문자열로 변환
+            String message = objectMapper.writeValueAsString(messageRequest);
+            // Redis에 메시지 발송 (예: "patientStatusUpdate" 주제로)
+            redisTemplate.convertAndSend("patientStatusUpdate", message);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace(); // 예외 처리 (로깅 등)
+        }
     }
 
     @Override
@@ -158,10 +176,31 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         if (!patientAdmissionRepository.existsById(Math.toIntExact(pid))) {
             throw new RuntimeException("환자를 찾을 수 없습니다."); // 예외 처리
         }
-        patientAdmissionRepository.deleteById(Math.toIntExact(pid));
-        redisTemplate.convertAndSend("/topic/admission/", "환자 삭제" + pid);
 
+        // 환자 삭제
+        patientAdmissionRepository.deleteById(Math.toIntExact(pid));
+
+        // 현재 상태 카운트 집계
+        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
+        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
+        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
+
+        // 메시지 발송
+        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
+
+        try {
+            // JSON 문자열로 변환
+            String message = objectMapper.writeValueAsString(messageRequest);
+            // Redis에 메시지 발송 (예: "patientStatusUpdate" 주제로)
+            redisTemplate.convertAndSend("patientStatusUpdate", message);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace(); // 예외 처리 (로깅 등)
+        }
+
+        // Redis에 환자 삭제 메시지 발송
+        redisTemplate.convertAndSend("/topic/admission/", "환자 삭제: " + pid);
     }
+
 
     @Override
     public PatientAdmission getLatestCompletionTime(Integer chartNum) {
@@ -178,9 +217,9 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
 
     @Override
     public void sendPatientCounts() {
-        int waitingCount = patientAdmissionRepository.countByTreatStatus(STATUS_WAITING);
-        int inTreatmentCount = patientAdmissionRepository.countByTreatStatus(STATUS_IN_TREATMENT);
-        int completedCount = patientAdmissionRepository.countByTreatStatus(STATUS_COMPLETED);
+        int waitingCount = patientAdmissionRepository.countByTreatStatusAndTodayReception(STATUS_WAITING);
+        int inTreatmentCount = patientAdmissionRepository.countByTreatStatusAndTodayReception(STATUS_IN_TREATMENT);
+        int completedCount = patientAdmissionRepository.countByTreatStatusAndTodayReception(STATUS_COMPLETED);
 
         // 메시지 객체 생성
         Map<String, Object> message = new HashMap<>();

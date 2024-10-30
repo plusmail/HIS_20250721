@@ -27,5 +27,6 @@ public interface PatientAdmissionRepository extends JpaRepository<PatientAdmissi
     @Query("SELECT pa FROM PatientAdmission pa WHERE pa.chartNum = :chartNum ORDER BY pa.completionTime DESC LIMIT 1")
     PatientAdmission findLatestByChartNum(@Param("chartNum") Integer chartNum);
 
-    int countByTreatStatus(String status);
+    @Query("SELECT COUNT(e) FROM PatientAdmission e WHERE e.treatStatus = :status AND FUNCTION('DATE', e.receptionTime) = CURRENT_DATE")
+    int countByTreatStatusAndTodayReception(@Param("status") String status);
 }
