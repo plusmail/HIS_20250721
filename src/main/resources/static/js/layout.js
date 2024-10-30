@@ -190,7 +190,6 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
         const menu_chartNum = selectedRow.querySelector("td:nth-child(5)").textContent;
         const menu_birthDate = selectedRow.querySelector("td:nth-child(6)").textContent;
 
-        console.log("dddddddddddddddd" ,menu_name)
         // HTML 요소에 데이터 삽입
         document.querySelector("#patientInfo").innerHTML = `
             <div class="text-center row">
@@ -227,8 +226,12 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
         } else if (window.location.href.includes("/reservation")) {
             let department = document.getElementById('departmentInput');
             let chartNumber = document.getElementById('chart-numberInput');
-            department.value = menu_name;
-            chartNumber.value = menu_chartNum;
+            if (department) {
+                department.value = menu_name;
+            }
+            if (chartNumber) {
+                chartNumber.value = menu_chartNum;
+            }
         }
 
         setSessionStorageItem('selectedPatient', JSON.stringify({

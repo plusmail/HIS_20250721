@@ -202,7 +202,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void deleteUser(MemberJoinDTO memberJoinDTO) throws MidExistException {
+    public void deleteUser(MemberJoinDTO memberJoinDTO) throws MemberService.MidExistException {
 
         memberRepository.deleteById(memberJoinDTO.getMid());
     }
