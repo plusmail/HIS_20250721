@@ -32,4 +32,5 @@ public interface PatientAdmissionService {
     void registerAdmission(PatientAdmission patientAdmission);
 
     void sendPatientCounts();
+
 }

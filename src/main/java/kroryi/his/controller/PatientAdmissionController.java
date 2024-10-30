@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.domain.Reservation;
 import kroryi.his.dto.PatientAdmissionDTO;
+import kroryi.his.repository.PatientAdmissionRepository;
 import kroryi.his.repository.ReservationRepository;
 import kroryi.his.service.PatientAdmissionService;
+import kroryi.his.websocket.MessageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ public class PatientAdmissionController {
 
     @Autowired
     private PatientAdmissionService patientAdmissionService;
+    @Autowired
+    private PatientAdmissionRepository patientAdmissionRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -218,6 +222,13 @@ public class PatientAdmissionController {
             return ResponseEntity.notFound().build(); // 404 Not Found
         }
     }
-
+    @GetMapping("/status")
+    public ResponseEntity<MessageRequest> getPatientStatus() {
+        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
+        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
+        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
+        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
+        return ResponseEntity.ok(messageRequest);
+    }
 
 }
