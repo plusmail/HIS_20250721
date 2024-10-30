@@ -406,11 +406,11 @@ function fetchTerms() {
                 newRow.appendChild(termCell);
 
                 const editCell = document.createElement('td');
-                editCell.innerHTML = '<button onclick="editTerm(this)">수정</button>';
+                editCell.innerHTML = `<button onclick="addTermByNote('${term.name}')">추가</button>`
                 newRow.appendChild(editCell);
 
                 const deleteCell = document.createElement('td');
-                deleteCell.innerHTML = '<button onclick="deleteTerm(this)">삭제</button>';
+                deleteCell.innerHTML = `<button onclick="deleteTerm('${term.id}')">삭제</button>`
                 newRow.appendChild(deleteCell);
 
                 termList.appendChild(newRow);
@@ -422,3 +422,37 @@ function fetchTerms() {
 }
 
 fetchTerms()
+
+function addTermByNote(name) {
+    const patientNoteElement = document.getElementById('patient-note');
+    const patientNoteElementValue = document.getElementById('patient-note').value;
+
+    if(!patientNoteElementValue){
+        patientNoteElement.value += name;
+    }
+
+    else {
+        patientNoteElement.value += ", " +name;
+    }
+}
+
+function deleteTerm(id){
+    fetch(`reservation/deleteTerm?seq=${id}`, {
+        method: 'DELETE',
+    })
+        .then(response => {
+            if (response.ok) {
+                // 성공적으로 삭제되었을 때 실행할 동작
+                alert('Term deleted successfully.');
+                // 테이블에서 행 삭제
+                fetchTerms();
+            } else {
+                throw new Error('Failed to delete term.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting term.');
+        });
+
+}

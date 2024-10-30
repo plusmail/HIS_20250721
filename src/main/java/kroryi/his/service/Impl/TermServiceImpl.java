@@ -1,6 +1,7 @@
 package kroryi.his.service.Impl;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import kroryi.his.domain.Term;
 import kroryi.his.dto.TermDTO;
 import kroryi.his.repository.TermRepository;
@@ -41,6 +42,15 @@ public class TermServiceImpl implements TermService {
         return termRepository.findAll().stream()
                 .map(term -> modelMapper.map(term, TermDTO.class)) // 엔티티를 DTO로 변환
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteTerm(Long seq) {
+        if (!termRepository.existsById(seq)) {
+            throw new EntityNotFoundException("not found: "+seq);
+        }
+        termRepository.deleteById(seq);
+
     }
 
 
