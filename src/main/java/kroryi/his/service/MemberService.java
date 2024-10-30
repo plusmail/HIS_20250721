@@ -33,7 +33,7 @@ public interface MemberService {
 
     List<MemberJoinDTO> getMembers();
 
-//페이지 검색
+    //페이지 검색
     PageResponseDTO<MemberJoinDTO> list(PageRequestDTO pageRequestDTO);
 
     PageResponseDTO<MemberListAllDTO> listWithAll(PageRequestDTO pageRequestDTO);

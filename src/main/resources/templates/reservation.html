@@ -5,6 +5,7 @@
       layout:decorate="~{layout/layout.html}">
 
 <div layout:fragment="reservation" style="padding: 10px">
+
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a class="nav-link active" data-bs-toggle="tab" href="#reservation_view" aria-selected="true"
@@ -40,7 +41,7 @@
                                         <table class="table">
                                             <thead>
                                             <tr>
-                                                <th>일</th>
+                                                <th style="color: red">일</th>
                                                 <th>월</th>
                                                 <th>화</th>
                                                 <th>수</th>
@@ -79,7 +80,7 @@
                                     </table>
 
                                 </div>
-                                <div id="bodyContent"  class="col-md-8">
+                                <div id="bodyContent" class="col-md-8">
 
                                 </div>
 
@@ -92,15 +93,17 @@
         </div>
 
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         const reservationTimes = [
-            "9:00", "9:30", "10:00", "10:30", "11:00",
+            "09:00", "09:30", "10:00", "10:30", "11:00",
             "11:30", "12:00", "12:30", "13:00", "13:30",
             "14:00", "14:30", "15:00", "15:30", "16:00",
             "16:30", "17:00", "17:30", "18:00", "18:30",
             "19:00", "19:30"
         ];
+        const calendarBody = document.getElementById('calendar-body');
 
 
         loadContent('/reservation_view');
@@ -110,6 +113,9 @@
             loadContent('/reservation_view');
             renderCalendar();
         });
+
+        const currentDate = new Date();
+
 
 
         function loadContent(page) {
@@ -122,25 +128,24 @@
             });
         }
 
-        const currentDate = new Date();
 
 
         function renderCalendar() {
-
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-
             const firstDay = new Date(year, month, 1).getDay();
             const lastDate = new Date(year, month + 1, 0).getDate();
             const monthYear = document.getElementById('monthYear');
             const calendarBody = document.getElementById('calendar-body');
             monthYear.innerText = `${year}년 ${month + 1}월`;
             calendarBody.innerHTML = '';
-
             let date = 1;
+
+            // Variable to hold the currently selected cell
+            let selectedCell = null;
+
             for (let i = 0; i < 6; i++) {
                 const row = document.createElement('tr');
-
                 for (let j = 0; j < 7; j++) {
                     const cell = document.createElement('td');
                     cell.classList.add('calendarDate');
@@ -149,14 +154,55 @@
                     } else if (date > lastDate) {
                         break;
                     } else {
+                        if ([0, 7, 14, 21, 28, 35].includes(j)) {
+                            cell.style.color = 'red';
+                        } else if ([6, 13, 20, 27, 34].includes(j)) {
+                            cell.style.color = 'blue';
+                        } else {
+                            cell.style.color = 'black';
+                        }
                         cell.innerHTML = date;
+
+                        // Highlight today’s date
+                        if (date === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                            cell.classList.add('selected');
+                            // Call for today's date
+                            const todayDate = `${year}-${month + 1}-${date}`;
+                            dateReservationList(todayDate);
+                            console.log("!!!!"+todayDate)
+                            selectedCell = cell; // Keep track of today's cell
+                        }
+
                         date++;
                     }
                     row.appendChild(cell);
                 }
-
                 calendarBody.appendChild(row);
             }
+
+            calendarBody.addEventListener('click', function (event) {
+                // 클릭한 요소가 <td>이고 class가 'calendarDate'일 때
+                if (event.target.tagName === 'TD' && event.target.classList.contains('calendarDate')) {
+                    const tdElement = event.target;
+
+                    // 기존에 선택된 td에서 배경색을 제거
+                    const selected = document.querySelector('.calendarDate[style*="background-color: blue"]');
+                    if (selected) {
+                        selected.style.backgroundColor = ''; // 이전 선택 제거
+                        selected.style.color = ''; // 이전 선택의 글자색 초기화
+                    }
+
+                    const selectedCells = document.querySelectorAll("td.calendarDate.selected");
+                    selectedCells.forEach(cell => cell.classList.remove("selected"));
+                    tdElement.classList.add("selected");
+
+                    // 클릭한 날짜에 배경색 추가
+                    // console.log()
+                    // tdElement.style.backgroundColor = 'blue'; // 클릭한 td에 배경색 설정
+                    // tdElement.style.color = 'white'; // 클릭한 td의 글자색 설정
+
+                }
+            });
 
 
             // 캘린더 날짜 선택시 오늘 날짜 정보 받아오기
@@ -167,7 +213,6 @@
 
                     // 저장한 날짜 텍스트, 날짜 형식으로 재변환
                     const selectedDate = `${year}-${month + 1}-${day}`;
-                    console.log(selectedDate)
 
                     dateReservationList(selectedDate);
                 });
@@ -186,65 +231,6 @@
         }
 
 
-        function dateReservationList(selectedDate) {
-            fetch('reservation/selectedDatePatientList', {
-
-                method: 'POST', // POST 요청
-                headers: {
-                    'Content-Type': 'application/json' // JSON 형식으로 데이터 전송
-                },
-                body: JSON.stringify({
-                    reservationDate: selectedDate
-                }) // JSON 객체로 전송
-            })
-                .then(response => {
-                    // 응답 상태가 성공적인 경우 JSON으로 변환
-                    if (!response.ok) {
-                        throw new Error('네트워크 응답이 실패했습니다.');
-                    }
-                    return response.json(); // JSON 데이터로 변환
-                })
-                .then(data => {
-
-                    // 환자 데이터가 들어갈 ID값 보관
-                    const tableBody = document.querySelector('#reservationTableList');
-
-                    // 테이블의 기존 데이터를 지우고 새 데이터를 추가
-                    // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
-                    tableBody.innerHTML = ''; // 기존 내용 제거
-
-
-                    // 데이터 배열을 순회하여 테이블에 추가
-                    data.forEach(item => {
-
-                        // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
-                        const time = new Date(item.reservationDate).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-
-
-                        const row = document.createElement('tr'); // 새로운 행 생성
-                        row.id = 'reservationTableListParent'; // ID 추가
-                        row.innerHTML = `
-    <td>${time}</td>
-    <td>${item.department}</td>
-    <td>${item.patientNote}</td>
-`; // 각 열에 데이터 삽입
-
-                        //
-                        row.onclick = function () {
-                            selectList(item.seq);
-                        };
-
-                        tableBody.appendChild(row); // tbody에 행 추가
-                    });
-                })
-                .catch(error => {
-                    // 에러 처리
-                    console.error('에러 발생:', error);
-                });
-        }
 
 
     </script>
