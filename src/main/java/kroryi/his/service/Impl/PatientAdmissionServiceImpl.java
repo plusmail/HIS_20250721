@@ -52,9 +52,32 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     @Autowired
     private ObjectMapper objectMapper;
 
+
+    // 환자 상태 집계 및 Redis 메시지 전송 메서드
+    private void sendPatientStatusUpdate() {
+        // 현재 상태 카운트 집계
+        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
+        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
+        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
+
+        // 메시지 발송
+        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
+
+        try {
+            // JSON 문자열로 변환
+            String message = objectMapper.writeValueAsString(messageRequest);
+            // Redis에 메시지 발송 (예: "patientStatusUpdate" 주제로)
+            redisTemplate.convertAndSend("patientStatusUpdate", message);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace(); // 예외 처리 (로깅 등)
+        }
+    }
+
+
     @Transactional
     @Override
     public PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException {
+        // 새로운 PatientAdmission 엔티티 생성 및 데이터 설정
         PatientAdmission patientAdmission = new PatientAdmission();
         patientAdmission.setChartNum(patientAdmissionDTO.getChartNum());
         patientAdmission.setPaName(patientAdmissionDTO.getPaName());
@@ -65,26 +88,20 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         patientAdmission.setCompletionTime(patientAdmissionDTO.getCompletionTime());
         patientAdmission.setTreatStatus(patientAdmissionDTO.getTreatStatus());
 
+        // ID가 null인지 확인
         if (patientAdmission.getPid() != null) {
             throw new IllegalArgumentException("ID는 null이 아니어야 합니다."); // 예외 처리
         }
 
+        // PatientAdmission 저장
         PatientAdmission savedAdmission = patientAdmissionRepository.save(patientAdmission);
 
-        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
-        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
-        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
+        // 환자 상태 집계 및 Redis 메시지 전송
+        sendPatientStatusUpdate();
 
-
-        // Create a message payload
-        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
-        log.info("===============> {}", messageRequest);
-
-        String messageJson = objectMapper.writeValueAsString(messageRequest);
-
-        redisTemplate.convertAndSend("patientStatusUpdate", messageJson);
         return savedAdmission;
     }
+
 
 
     @Override
@@ -124,25 +141,12 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     @Override
     public void updatePatientAdmission(PatientAdmission patientAdmission) {
         // 상태 업데이트
-        PatientAdmission updatedPatient = patientAdmissionRepository.save(patientAdmission);
+        patientAdmissionRepository.save(patientAdmission);
 
-        // 현재 상태 카운트 집계
-        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
-        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
-        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
-
-        // 메시지 발송
-        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
-
-        try {
-            // JSON 문자열로 변환
-            String message = objectMapper.writeValueAsString(messageRequest);
-            // Redis에 메시지 발송 (예: "patientStatusUpdate" 주제로)
-            redisTemplate.convertAndSend("patientStatusUpdate", message);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace(); // 예외 처리 (로깅 등)
-        }
+        // 환자 상태 집계 및 Redis 메시지 전송
+        sendPatientStatusUpdate();
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -173,33 +177,20 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     @Transactional
     public void cancelAdmission(Integer pid) {
         // 환자 삭제 로직
-        if (!patientAdmissionRepository.existsById(Math.toIntExact(pid))) {
+        if (!patientAdmissionRepository.existsById(pid)) {
             throw new RuntimeException("환자를 찾을 수 없습니다."); // 예외 처리
         }
 
         // 환자 삭제
-        patientAdmissionRepository.deleteById(Math.toIntExact(pid));
+        patientAdmissionRepository.deleteById(pid);
 
-        // 현재 상태 카운트 집계
-        int status1 = patientAdmissionRepository.countByTreatStatusAndTodayReception("1");
-        int status2 = patientAdmissionRepository.countByTreatStatusAndTodayReception("2");
-        int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
-
-        // 메시지 발송
-        MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
-
-        try {
-            // JSON 문자열로 변환
-            String message = objectMapper.writeValueAsString(messageRequest);
-            // Redis에 메시지 발송 (예: "patientStatusUpdate" 주제로)
-            redisTemplate.convertAndSend("patientStatusUpdate", message);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace(); // 예외 처리 (로깅 등)
-        }
+        // 환자 상태 집계 및 Redis 메시지 전송
+        sendPatientStatusUpdate();
 
         // Redis에 환자 삭제 메시지 발송
         redisTemplate.convertAndSend("/topic/admission/", "환자 삭제: " + pid);
     }
+
 
 
     @Override

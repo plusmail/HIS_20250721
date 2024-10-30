@@ -39,6 +39,8 @@ const socket = new SockJS("http://localhost:8080/ws");
 document.addEventListener("DOMContentLoaded", function () {
     const stompClient = Stomp.over(socket);
 
+    fetchPatientStatus();
+
     stompClient.connect({}, function(frame) {
         console.log('WebSocket connected:', frame);
 
@@ -67,6 +69,25 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error('WebSocket connection error:', error);
     });
 });
+
+function fetchPatientStatus() {
+    fetch("/api/patient-admission/status") // API 엔드포인트를 호출
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 초기 환자 상태 업데이트
+            if (data) {
+                document.getElementById('home-waitingCount').textContent = data.status1;
+                document.getElementById('home-inTreatmentCount').textContent = data.status2;
+                document.getElementById('home-completedCount').textContent = data.status3;
+            }
+        })
+        .catch(error => console.error('Error fetching patient status:', error));
+}
 
 
 // 페이지 로드 시 호출
