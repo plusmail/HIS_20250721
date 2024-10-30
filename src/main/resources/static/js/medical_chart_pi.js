@@ -455,7 +455,6 @@ piMemoAddBtn.addEventListener("click", e => {
 });
 
 function readPaChart() {
-    console.log("ccccccccccc->"+patientInfos.chartNum)
     $.ajax({
         url: '/medical_chart/getChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
         type: 'GET',  // GET 요청
@@ -486,21 +485,19 @@ function readPaChart() {
             })
 
 
-            // // 데이터를 순회하여 테이블에 추가
-            // data.forEach(chart => {
-            //     let row = `<tr>
-            //                   <td>${chart.mdTime}</td>
-            //                   <td>${chart.teethNum}</td>
-            //                   <td>${chart.medicalDivision}</td>
-            //                   <td>${chart.medicalContent}</td>
-            //                </tr>`;
-            //     tableBody.append(row);  // 새로운 행을 테이블에 추가
-            // });
-
-
         },
         error: function (xhr, status, error) {
             console.error('Error:', error);  // 에러 처리
         }
     });
 }
+
+// 각 셀을 클릭했을 때 배경색을 변경
+document.querySelectorAll('#plan-data td').forEach(cell => {
+    cell.addEventListener('click', function() {
+        // 모든 셀에서 selected-cell 클래스 제거
+        document.querySelectorAll('#plan-data td').forEach(cell => cell.classList.remove('selected-cell'));
+        // 현재 클릭한 셀에만 selected-cell 클래스 추가
+        this.classList.add('selected-cell');
+    });
+});
