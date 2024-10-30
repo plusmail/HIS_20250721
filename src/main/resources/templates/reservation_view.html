@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="/css/reservation.css">
+    <title></title>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        <!-- 타임테이블 -->
+        <div class="col-md-8">
+            <div class="container-fluid p-3">
+                <table class="table table-bordered" id="timetable">
+                    <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <!-- 동적으로 의사 헤더가 삽입됩니다 -->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- 동적으로 시간 슬롯이 생성됩니다 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/reservation_view.js"></script>
+</body>
+</html>

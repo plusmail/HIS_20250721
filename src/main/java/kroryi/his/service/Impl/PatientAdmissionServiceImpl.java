@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,6 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         LocalDateTime startDate = date.atStartOfDay(); // 입력된 날짜의 00시 00분 00초
         LocalDateTime endDate = date.atTime(23, 59, 59);
 
-
         return patientAdmissionRepository.countByTreatStatusAndReceptionTimeBetween(count,startDate, endDate);
     }
 
@@ -102,9 +102,10 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
     @Override
     public PatientAdmission getLatestCompletionTime(Integer chartNum) {
         PatientAdmission admissions = patientAdmissionRepository.findLatestByChartNum(chartNum);
-        log.info(admissions.toString());
-        return admissions;
+        log.info(admissions != null ? admissions.toString() : "chartNum {}에 대한 환자 데이터가 없습니다.", chartNum);
+        return admissions; // 데이터가 없으면 null을 반환
     }
+
 
     private PatientAdmissionDTO convertToDTO(PatientAdmission admission) {
         PatientAdmissionDTO dto = new PatientAdmissionDTO();
