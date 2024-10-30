@@ -2,8 +2,11 @@ package kroryi.his.controller;
 
 import java.util.List;
 
+import kroryi.his.domain.Term;
 import kroryi.his.dto.ReservationDTO;
+import kroryi.his.dto.TermDTO;
 import kroryi.his.service.ReservationRegisterService;
+import kroryi.his.service.TermService;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,9 @@ public class ReservationRegisterController {
 
     @Autowired
     private ReservationRegisterService rServ;
+
+    @Autowired
+    private TermService termService;
 
     // 캘린더에서 날짜 선택시
     @PostMapping("/selectedDatePatientList")
@@ -51,11 +57,11 @@ public class ReservationRegisterController {
     @PostMapping("/insertReservationInformation")
     public List<ReservationDTO> insertReservationInformation(@RequestBody ReservationDTO dto) {
         try {
-            log.info("4444444444"+dto);
+            log.info("4444444444" + dto);
 
             // 저장 후 전체 예약 목록을 가져와서 반환
             List<ReservationDTO> list = rServ.insertReservationInformation(dto); // 모든 예약을 가져오는 메서드 필요
-            log.info("333333333333333333##"+list);
+            log.info("333333333333333333##" + list);
             return list;
 
         } catch (Exception e) {
@@ -67,8 +73,8 @@ public class ReservationRegisterController {
 
     @PostMapping("/selectedReservation")
     public List<ReservationDTO> selectedReservation(@RequestBody ReservationDTO dto) {// 디버깅 용도
-        List<ReservationDTO> list = rServ.getReservations(dto.getChartNumber(),dto.getReservationDate());
-        log.info("##########!!!!!!!!"+list);
+        List<ReservationDTO> list = rServ.getReservations(dto.getChartNumber(), dto.getReservationDate());
+        log.info("##########!!!!!!!!" + list);
 
 //        if (list.isEmpty()) {
 //            return ResponseEntity.noContent().build();
@@ -78,8 +84,6 @@ public class ReservationRegisterController {
     }
 
 
-
-
     // 예약에서 업데이트 되는 경우
     @PostMapping("/updateReservationInformation")
     public ResponseEntity<String> updateReservationInformation(@RequestBody ReservationDTO dto) {
@@ -87,9 +91,7 @@ public class ReservationRegisterController {
             // 해당 정보 저장
             rServ.updateReservationInformation(dto);
             return ResponseEntity.ok().build();
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             // 예외가 발생한 경우 처리
             logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -103,5 +105,21 @@ public class ReservationRegisterController {
         return ResponseEntity.ok("예약이 성공적으로 삭제되었습니다.");
     }
 
+    @PostMapping("/terms")
+    public ResponseEntity<Term> addTerm(@RequestBody TermDTO termDTO) {
+        Term savedTerm = termService.saveTerm(termDTO);
+        logger.info("Term added: {}", savedTerm); // 추가된 용어 로깅
+        return ResponseEntity.ok(savedTerm);
+    }
+
+    // 모든 용어 조회
+    @GetMapping("/terms/all") // 추가된 모든 용어 조회를 위한 POST 메서드
+    public ResponseEntity<List<Term>> getTerms() {
+        List<Term> terms = termService.getAllTerms();
+        logger.info("Retrieved terms: {}", terms); // 조회된 용어 로깅
+        return ResponseEntity.ok(terms);
+    }
+
 }
+
 
