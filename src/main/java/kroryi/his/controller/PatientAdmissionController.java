@@ -33,10 +33,12 @@ public class PatientAdmissionController {
 
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
 
 
     // 환자 등록
@@ -77,6 +79,8 @@ public class PatientAdmissionController {
 
         // DB에 저장
         PatientAdmission patientAdmissionDTO1 = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+
+        messagingTemplate.convertAndSend("/topic/waitingPatients", patientAdmissionDTO1);
 
         response.put("data", patientAdmissionDTO1);
         response.put("message", "환자가 대기 상태로 등록되었습니다.");
