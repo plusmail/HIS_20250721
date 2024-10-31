@@ -28,8 +28,6 @@ function setSessionStorageItem(key, value) {
 window.addEventListener('sessionStorageChanged', (event) => {
     console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
     patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
-    readPaChart()
-
 });
 
 
