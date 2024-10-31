@@ -71,24 +71,6 @@ function assignPatientValues(patient) {
 
 // 세션 데이터 get
 let patientInfo = sessionStorage.getItem('selectedPatient');
-
-function setSessionStorageItem(key, value) {
-    sessionStorage.setItem(key, value);
-    const event = new CustomEvent('sessionStorageChanged', {
-        detail: { key, value }
-    });
-    window.dispatchEvent(event);
-}
-
-// 이벤트 리스너 등록
-window.addEventListener('sessionStorageChanged', (event) => {
-    console.log('sessionStorage 값이 변경되었습니다:', event.detail.key, event.detail.value);
-    window.patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
-
-});
-
-
-
 // 세션에 값이 있으면 세션 데이터를 사용
 if (patientInfo) {
     patientInfo = JSON.parse(patientInfo);
@@ -234,21 +216,15 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             }
         }
 
-        setSessionStorageItem('selectedPatient', JSON.stringify({
+
+        // 세션 저장
+        sessionStorage.setItem('selectedPatient', JSON.stringify({
             name: menu_name,
             age: menu_age,
             gender: menu_gender,
             chartNum: menu_chartNum,
             birthDate: menu_birthDate
-        }))
-        // // 세션 저장
-        // sessionStorage.setItem('selectedPatient', JSON.stringify({
-        //     name: menu_name,
-        //     age: menu_age,
-        //     gender: menu_gender,
-        //     chartNum: menu_chartNum,
-        //     birthDate: menu_birthDate
-        // }));
+        }));
 
 
         // 모달 창 닫기
