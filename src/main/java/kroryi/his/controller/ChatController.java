@@ -1,10 +1,12 @@
 package kroryi.his.controller;
 
 import jakarta.servlet.http.HttpSession;
+import kroryi.his.domain.ChatRoom;
 import kroryi.his.domain.Member;
 import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
 import kroryi.his.dto.MemberJoinDTO;
+import kroryi.his.repository.ChatRoomRepository;
 import kroryi.his.service.ChatRoomService;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -32,19 +34,20 @@ public class ChatController {
     private final MemberService memberService;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomService chatRoomService;
+    private final ChatRoomRepository chatRoomRepository;
 
     @GetMapping("/auth/currentUser")
-    public ResponseEntity<MemberJoinDTO> getCurrentUser() {
-        log.info("Current user endpoint accessed");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+    public ResponseEntity<MemberJoinDTO> getCurrentUser(HttpSession session) {
+        // 세션에서 사용자 정보를 가져옵니다.
+        String loggedInUserId = (String) session.getAttribute("loggedInUserId");
+        if (loggedInUserId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        UserDetails currentUser = (UserDetails) authentication.getPrincipal();
-        MemberJoinDTO memberDTO = new MemberJoinDTO(currentUser.getUsername(), currentUser.getAuthorities().toString());
+
+        // 예시로 MemberJoinDTO를 사용해 사용자 정보를 반환
+        MemberJoinDTO memberDTO = new MemberJoinDTO(loggedInUserId, "ROLE_USER");  // 필요에 따라 role 변경
         return ResponseEntity.ok(memberDTO);
     }
-
 
     // 채팅방 생성
     @PostMapping("/rooms")
@@ -57,8 +60,11 @@ public class ChatController {
             memberMidsList.add(currentUserId);
         }
 
+        // recipientId를 두 번째 사용자로 설정
+        String recipientId = memberMidsList.size() > 1 ? memberMidsList.get(1) : null;
+
         // 채팅방 생성 서비스 호출
-        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList);
+        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList, recipientId);
 
         if (createdRoom.getId() == null) {
             log.error("채팅방 생성 실패 - 방 ID가 null입니다.");
@@ -72,11 +78,17 @@ public class ChatController {
 
     // 채팅방 목록 반환
     @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoomDTO>> getUserChatRooms(@AuthenticationPrincipal UserDetails userDetails) {
-        String currentUserId = userDetails.getUsername(); // 현재 로그인된 사용자 ID 가져오기
+    public ResponseEntity<List<ChatRoomDTO>> getUserChatRooms() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String currentUserId = ((UserDetails) authentication.getPrincipal()).getUsername(); // 현재 로그인된 사용자 ID 가져오기
         List<ChatRoomDTO> rooms = chatRoomService.getAllChatRoomsForUserWithLastMessage(currentUserId);
         return ResponseEntity.ok(rooms);
     }
+
 
     // ChatController에 사용자 목록 반환 엔드포인트 추가
     @GetMapping("/member/list")
@@ -99,16 +111,55 @@ public class ChatController {
             @PathVariable Long roomId,
             @RequestBody ChatMessageDTO messageDTO) {
         messageDTO.setRoomId(roomId);
-        ChatMessageDTO savedMessage = chatRoomService.saveMessage(roomId, messageDTO);
+
+        // 수신자가 지정되지 않은 경우 기본 수신자를 설정
+        if (messageDTO.getRecipientId() == null) {
+            String recipientId = determineRecipientId(roomId, messageDTO.getSenderId());
+            messageDTO.setRecipientId(recipientId);
+        }
+
+        log.info("Sending message from senderId: {} to recipientId: {}", messageDTO.getSenderId(), messageDTO.getRecipientId());
+
+        ChatMessageDTO savedMessage = chatRoomService.createMessage(
+                roomId,
+                messageDTO.getContent(),
+                messageDTO.getSenderId(),
+                messageDTO.getRecipientId()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
+    }
+
+    // roomId와 senderId를 기반으로 수신자 ID를 결정하는 메서드
+    private String determineRecipientId(Long roomId, String senderId) {
+        // 로직: 채팅방의 멤버 중 senderId가 아닌 다른 사용자 찾기
+        ChatRoom room = chatRoomRepository.findById(roomId).orElse(null);
+        if (room != null) {
+            for (Member member : room.getMembers()) {
+                if (!member.getMid().equals(senderId)) {
+                    return member.getMid();  // sender가 아닌 다른 멤버의 ID 반환
+                }
+            }
+        }
+        return null;  // 기본 수신자가 없으면 null 반환
     }
 
     // WebSocket에서 메시지 전송 처리
     @MessageMapping("/chat.send")
     public void sendMessage(ChatMessageDTO message) {
-        chatRoomService.sendMessageToRoom(message.getRoomId(), message);
-        messagingTemplate.convertAndSend("/topic/rooms/" + message.getRoomId(), message);
+        ChatMessageDTO savedMessage = chatRoomService.createMessage(
+                message.getRoomId(),
+                message.getContent(),
+                message.getSenderId(),
+                message.getRecipientId() // 방 생성 시 저장된 recipientId
+        );
+
+        messagingTemplate.convertAndSendToUser(
+                savedMessage.getRecipientId(),
+                "/topic/rooms/" + message.getRoomId(),
+                savedMessage
+        );
     }
+
 
     // WebSocket에서 사용자 추가 처리
     @MessageMapping("/chat.addUser")

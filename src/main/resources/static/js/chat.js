@@ -10,23 +10,57 @@ const chatModalLabel = document.getElementById('chatModalLabel');
 const messageList = document.getElementById('messageList');
 const messageInput = document.getElementById('messageInput');
 const sendMessageButton = document.getElementById('sendMessageButton');
+// WebSocket 연결 설정
+const socket = new SockJS('/ws');
+const stompClient = Stomp.over(socket);
 
 let selectedUser = null;
 let currentUser = {};
 let chatRooms = [];
 let currentRoomId = null;
+let loggedInUserId = null;
+
+// 클라이언트 WebSocket 설정
+stompClient.connect({}, function (frame) {
+    console.log('Connected to server:', frame);
+    stompClient.subscribe(`/user/topic/rooms/${currentRoomId}`, function (message) {
+        renderMessages([JSON.parse(message.body)]);
+    });
+});
+
+function connectWebSocket() {
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        stompClient.subscribe(`/user/topic/rooms/${currentRoomId}`, function (message) {
+            renderMessages([JSON.parse(message.body)]);
+        });
+    }, function (error) {
+        console.error('WebSocket connection error:', error);
+        // 연결 실패 시 5초 후 재시도
+        setTimeout(connectWebSocket, 5000);
+    });
+}
+
+// 첫 연결 시도
+connectWebSocket();
 
 // 버튼 클릭 시 채팅 패널 표시/숨기기
 chatButton.addEventListener('click', () => {
     chatPanel.classList.toggle('open');
 });
 
-// 서버에서 로그인된 사용자 정보 가져오기
+// 로그인한 사용자 정보를 가져와 loggedInUserId를 설정하는 함수
 function fetchCurrentUser() {
-    axios.get(window.location.origin + '/api/chat/auth/currentUser')
+    console.log("fetchCurrentUser 함수 호출"); // 호출 여부 확인
+    axios.get('/api/chat/auth/currentUser')
         .then(response => {
-            currentUser = response.data;
-            console.log("현재 사용자 정보:", currentUser);
+            const currentUser = response.data;
+            loggedInUserId = currentUser.username; // 설정
+            console.log("로그인된 사용자 ID:", loggedInUserId); // 설정 확인
         })
         .catch(error => {
             console.error("현재 사용자 정보 불러오기 실패:", error);
@@ -113,6 +147,42 @@ function renderUserList(users) {
     });
 }
 
+startChatBtn.addEventListener('click', () => {
+    // selectedUser와 loggedInUserId의 값이 무엇인지 확인하는 로그
+    console.log("selectedUser:", selectedUser);
+    console.log("loggedInUserId:", loggedInUserId);
+
+    if (!selectedUser || !loggedInUserId) {
+        alert('사용자를 찾을 수 없습니다.');
+        return;
+    }
+
+    const roomName = `${selectedUser.name}와의 1:1 채팅`;
+    const recipientId = selectedUser.mid; // 선택한 사용자의 ID를 recipientId로 설정
+
+    // 방 생성 요청 전에 로그로 확인
+    console.log("방 생성 요청:", roomName, recipientId, loggedInUserId);
+
+    axios.post('/api/chat/rooms', {
+        roomName: roomName,
+        memberMids: [loggedInUserId, recipientId], // 로그인한 사용자와 수신자
+        recipientId: recipientId // 수신자를 설정
+    })
+        .then(response => {
+            const newRoom = response.data;
+            chatRooms.push(newRoom);
+            renderChatRooms();
+            openChatRoom(newRoom.id);
+            selectedUser = null;
+
+            // 사용자 선택 모달 닫기
+            const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
+            userSelectionModal.hide();
+        })
+        .catch(error => {
+            console.error('채팅방 생성 실패:', error);
+        });
+});
 
 // 채팅방을 클릭하여 모달 열기
 function openChatRoom(roomId) {
@@ -138,7 +208,6 @@ function openChatRoom(roomId) {
         });
 }
 
-
 // 메시지 렌더링
 function renderMessages(messages) {
     messageList.innerHTML = '';
@@ -160,20 +229,28 @@ function addMessageToChat(message) {
 sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
 
-    if (!message || !currentRoomId) {
-        alert('메시지를 보내기 전에 채팅방을 선택하세요.');
+    if (!message || !currentRoomId || !selectedUser) {
+        alert('메시지를 보내기 전에 사용자를 선택하세요.');
         return;
     }
 
     axios.post(`/api/chat/rooms/${currentRoomId}/messages`, {
         content: message,
-        senderId: currentUser.mid
+        senderId: currentUser.mid,
+        recipientId: selectedUser.mid  // 선택된 수신자의 ID 설정
     })
         .then(response => {
-            addMessageToChat(response.data);
+            const newMessage = response.data;
+            const li = document.createElement('li');
+            li.classList.add('message-item', newMessage.senderId === currentUser.mid ? 'right' : 'left');
+            li.textContent = newMessage.senderName ? `${newMessage.senderName}: ${newMessage.content}` : newMessage.content;
+            messageList.appendChild(li); // 새 메시지 추가
             messageInput.value = '';
         })
         .catch(error => {
             console.error('메시지 전송 실패:', error);
         });
 });
+
+
+

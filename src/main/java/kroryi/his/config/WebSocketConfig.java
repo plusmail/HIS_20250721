@@ -12,8 +12,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");  // 메시지를 전달할 경로
-        config.setApplicationDestinationPrefixes("/app");  // 메시지를 보낼 경로
+        config.enableSimpleBroker("/topic", "/user");  // 메시지를 전달할 경로에 /user 추가
+        config.setUserDestinationPrefix("/user");      // 개인 메시징 경로를 /user로 설정
+        config.setApplicationDestinationPrefixes("/app");  // 클라이언트가 메시지를 보낼 때의 경로
     }
 
     @Override
@@ -23,3 +24,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();  // SockJS 사용
     }
 }
+

@@ -15,5 +15,6 @@ public class ChatRoomDTO {
     private Long id;
     private String roomName;
     private Set<String> memberMids;
+    private String recipientId;  // 기본 수신자 ID
     private ChatMessageDTO lastMessage;
 }

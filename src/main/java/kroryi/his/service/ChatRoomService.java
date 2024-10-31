@@ -8,16 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 public interface ChatRoomService {
-    ChatRoomDTO createChatRoom(String roomName, List<String> memberNames);
-
-    List<ChatRoomDTO> getAllChatRooms();
+    ChatRoomDTO createChatRoom(String roomName, List<String> memberMids, String recipientId);
 
     List<ChatMessageDTO> getMessagesByRoomId(Long roomId);
 
-    ChatMessageDTO saveMessage(Long roomId, ChatMessageDTO messageDTO);
-
-    void sendMessageToRoom(Long roomId, ChatMessageDTO messageDTO);
-
     List<ChatRoomDTO> getAllChatRoomsForUserWithLastMessage(String userId);
+
+    ChatMessageDTO createMessage(Long roomId, String content, String senderId, String recipientId);
+
 
 }
