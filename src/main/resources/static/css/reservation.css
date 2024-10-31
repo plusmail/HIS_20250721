@@ -68,3 +68,9 @@ table tbody td {
     color: white;
 }
 
+.tag {
+    background-color: #e0e0e0;
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-right: 5px;
+}

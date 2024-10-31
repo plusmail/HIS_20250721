@@ -51,7 +51,7 @@ function rReset(reset) {
     reservationDateElement.value = '';
 
     const reservationTimeElement = document.getElementById('test_time');
-    reservationTimeElement.value = "9:00";
+    reservationTimeElement.selectedIndex = '9:00';
 
     // 환자이름
     const departmentElement = document.getElementById('departmentInput');
@@ -74,6 +74,9 @@ function rReset(reset) {
     // 노트
     const patientNoteElement = document.getElementById('patient-note');
     patientNoteElement.value = '';
+
+    const taggedWordsDiv = document.getElementById('taggedWords');
+    taggedWordsDiv.innerHTML = '';
 
     // 예약 미이행 - c/A
     const reservationStatusCaElement = document.getElementById('reservation-status-ca');
@@ -106,6 +109,8 @@ function rReset2(responseData) {
     const reservationStatusBaElement = document.getElementById('reservation-status-ba');
     const reservationStatusElement = document.getElementById('reservation-status-none');
     const indexNumberElement = document.getElementById('index-number');
+    const taggedWordsDiv = document.getElementById('taggedWords');
+
 
     // 받아온 데이터로 데이터 새로 등록
 
@@ -144,6 +149,7 @@ function rReset2(responseData) {
 
         // 인덱스 번호
         indexNumberElement.innerHTML = responseData[0].seq;
+        console.log(responseData);
     }
 }
 
@@ -341,12 +347,12 @@ function addRow() {
 
     // 저장 버튼
     const saveCell = document.createElement('td');
-    saveCell.innerHTML = '<button onclick="saveTerm(this)">저장</button>'; // 저장 버튼 추가
+    saveCell.innerHTML = '<button onclick="saveTerm(this)" class="btn btn-success">저장</button>'; // 저장 버튼 추가
     newRow.appendChild(saveCell);
 
     // 삭제 버튼
     const deleteCell = document.createElement('td');
-    deleteCell.innerHTML = '<button onclick="deleteTerm(this)">삭제</button>'; // 삭제 버튼 추가
+    deleteCell.innerHTML = '<button onclick="deleteTerm(this)" class="btn btn-danger">삭제</button>'; // 삭제 버튼 추가
     newRow.appendChild(deleteCell);
 
     termList.appendChild(newRow);
@@ -367,7 +373,7 @@ function saveTerm(button) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name: termInput })
+        body: JSON.stringify({name: termInput})
     })
         .then(response => {
             if (!response.ok) {
@@ -377,8 +383,11 @@ function saveTerm(button) {
         })
         .then(newTerm => {
             row.cells[0].textContent = newTerm.name; // 입력 필드를 텍스트로 변경
-            row.cells[1].innerHTML = '<button onclick="editTerm(this)">수정</button>'; // 수정 버튼 추가
-            row.cells[2].innerHTML = '<button onclick="deleteTerm(this)">삭제</button>'; // 삭제 버튼 추가
+            row.cells[1].innerHTML = `
+    <button onclick="addTermByNote('${newTerm.name}')" class="btn btn-success">추가</button>`;
+            row.cells[2].innerHTML = `
+    <button onclick="deleteTerm(this)" class="btn btn-danger">삭제</button>`;
+
         })
         .catch(error => {
             alert(error.message);
@@ -406,11 +415,11 @@ function fetchTerms() {
                 newRow.appendChild(termCell);
 
                 const editCell = document.createElement('td');
-                editCell.innerHTML = `<button onclick="addTermByNote('${term.name}')">추가</button>`
+                editCell.innerHTML = `<button onclick="addTermByNote('${term.name}')" class="btn btn-success">추가</button>`
                 newRow.appendChild(editCell);
 
                 const deleteCell = document.createElement('td');
-                deleteCell.innerHTML = `<button onclick="deleteTerm('${term.id}')">삭제</button>`
+                deleteCell.innerHTML = `<button onclick="deleteTerm('${term.id}')"  class="btn btn-danger">삭제</button>`
                 newRow.appendChild(deleteCell);
 
                 termList.appendChild(newRow);
@@ -427,27 +436,34 @@ function addTermByNote(name) {
     const patientNoteElement = document.getElementById('patient-note');
     const patientNoteElementValue = document.getElementById('patient-note').value;
 
-    if(!patientNoteElementValue){
+    if (!patientNoteElementValue) {
         patientNoteElement.value += name;
+    } else {
+        patientNoteElement.value += ", " + name;
     }
 
-    else {
-        patientNoteElement.value += ", " +name;
+    if (name) {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = name;
+
+        const taggedWordsDiv = document.getElementById('taggedWords');
+        taggedWordsDiv.appendChild(span);
     }
 }
 
-function deleteTerm(id){
+function deleteTerm(id) {
     fetch(`reservation/deleteTerm?seq=${id}`, {
         method: 'DELETE',
     })
         .then(response => {
             if (response.ok) {
                 // 성공적으로 삭제되었을 때 실행할 동작
-                alert('Term deleted successfully.');
+                alert('성공적으로 삭제 되었습니다.');
                 // 테이블에서 행 삭제
                 fetchTerms();
             } else {
-                throw new Error('Failed to delete term.');
+                throw new Error('삭제 실패');
             }
         })
         .catch(error => {
