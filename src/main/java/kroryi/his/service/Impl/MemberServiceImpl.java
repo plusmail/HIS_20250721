@@ -225,5 +225,10 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.toList());
     }
 
+    // 사용자 이름과 비밀번호로 사용자 찾기
+    public Member findMemberByUsernameAndPassword(String username, String password) {
+        return memberRepository.findByMidAndPassword(username, password)
+                .orElse(null);  // Optional 처리
+    }
 
 }

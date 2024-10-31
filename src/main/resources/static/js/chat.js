@@ -12,68 +12,57 @@ const messageInput = document.getElementById('messageInput');
 const sendMessageButton = document.getElementById('sendMessageButton');
 // WebSocket 연결 설정
 const socket = new SockJS('/ws');
-const stompClient = Stomp.over(socket);
 
 let selectedUser = null;
 let currentUser = {};
 let chatRooms = [];
+let currentUserData = {};
 let currentRoomId = null;
 let loggedInUserId = null;
+let stompClient;
 
-// 클라이언트 WebSocket 설정
-stompClient.connect({}, function (frame) {
-    console.log('Connected to server:', frame);
-    stompClient.subscribe(`/user/topic/rooms/${currentRoomId}`, function (message) {
-        renderMessages([JSON.parse(message.body)]);
-    });
-});
-
-function connectWebSocket() {
+function connectWebSocket(roomId) {
     const socket = new SockJS('/ws');
-    const stompClient = Stomp.over(socket);
+    stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
-        console.log('Connected: ' + frame);
-
-        stompClient.subscribe(`/user/topic/rooms/${currentRoomId}`, function (message) {
+        console.log('Connected to server:', frame);
+        stompClient.subscribe(`/user/topic/rooms/${roomId}`, function (message) {
             renderMessages([JSON.parse(message.body)]);
         });
     }, function (error) {
         console.error('WebSocket connection error:', error);
-        // 연결 실패 시 5초 후 재시도
-        setTimeout(connectWebSocket, 5000);
+        setTimeout(() => connectWebSocket(roomId), 5000); // 연결 실패 시 재시도
     });
 }
 
-// 첫 연결 시도
-connectWebSocket();
-
-// 버튼 클릭 시 채팅 패널 표시/숨기기
 chatButton.addEventListener('click', () => {
+    const chatPanel = document.getElementById('chatPanel');
     chatPanel.classList.toggle('open');
 });
 
-// 로그인한 사용자 정보를 가져와 loggedInUserId를 설정하는 함수
+// 현재 사용자 정보 가져오기
 function fetchCurrentUser() {
-    console.log("fetchCurrentUser 함수 호출"); // 호출 여부 확인
-    axios.get('/api/chat/auth/currentUser')
+    axios.get('/api/user/session')
         .then(response => {
-            const currentUser = response.data;
-            loggedInUserId = currentUser.username; // 설정
-            console.log("로그인된 사용자 ID:", loggedInUserId); // 설정 확인
+            currentUserData = response.data;
+            loggedInUserId = globalUserData.username || globalUserData.mid; // mid 사용
+            console.log('로그인된 사용자 ID:', loggedInUserId);
         })
         .catch(error => {
-            console.error("현재 사용자 정보 불러오기 실패:", error);
+            console.error('Error fetching user session:', error);
         });
 }
 
-// 페이지가 로드되면 서버에서 현재 사용자와 채팅방 목록 불러오기
-document.addEventListener('DOMContentLoaded', function () {
+// 페이지 로드 시 사용자 정보 가져오기
+document.addEventListener('DOMContentLoaded', fetchCurrentUser);
+
+// DOMContentLoaded 시 초기화
+document.addEventListener('DOMContentLoaded', () => {
     fetchCurrentUser();
     loadChatRooms();
 });
 
-// 채팅방 목록 불러오기
 function loadChatRooms() {
     axios.get(window.location.origin + '/api/chat/rooms')
         .then(response => {
@@ -86,7 +75,8 @@ function loadChatRooms() {
         });
 }
 
-// 채팅방 목록 렌더링 (최근 메시지 표시)
+
+// 채팅방 목록 렌더링 함수
 function renderChatRooms() {
     roomList.innerHTML = '';
     chatRooms.forEach(room => {
@@ -96,95 +86,15 @@ function renderChatRooms() {
 
         const recentMessage = document.createElement('span');
         recentMessage.classList.add('recent-message');
-
-        // 최근 메시지 표시
-        const lastMessage = room.lastMessage ? room.lastMessage.content : '메시지가 없습니다.';
-        recentMessage.textContent = lastMessage;
+        recentMessage.textContent = room.lastMessage ? room.lastMessage.content : '메시지가 없습니다.';
 
         li.appendChild(recentMessage);
-
         li.addEventListener('click', () => openChatRoom(room.id));
-
         roomList.appendChild(li);
     });
 }
 
-// 사용자 목록 불러오기 함수
-function loadUsers() {
-    axios.get('/api/chat/member/list')
-        .then(response => {
-            const users = response.data;
-            renderUserList(users);
-        })
-        .catch(error => {
-            console.error('사용자 목록 불러오기 실패:', error);
-        });
-}
-
-// 사용자 선택 모달이 열릴 때 사용자 목록 로드
-createChatRoomBtn.addEventListener('click', () => {
-    loadUsers();
-});
-
-// 사용자 선택 함수
-function selectUser(user, listItem) {
-    selectedUser = user;  // 선택된 사용자 설정
-    userList.querySelectorAll('li').forEach(li => li.classList.remove('active')); // 모든 목록 아이템에서 active 제거
-    listItem.classList.add('active'); // 선택된 목록 아이템에 active 추가
-}
-
-// 사용자 목록을 렌더링하는 함수
-function renderUserList(users) {
-    const userList = document.getElementById('userList');
-    userList.innerHTML = ''; // 기존 목록 초기화
-
-    users.forEach(user => {
-        const li = document.createElement('li');
-        li.classList.add('list-group-item');
-        li.textContent = user.name; // 사용자 이름을 표시
-        li.addEventListener('click', () => selectUser(user, li));
-        userList.appendChild(li);
-    });
-}
-
-startChatBtn.addEventListener('click', () => {
-    // selectedUser와 loggedInUserId의 값이 무엇인지 확인하는 로그
-    console.log("selectedUser:", selectedUser);
-    console.log("loggedInUserId:", loggedInUserId);
-
-    if (!selectedUser || !loggedInUserId) {
-        alert('사용자를 찾을 수 없습니다.');
-        return;
-    }
-
-    const roomName = `${selectedUser.name}와의 1:1 채팅`;
-    const recipientId = selectedUser.mid; // 선택한 사용자의 ID를 recipientId로 설정
-
-    // 방 생성 요청 전에 로그로 확인
-    console.log("방 생성 요청:", roomName, recipientId, loggedInUserId);
-
-    axios.post('/api/chat/rooms', {
-        roomName: roomName,
-        memberMids: [loggedInUserId, recipientId], // 로그인한 사용자와 수신자
-        recipientId: recipientId // 수신자를 설정
-    })
-        .then(response => {
-            const newRoom = response.data;
-            chatRooms.push(newRoom);
-            renderChatRooms();
-            openChatRoom(newRoom.id);
-            selectedUser = null;
-
-            // 사용자 선택 모달 닫기
-            const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
-            userSelectionModal.hide();
-        })
-        .catch(error => {
-            console.error('채팅방 생성 실패:', error);
-        });
-});
-
-// 채팅방을 클릭하여 모달 열기
+// 채팅방 열기
 function openChatRoom(roomId) {
     currentRoomId = roomId;
     const room = chatRooms.find(r => r.id === roomId);
@@ -193,6 +103,7 @@ function openChatRoom(roomId) {
     axios.get(`/api/chat/rooms/${roomId}/messages`)
         .then(response => {
             renderMessages(response.data);
+            connectWebSocket(roomId); // 채팅방에 맞는 WebSocket 구독
 
             // 중앙에 위치한 채팅 모달 열기 (data-bs-toggle 활용)
             const chatModalTrigger = document.createElement('button');
@@ -208,13 +119,14 @@ function openChatRoom(roomId) {
         });
 }
 
-// 메시지 렌더링
+
+// 메시지를 렌더링하는 함수
 function renderMessages(messages) {
-    messageList.innerHTML = '';
+    messageList.innerHTML = ''; // 기존 메시지 목록 초기화
     messages.forEach(message => addMessageToChat(message));
 }
 
-// 메시지 추가 함수
+// 개별 메시지를 채팅 목록에 추가하는 함수
 function addMessageToChat(message) {
     const li = document.createElement('li');
     li.classList.add('message-item', message.senderId === currentUser.mid ? 'right' : 'left');
@@ -228,7 +140,6 @@ function addMessageToChat(message) {
 // 메시지 전송
 sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
-
     if (!message || !currentRoomId || !selectedUser) {
         alert('메시지를 보내기 전에 사용자를 선택하세요.');
         return;
@@ -236,21 +147,98 @@ sendMessageButton.addEventListener('click', () => {
 
     axios.post(`/api/chat/rooms/${currentRoomId}/messages`, {
         content: message,
-        senderId: currentUser.mid,
-        recipientId: selectedUser.mid  // 선택된 수신자의 ID 설정
+        senderId: loggedInUserId,
+        recipientId: selectedUser.mid
     })
         .then(response => {
-            const newMessage = response.data;
-            const li = document.createElement('li');
-            li.classList.add('message-item', newMessage.senderId === currentUser.mid ? 'right' : 'left');
-            li.textContent = newMessage.senderName ? `${newMessage.senderName}: ${newMessage.content}` : newMessage.content;
-            messageList.appendChild(li); // 새 메시지 추가
+            addMessageToChat(response.data);
             messageInput.value = '';
         })
         .catch(error => {
             console.error('메시지 전송 실패:', error);
         });
 });
+
+createChatRoomBtn.addEventListener('click', () => {
+    loadUsers();
+});
+
+// 사용자 불러오기
+function loadUsers() {
+    axios.get('/api/chat/member/list')
+        .then(response => {
+            console.log("사용자 목록:", response.data); // 디버깅 로그 추가
+            const users = response.data;
+            renderUserList(users);
+        })
+        .catch(error => {
+            console.error('사용자 목록 불러오기 실패:', error);
+        });
+}
+
+// 사용자 리스트 렌더링
+function renderUserList(users) {
+    const userList = document.getElementById('userList');
+    userList.innerHTML = ''; // 기존 목록 초기화
+
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.textContent = user.name;
+        li.addEventListener('click', () => selectUser(user, li));
+        userList.appendChild(li);
+    });
+}
+
+// 사용자 선택 함수
+function selectUser(user, listItem) {
+    selectedUser = user; // 선택된 사용자 설정
+    recipientId = selectedUser.mid; // 선택된 사용자의 ID를 recipientId로 설정
+    console.log("선택된 수신자 ID:", recipientId);
+
+    // 선택한 사용자 스타일 업데이트
+    userList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+    listItem.classList.add('active');
+}
+
+startChatBtn.addEventListener('click', () => {
+    console.log("selectedUser:", selectedUser);
+    console.log("loggedInUserId:", loggedInUserId);
+
+    if (!selectedUser || !loggedInUserId) {
+        alert('사용자를 찾을 수 없습니다.');
+        return;
+    }
+
+    const roomName = `${selectedUser.name}와의 1:1 채팅`;
+    const recipientId = selectedUser.mid;
+
+    console.log("방 생성 요청:", roomName, recipientId, loggedInUserId);
+
+    axios.post('/api/chat/rooms', {
+        roomName: roomName,
+        memberMids: [loggedInUserId, recipientId],
+        recipientId: recipientId
+    })
+        .then(response => {
+            const newRoom = response.data;
+            chatRooms.push(newRoom);
+            renderChatRooms();
+            openChatRoom(newRoom.id);
+            selectedUser = null;
+
+            const userSelectionModal = bootstrap.Modal.getInstance(document.getElementById('userSelectionModal'));
+            userSelectionModal.hide();
+        })
+        .catch(error => {
+            console.error('채팅방 생성 실패:', error);
+        });
+});
+
+
+
+
+
 
 
 

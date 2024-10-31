@@ -6,6 +6,7 @@ import kroryi.his.domain.Member;
 import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
 import kroryi.his.dto.MemberJoinDTO;
+import kroryi.his.dto.MemberSecurityDTO;
 import kroryi.his.repository.ChatRoomRepository;
 import kroryi.his.service.ChatRoomService;
 import kroryi.his.service.MemberService;
@@ -22,12 +23,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
+@SessionAttributes("loggedInUser")
 @Log4j2
 public class ChatController {
 
@@ -36,17 +40,16 @@ public class ChatController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomRepository chatRoomRepository;
 
+
     @GetMapping("/auth/currentUser")
-    public ResponseEntity<MemberJoinDTO> getCurrentUser(HttpSession session) {
-        // 세션에서 사용자 정보를 가져옵니다.
-        String loggedInUserId = (String) session.getAttribute("loggedInUserId");
-        if (loggedInUserId == null) {
+    public ResponseEntity<MemberJoinDTO> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // 예시로 MemberJoinDTO를 사용해 사용자 정보를 반환
-        MemberJoinDTO memberDTO = new MemberJoinDTO(loggedInUserId, "ROLE_USER");  // 필요에 따라 role 변경
-        return ResponseEntity.ok(memberDTO);
+        MemberSecurityDTO currentUser = (MemberSecurityDTO) authentication.getPrincipal();
+        return ResponseEntity.ok(new MemberJoinDTO(currentUser.getUsername(), currentUser.getName()));
     }
 
     // 채팅방 생성

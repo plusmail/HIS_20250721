@@ -67,4 +67,6 @@ public interface MemberService {
     List<MemberJoinDTO> getAllUserIdAndName();
 
     List<MemberJoinDTO> getAllMembers();
+
+    Member findMemberByUsernameAndPassword(String username, String password);
 }

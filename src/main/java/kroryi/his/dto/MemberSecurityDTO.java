@@ -1,5 +1,6 @@
 package kroryi.his.dto;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,7 +15,9 @@ import java.util.List;
 
 public class MemberSecurityDTO extends User {
 
+    @Getter
     private final String name;
+
     private final String password;
 
 
@@ -25,4 +28,5 @@ public class MemberSecurityDTO extends User {
         this.name = memberJoinDTO.getName();
         this.password = memberJoinDTO.getPassword();
     }
+
 }
