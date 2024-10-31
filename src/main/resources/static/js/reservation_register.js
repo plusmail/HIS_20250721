@@ -390,3 +390,130 @@ function deleteReservation() {
         });
 
 }
+
+function addRow() {
+    const termList = document.getElementById('termList');
+    const newRow = document.createElement('tr');
+
+    // 진료명 입력 필드
+    const termCell = document.createElement('td');
+    termCell.innerHTML = '<input type="text" placeholder="진료명을 입력하세요" />'; // 빈 입력 필드
+    newRow.appendChild(termCell);
+
+    // 저장 버튼
+    const saveCell = document.createElement('td');
+    saveCell.innerHTML = '<button onclick="saveTerm(this)">저장</button>'; // 저장 버튼 추가
+    newRow.appendChild(saveCell);
+
+    // 삭제 버튼
+    const deleteCell = document.createElement('td');
+    deleteCell.innerHTML = '<button onclick="deleteTerm(this)">삭제</button>'; // 삭제 버튼 추가
+    newRow.appendChild(deleteCell);
+
+    termList.appendChild(newRow);
+}
+
+function saveTerm(button) {
+    const row = button.parentNode.parentNode;
+    const termInput = row.querySelector('input').value.trim();
+
+    if (termInput === '') {
+        alert("진료명을 입력하세요.");
+        return;
+    }
+
+    // API 호출
+    fetch('/reservation/terms', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: termInput })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("진료명을 추가하는 데 오류가 발생했습니다.");
+            }
+            return response.json();
+        })
+        .then(newTerm => {
+            row.cells[0].textContent = newTerm.name; // 입력 필드를 텍스트로 변경
+            row.cells[1].innerHTML = '<button onclick="editTerm(this)">수정</button>'; // 수정 버튼 추가
+            row.cells[2].innerHTML = '<button onclick="deleteTerm(this)">삭제</button>'; // 삭제 버튼 추가
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+}
+
+function fetchTerms() {
+    fetch('/reservation/terms/all')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("용어를 가져오는 데 오류가 발생했습니다.");
+            }
+            return response.json();
+        })
+        .then(terms => {
+            console.log("Fetched terms:", terms);
+            const termList = document.getElementById('termList');
+            termList.innerHTML = ''; // 기존 행 초기화 (중복 방지)
+
+            terms.forEach(term => {
+                const newRow = document.createElement('tr');
+
+                const termCell = document.createElement('td');
+                termCell.textContent = term.name;
+                newRow.appendChild(termCell);
+
+                const editCell = document.createElement('td');
+                editCell.innerHTML = `<button onclick="addTermByNote('${term.name}')">추가</button>`
+                newRow.appendChild(editCell);
+
+                const deleteCell = document.createElement('td');
+                deleteCell.innerHTML = `<button onclick="deleteTerm('${term.id}')">삭제</button>`
+                newRow.appendChild(deleteCell);
+
+                termList.appendChild(newRow);
+            });
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+}
+
+fetchTerms()
+
+function addTermByNote(name) {
+    const patientNoteElement = document.getElementById('patient-note');
+    const patientNoteElementValue = document.getElementById('patient-note').value;
+
+    if(!patientNoteElementValue){
+        patientNoteElement.value += name;
+    }
+
+    else {
+        patientNoteElement.value += ", " +name;
+    }
+}
+
+function deleteTerm(id){
+    fetch(`reservation/deleteTerm?seq=${id}`, {
+        method: 'DELETE',
+    })
+        .then(response => {
+            if (response.ok) {
+                // 성공적으로 삭제되었을 때 실행할 동작
+                alert('Term deleted successfully.');
+                // 테이블에서 행 삭제
+                fetchTerms();
+            } else {
+                throw new Error('Failed to delete term.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting term.');
+        });
+
+}

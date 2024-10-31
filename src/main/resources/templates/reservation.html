@@ -117,7 +117,6 @@
         const currentDate = new Date();
 
 
-
         function loadContent(page) {
             $("#bodyContent").load(page, function (response, status, xhr) {
                 if (status === "error") {
@@ -129,16 +128,18 @@
         }
 
 
-
         function renderCalendar() {
+
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
+
             const firstDay = new Date(year, month, 1).getDay();
             const lastDate = new Date(year, month + 1, 0).getDate();
             const monthYear = document.getElementById('monthYear');
             const calendarBody = document.getElementById('calendar-body');
             monthYear.innerText = `${year}년 ${month + 1}월`;
             calendarBody.innerHTML = '';
+
             let date = 1;
 
             // Variable to hold the currently selected cell
@@ -146,6 +147,7 @@
 
             for (let i = 0; i < 6; i++) {
                 const row = document.createElement('tr');
+
                 for (let j = 0; j < 7; j++) {
                     const cell = document.createElement('td');
                     cell.classList.add('calendarDate');
@@ -154,10 +156,13 @@
                     } else if (date > lastDate) {
                         break;
                     } else {
-                        if ([0, 7, 14, 21, 28, 35].includes(j)) {
-                            cell.style.color = 'red';
-                        } else if ([6, 13, 20, 27, 34].includes(j)) {
-                            cell.style.color = 'blue';
+                        // 일요일이면 색갈이 빨간색으로
+                        if (j === 0) {
+                            cell.style.color = 'red'; // 숫자 색상을 빨간색으로 변경
+                        }
+                        // 토요일
+                        else if (j === 6) {
+                            cell.style.color = 'blue'; // 숫자 색상을 빨간색으로 변경
                         } else {
                             cell.style.color = 'black';
                         }
@@ -176,7 +181,9 @@
                         date++;
                     }
                     row.appendChild(cell);
+                    console.log(cell);
                 }
+
                 calendarBody.appendChild(row);
             }
 
