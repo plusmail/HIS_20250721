@@ -30,7 +30,7 @@ const yDownToothValues = document.querySelectorAll(".y-down-tooth")
 // 모달 데이터 선택
 const modalData = document.querySelectorAll(".modal-tr")
 // 모달 메모 데이터 전송 btn
-const modalInMemo = document.querySelector(".modal-in-memo")
+
 const allToothLists = tooth.querySelectorAll('button')
 const allsymptomLists = symptom.querySelectorAll('input')
 
@@ -354,36 +354,7 @@ modalData.forEach(function (row) {
     });
 });
 
-modalInMemo.addEventListener("click", e => {
-    let k = 1;
-    const selectedRows = document.querySelectorAll('tr.selected-row');  // 'selected-row' 클래스를 가진 모든 <tr> 선택
 
-    frequentlyUsedPhrases=[];
-    // 선택된 <tr>들에서 데이터 추출
-    selectedRows.forEach(function(row) {
-        row.querySelectorAll('td').forEach(function(cell) {
-            if(k%2===0) {
-                frequentlyUsedPhrases.push(cell.textContent);  // 각 <td>의 텍스트를 배열에 저장
-            }
-            k++
-        });
-    });
-
-
-    memo.textContent = frequentlyUsedPhrases
-    const closeModal = document.querySelector("#piModal")
-    let modalInstance = bootstrap.Modal.getInstance(closeModal)
-    if (!modalInstance) {
-        modalInstance = new bootstrap.modal(closeModal);
-    }
-    modalInstance.hide();
-})
-
-// 서버에서 Medical Charts 데이터를 가져오는 함수
-
-piModalBtn.addEventListener("click", e => {
-    readChartMemo()
-});
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -430,29 +401,6 @@ function readChartMemo() {
     });
 }
 
-piMemoAddBtn.addEventListener("click", e => {
-    $.ajax({
-        url: '/medical_chart/saveMemos',  // 서버의 API 엔드포인트
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            memo: piMemoAdd.value, // 서버로 전송할 데이터
-            doc: "의사"// 추후에 계정정보에서 의사 이름을 가져와서 저장.
-        }),
-        success: function (response) {
-            console.log('Success:', response);  // 성공 시 서버의 응답 처리
-            // 서버에서 데이터를 다시 불러와서 테이블 갱신하거나 다른 작업 수행
-            readChartMemo()
-
-            piMemoAdd.value === '';
-
-        },
-        error: function (xhr, status, error) {
-            console.error('Error:', error);  // 오류 처리
-        }
-    });
-
-});
 
 function readPaChart() {
     $.ajax({

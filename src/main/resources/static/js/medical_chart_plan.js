@@ -114,22 +114,6 @@ document.getElementById('saveBtn').addEventListener('click', function () {
 });
 
 
-// 치아 클릭 시 선택된 치아 value 값을 저장.
-mTooth.addEventListener("click", e => {
-    toothList = []
-    toothList.push(e.target.value)
-    if (e.target.tagName === "BUTTON" && e.target.id === '') {
-        if (e.target.classList.contains("opacity-50")) {
-            e.target.classList.remove("opacity-50")
-        } else {
-            e.target.classList.add("opacity-50")
-        }
-    } else {
-        if (e.target.tagName === "BUTTON") {
-            toothTerminal(e.target.id)
-        }
-    }
-})
 
 
 function toothTerminal(id) {
@@ -227,36 +211,6 @@ function toothTerminal(id) {
     }
 }
 
-// 선택된 checkbox와 매칭되는 라벨값 을 클릭 이벤트가 발생한 타겟에 출력.
-document.getElementById('save-tooth').addEventListener('click', function () {
-    if (selectedPTag) {
-        const buttons = toothModal.querySelectorAll('button.opacity-50');
-        let selectedbuttons = [];
-
-        console.log(buttons);
-        buttons.forEach(button => {
-            selectedbuttons.push(button.textContent); // label의 텍스트 값을 수집
-
-            // selectedValues.push(checkbox.value); // 체크된 값 수집
-        });
-        buttons.forEach(button => {
-            button.classList.remove('opacity-50');
-        })
-        console.log(selectedbuttons)
-
-        // p 태그에 선택된 값을 표시
-        selectedPTag.textContent = selectedbuttons.join(', ');
-
-        if (selectedPTag.textContent === '' || selectedPTag.textContent === null) {
-            selectedPTag.textContent = "치아 선택";
-        }
-        // 모달 닫기
-        const bootstrapModal = bootstrap.Modal.getInstance(toothModal);
-        bootstrapModal.hide();
-    } else {
-        console.error("No p tag was selected to display the results.");
-    }
-});
 
 $(document).ready(function() {
     saveChartNum();
