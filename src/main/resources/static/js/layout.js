@@ -105,7 +105,7 @@ if (patientInfo) {
         patientLastVisit(parseInt(patientInfo.chartNum)).then(data => {
             console.log(data);
             if (data.completionTime) {
-                const completionTime = new Date(data.completionTime);
+                const completionTime = new Date(data.completionTime[0],data.completionTime[1],data.completionTime[2]);
                 lastVisit.value = completionTime.toISOString().split('T')[0]; // "yyyy-MM-dd" 형식으로 변환
             } else {
                 lastVisit.value = ''; // completionTime이 null일 경우 빈 문자열
@@ -204,7 +204,7 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             patientLastVisit(parseInt(menu_chartNum)).then(data => {
                 console.log(data.completionTime)
                 if (data.completionTime) {
-                    const completionTime = new Date(data.completionTime);
+                    const completionTime = new Date(data.completionTime[0],data.completionTime[1],data.completionTime[2]);
                     lastVisit.value = completionTime.toISOString().split('T')[0]; // "yyyy-MM-dd" 형식으로 변환
                 } else {
                     lastVisit.value = ''; // completionTime이 null일 경우 빈 문자열
