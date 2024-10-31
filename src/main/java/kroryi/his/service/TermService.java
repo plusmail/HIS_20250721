@@ -9,4 +9,5 @@ public interface TermService {
     Term saveTerm(TermDTO termDTO);
     List<Term> getAllTerms();
     List<TermDTO> getAllTermDTOs();
+    void deleteTerm(Long seq);
 }

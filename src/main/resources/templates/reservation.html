@@ -117,7 +117,6 @@
         const currentDate = new Date();
 
 
-
         function loadContent(page) {
             $("#bodyContent").load(page, function (response, status, xhr) {
                 if (status === "error") {
@@ -127,7 +126,6 @@
                 }
             });
         }
-
 
 
         function renderCalendar() {
@@ -147,6 +145,7 @@
                 const row = document.createElement('tr');
 
                 for (let j = 0; j < 7; j++) {
+                    console.log(j);
                     const cell = document.createElement('td');
                     cell.classList.add('calendarDate');
                     if (i === 0 && j < firstDay) {
@@ -154,18 +153,14 @@
                     } else if (date > lastDate) {
                         break;
                     } else {
-
                         // 일요일이면 색갈이 빨간색으로
-                        if([0, 7, 14, 21, 28, 35].includes(j)) {
+                        if (j === 0) {
                             cell.style.color = 'red'; // 숫자 색상을 빨간색으로 변경
                         }
-
                         // 토요일
-                        else if([6, 13, 20, 27, 34].includes(j)) {
+                        else if (j === 6) {
                             cell.style.color = 'blue'; // 숫자 색상을 빨간색으로 변경
-                        }
-
-                        else {
+                        } else {
                             cell.style.color = 'black';
                         }
 
@@ -258,7 +253,7 @@
 
                     const timetable = document.getElementById('timetable');
                     // 선택된 날짜를 화면에 표시
-                    if(timetable){
+                    if (timetable) {
                         document.getElementById('selectedDate').textContent = `선택된 날짜: ${selectedDate}`;
                         generateTimetable(data);
                     }

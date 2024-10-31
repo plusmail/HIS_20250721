@@ -120,6 +120,13 @@ public class ReservationRegisterController {
         return ResponseEntity.ok(terms);
     }
 
+    @DeleteMapping("/deleteTerm")
+    public ResponseEntity<String> deleteTerm(@RequestParam Long seq) {
+        termService.deleteTerm(seq);
+        return ResponseEntity.ok("ok");
+
+    }
 }
+
 
 
