@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PatientAdmissionDTO implements Serializable {
+    private Integer pid;
     private Integer chartNum;
     private String paName;
     private String mainDoc;

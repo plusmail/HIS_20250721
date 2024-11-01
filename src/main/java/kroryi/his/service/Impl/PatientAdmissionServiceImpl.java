@@ -109,6 +109,16 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         return patientAdmissionRepository.findByTreatStatus("1");
     }
 
+    @Override
+    public List<PatientAdmission> getTreatmentPatients() {
+        return patientAdmissionRepository.findByTreatStatus("2");
+    }
+
+    @Override
+    public List<PatientAdmission> getCompletePatients() {
+        return patientAdmissionRepository.findByTreatStatus("3");
+    }
+
 
     @Transactional
     @Override
