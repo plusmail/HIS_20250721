@@ -34,9 +34,9 @@
                                     <!-- 캘린더 구간 -->
                                     <div class="calendar">
                                         <div class="calendar-header">
-                                            <button onclick="prevMonth()">이전</button>
+                                            <button onclick="prevMonth()" class="btn btn-secondary">이전</button>
                                             <span id="monthYear"></span>
-                                            <button onclick="nextMonth()">다음</button>
+                                            <button onclick="nextMonth()" class="btn btn-secondary">다음</button>
                                         </div>
                                         <table class="table">
                                             <thead>
@@ -132,7 +132,6 @@
 
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-
             const firstDay = new Date(year, month, 1).getDay();
             const lastDate = new Date(year, month + 1, 0).getDate();
             const monthYear = document.getElementById('monthYear');
@@ -191,6 +190,7 @@
                     selectedCells.forEach(cell => cell.classList.remove("selected"));
                     tdElement.classList.add("selected");
 
+
                     // 클릭한 날짜에 배경색 추가
                     // console.log()
                     // tdElement.style.backgroundColor = 'blue'; // 클릭한 td에 배경색 설정
@@ -207,9 +207,10 @@
                     const day = this.textContent;
 
                     // 저장한 날짜 텍스트, 날짜 형식으로 재변환
-                    const selectedDate = `${year}-${month + 1}-${day}`;
+                    const selectedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
                     dateReservationList(selectedDate);
+
                 });
             });
 

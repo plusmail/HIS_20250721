@@ -336,26 +336,38 @@ function deleteReservation() {
 
 }
 
+let currentInputRow = null; // 현재 입력 중인 행을 추적하는 변수
+
 function addRow() {
+    // 이전에 추가된 행이 있다면 삭제
+    if (currentInputRow) {
+        currentInputRow.remove();
+    }
+
     const termList = document.getElementById('termList');
     const newRow = document.createElement('tr');
+    currentInputRow = newRow; // 현재 입력 중인 행 저장
 
-    // 진료명 입력 필드
     const termCell = document.createElement('td');
-    termCell.innerHTML = '<input type="text" placeholder="진료명을 입력하세요" />'; // 빈 입력 필드
+    termCell.innerHTML = '<input type="text" placeholder="진료명을 입력하세요" />';
     newRow.appendChild(termCell);
 
-    // 저장 버튼
     const saveCell = document.createElement('td');
-    saveCell.innerHTML = '<button onclick="saveTerm(this)" class="btn btn-success">저장</button>'; // 저장 버튼 추가
+    saveCell.innerHTML = '<button onclick="saveTerm(this)" class="btn btn-success">저장</button>';
     newRow.appendChild(saveCell);
 
-    // 삭제 버튼
     const deleteCell = document.createElement('td');
-    deleteCell.innerHTML = '<button onclick="deleteTerm(this)" class="btn btn-danger">삭제</button>'; // 삭제 버튼 추가
+    deleteCell.innerHTML = '<button onclick="deleteCurrentRow()" class="btn btn-danger">삭제</button>'; // 수정된 삭제 버튼
     newRow.appendChild(deleteCell);
 
     termList.appendChild(newRow);
+}
+
+function deleteCurrentRow() {
+    if (currentInputRow) {
+        currentInputRow.remove(); // 현재 입력 중인 행 삭제
+        currentInputRow = null; // 현재 입력 중인 행 초기화
+    }
 }
 
 function saveTerm(button) {
@@ -453,6 +465,7 @@ function addTermByNote(name) {
 }
 
 function deleteTerm(id) {
+    console.log('Deleting term with ID:', id);
     fetch(`reservation/deleteTerm?seq=${id}`, {
         method: 'DELETE',
     })
