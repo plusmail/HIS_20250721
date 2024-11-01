@@ -33,14 +33,9 @@ public class ChartPlanController {
         String chartPa = chartController.getPaName();
 
         String teethOne = chartPlan.getToothOne();
-        String teethTwo = chartPlan.getToothTwo();
         String planOne = chartPlan.getPlanOne();
-        String planTwo = chartPlan.getPlanTwo();
 
         service.addMedicalChart(teethOne, planOne, chartNum, chartPa);
-        if (!teethTwo.equals("치아 선택") && !teethTwo.equals("치료계획 선택")) {
-            service.addMedicalChart(teethTwo, planTwo, chartNum, chartPa);
-        }
 
 
         return null;
@@ -59,14 +54,9 @@ public class ChartPlanController {
         String chartPa = chartController.getPaName();
 
         String teethOne = chartPlan.getToothOne();
-        String teethTwo = chartPlan.getToothTwo();
         String planOne = chartPlan.getPlanOne();
-        String planTwo = chartPlan.getPlanTwo();
 
         service.deleteChart(chartNum, chartPa, teethOne, planOne);
-        if (!teethTwo.equals("치아 선택") && !teethTwo.equals("치료계획 선택")) {
-            service.deleteChart(chartNum, chartPa, teethTwo, planTwo);
-        }
 
 
         return null;

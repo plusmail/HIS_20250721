@@ -7,6 +7,21 @@
 <body>
         <div class="row">
             <div class="container text-center tooth-container" id="tooth-container">
+                <div class="row mt-2" style="width: 600px">
+                    <div class="input-group col">
+                        <span class="input-group-text" style="width: 6rem;">날짜</span>
+                        <input type="date" name="mdTime" id="mdTime" class=" form-control" required>
+                    </div>
+                    <div class="input-group col">
+                        <span class="input-group-text" style="width: 6rem;">진료의</span>
+                        <select class="form-select" name="checkDoc" id="checkDoc" required>
+                            <option value="" disabled selected>주치의</option>
+                            <th:block th:each="doctor : ${doctorNames}">
+                                <option th:value="${doctor}" th:text="${doctor}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+                </div>
                 <div class="row">
                     <!--치아 배열 시작-->
                     <!-- 상악 (윗니) -->
@@ -484,7 +499,8 @@
                 </tbody>
             </table>
         </div>
-        <script src="/js/medical_chart_pi.js"></script>
 
 </body>
+<script src="/js/medical_chart_pi.js"></script>
+
 </html>

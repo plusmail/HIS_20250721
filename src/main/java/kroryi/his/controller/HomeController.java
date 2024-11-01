@@ -61,7 +61,9 @@ public class HomeController {
 
     //    진료차트
     @GetMapping("/medical_chart")
-    public String medical_chart() {
+    public String medical_chart(Model model) {
+        List<String> doctorNames = patientRegisterService.getDoctorNames();
+        model.addAttribute("doctorNames", doctorNames); // 의사 이름을 모델에 추가
         return "medical_chart";
     }
 
