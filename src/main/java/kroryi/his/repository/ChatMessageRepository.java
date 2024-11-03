@@ -12,6 +12,9 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     ChatMessage findTopByChatRoomOrderByTimestampDesc(ChatRoom chatRoom);
 
+    // 특정 채팅방 ID에 속하는 메시지들 삭제
+    void deleteByChatRoomId(Long chatRoomId);
+
 
 
 

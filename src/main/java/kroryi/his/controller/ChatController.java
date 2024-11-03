@@ -108,6 +108,14 @@ public class ChatController {
         return ResponseEntity.ok(messages);
     }
 
+
+    // 선택한 채팅방 삭제
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity<Void> deleteChatRoom(@PathVariable Long roomId) {
+        chatRoomService.deleteChatRoom(roomId);
+        return ResponseEntity.noContent().build();
+    }
+
     // 채팅 메시지 저장
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<ChatMessageDTO> postMessage(

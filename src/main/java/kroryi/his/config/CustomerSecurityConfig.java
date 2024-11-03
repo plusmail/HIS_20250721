@@ -22,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -62,29 +63,33 @@ public class CustomerSecurityConfig {
                         .tokenValiditySeconds(60 * 60 * 24 * 30)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/member/login/**").permitAll()
-                                .requestMatchers("/member/login-proc").permitAll()
-//                        .requestMatchers("/home").authenticated()
-                                .anyRequest().authenticated()
+                        .requestMatchers("/member/login/**", "/member/login-proc", "/api/chat/auth/currentUser").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/member/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .loginProcessingUrl("/member/login-proc")
-                        .defaultSuccessUrl("/home", true)
+                        .loginPage("/member/login")   // 로그인 페이지 경로
+                        .usernameParameter("username") // 폼에서 사용자 이름 필드 매핑
+                        .passwordParameter("password") // 폼에서 비밀번호 필드 매핑
+                        .loginProcessingUrl("/member/login-proc") // 로그인 처리 URL
+                        .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트할 URL
                         .permitAll()
                 )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedHandler(accessDeniedHandler())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler())
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 세션 생성 정책
-                        .maximumSessions(1) // 최대 세션 수
-                        .expiredUrl("/login?expired") // 세션 만료 시 리다이렉트 URL
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1)
+                        .expiredUrl("/login?expired")
                 )
                 .userDetailsService(userDetailsService)
-                .logout(LogoutConfigurer::permitAll);
+                .logout(logout -> logout
+                        .permitAll()
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // 로그아웃 경로
+                        .logoutSuccessUrl("/member/login?logout") // 로그아웃 성공 시 리다이렉트 URL
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                );
 
         return http.build();
     }

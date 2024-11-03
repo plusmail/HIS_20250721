@@ -16,5 +16,5 @@ public interface ChatRoomService {
 
     ChatMessageDTO createMessage(Long roomId, String content, String senderId, String recipientId);
 
-
+    void deleteChatRoom(Long roomId);
 }

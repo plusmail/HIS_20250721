@@ -214,6 +214,14 @@
     .modal-dialog.modal-sm {
         max-width: 600px; /* 원하는 크기로 조정 */
     }
+
+    #deleteChatRoomsBtn {
+        margin-right: -120px; /* 추가 버튼과 더 가깝게 */
+    }
+
+    #deleteChatRoomsBtn i {
+        font-size: 0.9rem; /* 아이콘 크기 조절 */
+    }
 </style>
 
 
@@ -350,6 +358,9 @@
     <!-- 채팅방 목록 헤더 -->
     <div class="chat-panel-header">
         <span>채팅방 목록</span>
+        <button id="deleteChatRoomsBtn" class="btn btn-outline-danger btn-sm ms-2 d-flex align-items-center">
+            <i class="bi bi-trash"></i> <!-- 아이콘 크기 조절 -->
+        </button>
         <button id="createChatRoomBtn" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
             <i class="bi bi-plus"></i>
         </button>
