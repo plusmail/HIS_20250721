@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!socket && !stompClient) {
         socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
+    }else{
 
         stompClient.connect({}, function (frame) {
             console.log('Connected to server:', frame);
