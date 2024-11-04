@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('currentDate').value = today.toISOString().substring(0, 10);
 
     // WebSocket 초기화
-    const socket = new SockJS('/ws'); // SockJS 클라이언트 초기화
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {

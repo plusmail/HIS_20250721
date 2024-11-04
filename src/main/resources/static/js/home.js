@@ -33,9 +33,6 @@ function goToMaterialManagementPage() {
 }
 
 
-// WebSocket을 위한 전역 변수 설정
-const socket = new SockJS("http://localhost:8080/ws");
-
 document.addEventListener("DOMContentLoaded", function () {
     const stompClient = Stomp.over(socket);
 

@@ -93,7 +93,6 @@ public class CustomerSecurityConfig {
                 .userDetailsService(userDetailsService)
                 .logout(logout -> logout
                         .permitAll()
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // 로그아웃 경로
                         .logoutSuccessUrl("/member/login?logout") // 로그아웃 성공 시 리다이렉트 URL
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")

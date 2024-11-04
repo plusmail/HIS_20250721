@@ -207,15 +207,6 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.deleteById(memberJoinDTO.getMid());
     }
 
-    @Override
-    public List<MemberJoinDTO> getAllUserIdAndName() {
-        List<Object[]> members = memberRepository.findUserIdsAndNames();
-
-        // DTO로 변환하여 반환
-        return members.stream()
-                .map(member -> new MemberJoinDTO((String) member[0], (String) member[1]))
-                .collect(Collectors.toList());
-    }
 
     // MemberService에 모든 멤버를 가져오는 메서드 추가
     public List<MemberJoinDTO> getAllMembers() {

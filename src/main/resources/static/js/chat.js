@@ -10,30 +10,37 @@ const chatModalLabel = document.getElementById('chatModalLabel');
 const messageList = document.getElementById('messageList');
 const messageInput = document.getElementById('messageInput');
 const sendMessageButton = document.getElementById('sendMessageButton');
-// WebSocket 연결 설정
-const socket = new SockJS('/ws');
+
 
 let selectedUser = null;
 let chatRooms = [];
 let currentRoomId = null;
 let loggedInUserId = null;
-let stompClient;
-connectWebSocket()
 
-function connectWebSocket() {
-    const stompClient = Stomp.over(socket);
 
-    stompClient.connect({}, function (frame) {
-        console.log('Connected to WebSocket server:', frame);
+// WebSocket 설정 및 연결
+document.addEventListener('DOMContentLoaded', () => {
+    // 중복 방지를 위해 한 번만 초기화
+    if (!socket && !stompClient) {
+        socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
 
-        // 현재 열려 있는 채팅방의 메시지를 실시간으로 수신
-        stompClient.subscribe(`/topic/rooms/${currentRoomId}`, function (message) {
-            const newMessage = JSON.parse(message.body);
-            addMessageToChat(newMessage); // 새로운 메시지를 채팅 UI에 추가
-            loadChatRooms(); // 채팅방 목록을 업데이트하여 최신 메시지 표시
+        stompClient.connect({}, function (frame) {
+            console.log('Connected to server:', frame);
+
+            // 현재 열려 있는 채팅방의 메시지를 수신하고 목록을 업데이트
+            stompClient.subscribe(`/topic/rooms/${currentRoomId}`, function (message) {
+                const newMessage = JSON.parse(message.body);
+                addMessageToChat(newMessage); // 새로운 메시지를 채팅 UI에 추가
+                loadChatRooms(); // 채팅방 목록을 업데이트하여 최신 메시지 표시
+            });
         });
-    });
-}
+    }
+
+    // 사용자 정보 가져오기 및 채팅방 목록 초기화
+    fetchCurrentUser();
+    loadChatRooms();
+});
 
 chatButton.addEventListener('click', () => {
     const chatPanel = document.getElementById('chatPanel');
@@ -296,27 +303,26 @@ function addMessageToChat(message) {
 
 
 
-// 메시지 전송 버튼 클릭 이벤트 수정
+// 메시지 전송 버튼 클릭 이벤트
 sendMessageButton.addEventListener('click', () => {
-    const messageContent = messageInput.value.trim();
+    const message = messageInput.value.trim();
 
-    if (!messageContent || !currentRoomId || !recipientId) {
+    if (!message || !currentRoomId || !recipientId) {
         alert('메시지를 보내기 전에 사용자를 선택하세요.');
         return;
     }
 
     const newMessage = {
-        roomId: currentRoomId,
-        content: messageContent,
+        content: message,
         senderId: loggedInUserId,
         recipientId: recipientId,
         timestamp: new Date().toISOString()
     };
 
     // WebSocket을 통해 서버로 메시지 전송
-    stompClient.send("/app/chat.send", {}, JSON.stringify(newMessage));
+    stompClient.send(`/app/chat/${currentRoomId}`, {}, JSON.stringify(newMessage));
 
-    // 로컬 UI에 메시지 추가
+    // UI에 메시지 추가
     addMessageToChat(newMessage);
     messageInput.value = '';
 });

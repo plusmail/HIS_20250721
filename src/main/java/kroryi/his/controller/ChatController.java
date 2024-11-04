@@ -97,7 +97,7 @@ public class ChatController {
     // ChatController에 사용자 목록 반환 엔드포인트 추가
     @GetMapping("/member/list")
     public ResponseEntity<List<MemberJoinDTO>> getAllMembers() {
-        List<MemberJoinDTO> members = memberService.getAllMembers();
+        List<MemberJoinDTO> members = memberService.getMembers();
         return ResponseEntity.ok(members);
     }
 
