@@ -14,6 +14,8 @@ public interface PatientAdmissionService {
     PatientAdmission savePatientAdmission(PatientAdmissionDTO patientAdmissionDTO) throws JsonProcessingException;
 
     List<PatientAdmission> getWaitingPatients();
+    List<PatientAdmission> getTreatmentPatients();
+    List<PatientAdmission> getCompletePatients();
 
     long getCompleteTreatmentCount(String count, LocalDate date);
 
