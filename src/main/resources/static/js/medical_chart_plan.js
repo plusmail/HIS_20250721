@@ -255,16 +255,7 @@ if (!window.MedicalPlanModule) {
                     checkDoc: checkDoc.value
                 }),
                 success: function (response) {
-                    console.log("Data saved to DB:", response);
-                    let tableBody = $("#paChart-list");
-                    let row = `<tr>
-                  <td>${response.mdTime}</td>
-                  <td>${response.teethNum}</td>
-                  <td>${response.medicalDivision}</td>
-                  <td>${response.medicalContent}</td>
-                  <td>${response.checkDoc}</td>
-               </tr>`;
-                    tableBody.append(row);
+                    readPaChart();
                     addNewRow();
                 },
                 error: function (error) {

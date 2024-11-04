@@ -45,3 +45,20 @@
     border-color: inherit !important;
     cursor: default;
 }
+
+.delete-icon {
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    float: right;
+    margin-left: 5px;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    font-size: 1.2rem;
+    transform: translateY(-50%);
+}
+
+.medical-content-cell {
+    position: relative;
+}

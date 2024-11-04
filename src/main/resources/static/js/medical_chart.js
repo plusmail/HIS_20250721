@@ -30,8 +30,6 @@ function saveChartNum() {
 }
 
 
-
-
 function fetchSessionItems() {
     $.ajax({
         url: '/medical_chart/get-session-items',
@@ -57,42 +55,67 @@ $(document).ready(function () {
 
 function readPaChart() {
     $.ajax({
-        url: '/medical_chart/getChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
-        type: 'GET',  // GET 요청
-        dataType: 'json',  // 서버에서 JSON 응답을 기대
+        url: '/medical_chart/getChartData?chartNum=' + patientInfos.chartNum,
+        type: 'GET',
+        dataType: 'json',
         success: function (data) {
-
-            console.log("차트 보여주는 메소드 실행")
             let tableBody = $("#paChart-list");
-            tableBody.empty();  // 기존 내용을 비움
+            tableBody.empty();
 
-            let previousMdTime = null;  // 이전 mdTime을 저장할 변수
+            let previousMdTime = null;
 
-// 데이터를 순회하여 테이블에 추가
+            // 데이터를 순회하여 테이블에 추가
             data.forEach(chart => {
-                // 이전 mdTime과 현재 mdTime이 같은 경우 빈 값을 출력, 다르면 mdTime을 출력
                 let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
 
-                let row = `<tr>
-                  <td>${mdTimeCell}</td>
-                  <td style="font-size: 0.9rem;">${chart.teethNum}</td>
-                  <td>${chart.medicalDivision}</td>
-                  <td>${chart.medicalContent}</td>
-                  <td>${chart.checkDoc}</td>
-               </tr>`;
-                tableBody.append(row);  // 새로운 행을 테이블에 추가
+                // 행 생성
+                let row = $(`
+                    <tr>
+                        <td>${mdTimeCell}</td>
+                        <td style="font-size: 0.9rem;">${chart.teethNum}</td>
+                        <td>${chart.medicalDivision}</td>
+                        <td>${chart.medicalContent}</td>
+                        <td class="medical-content-cell">${chart.checkDoc}</td>
+                    </tr>
+                `);
 
-                // 현재 mdTime 값을 이전 값으로 저장
+                // 각 데이터 클릭 이벤트 추가
+                row.on('click', function () {
+                    $('.medical-content-cell .delete-icon').remove();
+
+                    // 클릭한 행에서 "X" 아이콘 추가 또는 제거
+                    let medicalContentCell = row.find('.medical-content-cell');
+                    if (!medicalContentCell.find('.delete-icon').length) {
+                        medicalContentCell.append('<span class="delete-icon">X</span>');
+                    }
+
+                    // 삭제 아이콘 클릭 이벤트
+                    medicalContentCell.on('click', '.delete-icon', function (event) {
+                        event.stopPropagation();
+                        let cnum = chart.cnum;
+                        $.ajax({
+                            url: '/medical_chart/deleteChart',
+                            type: 'DELETE',
+                            data: { cnum: cnum },
+                            success: function(response) {
+                                readPaChart();
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    });
+                });
+                tableBody.append(row);
                 previousMdTime = chart.mdTime;
-            })
-
-
+            });
         },
         error: function (xhr, status, error) {
-            console.error('Error:', error);  // 에러 처리
+            console.error('Error:', error);
         }
     });
 }
+
 // HTML에 데이터 렌더링
 function renderItems(itemsArray) {
     // readPaChart()
@@ -121,3 +144,4 @@ function renderItems(itemsArray) {
         row.append(buttonCell);
     }
 }
+

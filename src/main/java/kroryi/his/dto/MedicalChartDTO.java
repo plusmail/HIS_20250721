@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 public class MedicalChartDTO implements Serializable {
+    private Integer cnum;
     private String paName;
     private LocalDate mdTime;
     private String medicalDivision;
