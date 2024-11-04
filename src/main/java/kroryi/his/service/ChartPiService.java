@@ -9,5 +9,5 @@ import java.util.List;
 public interface ChartPiService {
     List<List<String>> getSessionItems(Object sessionAttribute);
 
-    void saveMedicalChart(MedicalChartDTO medicalChartDTO);
+    MedicalChartDTO saveMedicalChart(MedicalChartDTO medicalChartDTO);
 }

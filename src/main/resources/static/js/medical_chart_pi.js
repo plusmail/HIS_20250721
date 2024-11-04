@@ -57,7 +57,9 @@ if (!window.MedicalChartModule) {
 
         // 치아 버튼 클릭시 호출
         function handleToothClick(e) {
-            if (e.target.tagName === "BUTTON") {
+            modalToothList = [];
+            modalToothList.push(e.target.value);
+            if (e.target.tagName === "BUTTON" && e.target.id === '') {
                 const toothValue = e.target.value;
 
                 // 치아 리스트에 추가하거나 제거
@@ -69,6 +71,8 @@ if (!window.MedicalChartModule) {
 
                 // 버튼의 스타일을 업데이트
                 e.target.classList.toggle("opacity-50");
+            }else if (e.target.tagName === "BUTTON") {
+                toothTerminal(e.target.id);
             }
         }
         function toothTerminal(id) {
@@ -222,11 +226,32 @@ if (!window.MedicalChartModule) {
             })
                 .then(response => {
                     if (response.ok) {
-                        toothValueReset();
-                        alert('저장되었습니다.');
+                        return response.json(); // 응답을 JSON 형식으로 변환
                     } else {
                         alert('저장 실패.');
+                        throw new Error('저장 실패');
                     }
+                })
+                .then(data => {
+                    let tableBody = $("#paChart-list");
+
+                    let previousMdTime = null;  // 이전 mdTime을 저장할 변수
+                    // 이전 mdTime과 현재 mdTime이 같은 경우 빈 값을 출력, 다르면 mdTime을 출력
+                    let mdTimeCell = (previousMdTime === data.mdTime) ? '' : data.mdTime;
+
+                    let row = `<tr>
+                  <td>${mdTimeCell}</td>
+                  <td style="font-size: 0.9rem;">${data.teethNum}</td>
+                  <td>${data.medicalDivision}</td>
+                  <td>${data.medicalContent}</td>
+                  <td>${data.checkDoc}</td>
+               </tr>`;
+                    tableBody.append(row);  // 새로운 행을 테이블에 추가
+
+                    // 현재 mdTime 값을 이전 값으로 저장
+                    previousMdTime = data.mdTime;
+                    // JSON 데이터를 사용하여 UI 업데이트 등을 수행
+                    alert('저장되었습니다.');
                 })
                 .catch(error => {
                     console.error('Error:', error);

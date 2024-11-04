@@ -47,7 +47,7 @@ public class ChartPiServiceImpl implements ChartPiService {
     }
 
     @Override
-    public void saveMedicalChart(MedicalChartDTO medicalChartDTO) {
+    public MedicalChartDTO saveMedicalChart(MedicalChartDTO medicalChartDTO) {
         MedicalChart medicalChart = MedicalChart.builder()
                 .mdTime(medicalChartDTO.getMdTime())
                 .checkDoc(medicalChartDTO.getCheckDoc())
@@ -59,6 +59,6 @@ public class ChartPiServiceImpl implements ChartPiService {
                 .build();
 
         medicalChartRepository.save(medicalChart);
+        return medicalChartDTO;
     }
-
 }
