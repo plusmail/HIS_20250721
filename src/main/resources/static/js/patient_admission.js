@@ -12,9 +12,6 @@ const completedPatientsTable = document.getElementById('completedPatientsTable')
 const completedPatientsBody = completedPatientsTable.querySelector('tbody');
 
 
-// WebSocket 초기화
-const socket = new SockJS('/ws'); // SockJS 클라이언트 초기화
-const stompClient = Stomp.over(socket);
 const waitingPatients = [];
 const treatmentPatients = [];
 const completePatients = [];
@@ -1002,6 +999,7 @@ function cancelReception() {
 
 // 모달에서 '예' 버튼 클릭 시 행 삭제 및 데이터베이스에서 삭제
     confirmCancelBtn.addEventListener("click", function () {
+        console.log("----------->", selectedRow)
         if (selectedRow) {
             const pid = selectedRow.cells[6].textContent; // 숨겨진 pid 가져오기
 
