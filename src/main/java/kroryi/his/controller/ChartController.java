@@ -69,5 +69,10 @@ public class ChartController {
     public List<MedicalChart> searchByChartNum(@RequestParam String chartNum) {
         return chartService.getChart(chartNum);
     }
+
+    @GetMapping("/PLANChartData")
+    public List<MedicalChart> searchByChartNumMedicalDivision(@RequestParam String chartNum) {
+        return chartService.PLANChart(chartNum,"PLAN");
+    }
 }
 

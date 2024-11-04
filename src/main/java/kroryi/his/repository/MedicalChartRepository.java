@@ -22,6 +22,8 @@ public interface MedicalChartRepository extends JpaRepository<MedicalChart, Inte
     List<MedicalChart> findMedicalChartByChartNumOrderByMdTimeAsc(String chartNum);
 
 
+    List<MedicalChart> findMedicalChartByChartNumAndMedicalDivision(String chartNum, String medicalDivision);
+
 
     @Transactional
     void deleteByChartNumAndPaNameAndTeethNumAndMedicalDivisionAndMdTime(
