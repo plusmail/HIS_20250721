@@ -14,25 +14,24 @@ const sendMessageButton = document.getElementById('sendMessageButton');
 const socket = new SockJS('/ws');
 
 let selectedUser = null;
-let currentUser = {};
 let chatRooms = [];
 let currentRoomId = null;
 let loggedInUserId = null;
 let stompClient;
-let selectedRooms = [];
+connectWebSocket()
 
-function connectWebSocket(roomId) {
-    const socket = new SockJS('/ws');
-    stompClient = Stomp.over(socket);
+function connectWebSocket() {
+    const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
-        console.log('Connected to server:', frame);
-        stompClient.subscribe(`/user/topic/rooms/${roomId}`, function (message) {
-            renderMessages([JSON.parse(message.body)]);
+        console.log('Connected to WebSocket server:', frame);
+
+        // 현재 열려 있는 채팅방의 메시지를 실시간으로 수신
+        stompClient.subscribe(`/topic/rooms/${currentRoomId}`, function (message) {
+            const newMessage = JSON.parse(message.body);
+            addMessageToChat(newMessage); // 새로운 메시지를 채팅 UI에 추가
+            loadChatRooms(); // 채팅방 목록을 업데이트하여 최신 메시지 표시
         });
-    }, function (error) {
-        console.error('WebSocket connection error:', error);
-        setTimeout(() => connectWebSocket(roomId), 5000); // 연결 실패 시 재시도
     });
 }
 
@@ -78,43 +77,43 @@ function loadChatRooms() {
 }
 
 
-// 채팅방 목록 렌더링 (최근 메시지 표시)
+// 채팅방 목록 렌더링 함수 (수정된 부분)
 function renderChatRooms() {
     roomList.innerHTML = '';
     chatRooms.forEach(room => {
         const li = document.createElement('li');
-        li.classList.add('list-group-item', 'chat-room-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        li.classList.add('list-group-item', 'chat-room-item');
 
-        // 채팅방 이름 표시
-        const roomName = document.createElement('span');
-        roomName.textContent = room.roomName;
+        // 채팅방 제목과 최근 메시지 컨테이너
+        const titleContainer = document.createElement('div');
+        titleContainer.classList.add('room-title-container');
 
-        // 삭제를 위한 체크박스 추가
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.classList.add('room-checkbox', 'me-2'); // 오른쪽에 약간의 여백 추가
-        checkbox.setAttribute('data-room-id', room.id);
+        const title = document.createElement('span');
+        title.classList.add('room-title');
+        title.textContent = room.roomName;
 
-        // 최근 메시지 표시
         const recentMessage = document.createElement('span');
-        recentMessage.classList.add('recent-message', 'text-muted', 'small');
+        recentMessage.classList.add('recent-message');
         recentMessage.textContent = room.lastMessage ? room.lastMessage.content : '메시지가 없습니다.';
 
-        // 체크박스, 채팅방 이름, 최근 메시지를 li에 추가
-        li.appendChild(checkbox);
-        li.appendChild(roomName);
-        li.appendChild(recentMessage);
+        // 제목과 최근 메시지를 컨테이너에 추가
+        titleContainer.appendChild(title);
+        titleContainer.appendChild(recentMessage);
+        li.appendChild(titleContainer);
 
-        // 클릭 시 채팅방 열기
-        li.addEventListener('click', (event) => {
-            if (event.target !== checkbox) { // 체크박스 클릭 시에는 열리지 않도록
-                openChatRoom(room.id);
-            }
-        });
+        // 체크박스 추가
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.classList.add('room-checkbox');
+        checkbox.dataset.roomId = room.id;
+        li.prepend(checkbox);
 
+        // 클릭 이벤트
+        li.addEventListener('click', () => openChatRoom(room.id));
         roomList.appendChild(li);
     });
 }
+
 
 // 사용자 불러오기
 function loadUsers() {
@@ -276,40 +275,54 @@ function renderMessages(messages) {
     messages.forEach(message => addMessageToChat(message));
 }
 
-// 개별 메시지를 채팅 목록에 추가하는 함수
+// 메시지 추가 함수
 function addMessageToChat(message) {
     const li = document.createElement('li');
-    li.classList.add('message-item', message.senderId === currentUser.mid ? 'right' : 'left');
-    li.textContent = message.senderId !== currentUser.mid
-        ? `${message.senderName}: ${message.content}`
-        : message.content;
+
+    // 보낸 사람과 로그인한 사용자를 비교하여 위치와 스타일 설정
+    if (message.senderId === loggedInUserId) {
+        li.classList.add('message-item', 'right-message');
+    } else {
+        li.classList.add('message-item', 'left-message');
+    }
+
+    // 메시지 내용 설정
+    li.textContent = message.content;
+
+    // 메시지 목록에 추가
     messageList.appendChild(li);
-    messageList.scrollTop = messageList.scrollHeight;
+    messageList.scrollTop = messageList.scrollHeight; // 스크롤을 맨 아래로
 }
+
+
 
 // 메시지 전송 버튼 클릭 이벤트 수정
 sendMessageButton.addEventListener('click', () => {
-    const message = messageInput.value.trim();
+    const messageContent = messageInput.value.trim();
 
-    if (!message || !currentRoomId || !recipientId) {
+    if (!messageContent || !currentRoomId || !recipientId) {
         alert('메시지를 보내기 전에 사용자를 선택하세요.');
         return;
     }
 
-    axios.post(`/api/chat/rooms/${currentRoomId}/messages`, {
-        content: message,
+    const newMessage = {
+        roomId: currentRoomId,
+        content: messageContent,
         senderId: loggedInUserId,
-        recipientId: recipientId
-    })
-        .then(response => {
-            const newMessage = response.data;
-            addMessageToChat(newMessage);
-            messageInput.value = '';
-        })
-        .catch(error => {
-            console.error('메시지 전송 실패:', error);
-        });
+        recipientId: recipientId,
+        timestamp: new Date().toISOString()
+    };
+
+    // WebSocket을 통해 서버로 메시지 전송
+    stompClient.send("/app/chat.send", {}, JSON.stringify(newMessage));
+
+    // 로컬 UI에 메시지 추가
+    addMessageToChat(newMessage);
+    messageInput.value = '';
 });
+
+
+
 
 
 

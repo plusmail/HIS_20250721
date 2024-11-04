@@ -33,6 +33,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @SessionAttributes("loggedInUser")
 @Log4j2
+@CrossOrigin(origins = "*") // 모든 출처를 허용 (보안상 좋지 않을 수 있으니 주의)
 public class ChatController {
 
     private final MemberService memberService;
@@ -154,21 +155,17 @@ public class ChatController {
         return null;  // 기본 수신자가 없으면 null 반환
     }
 
-    // WebSocket에서 메시지 전송 처리
     @MessageMapping("/chat.send")
     public void sendMessage(ChatMessageDTO message) {
         ChatMessageDTO savedMessage = chatRoomService.createMessage(
                 message.getRoomId(),
                 message.getContent(),
                 message.getSenderId(),
-                message.getRecipientId() // 방 생성 시 저장된 recipientId
+                message.getRecipientId()
         );
 
-        messagingTemplate.convertAndSendToUser(
-                savedMessage.getRecipientId(),
-                "/topic/rooms/" + message.getRoomId(),
-                savedMessage
-        );
+        // 채팅방 구독자에게 메시지 전송
+        messagingTemplate.convertAndSend("/topic/rooms/" + message.getRoomId(), savedMessage);
     }
 
 

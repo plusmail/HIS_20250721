@@ -63,8 +63,17 @@ public class CustomerSecurityConfig {
                         .tokenValiditySeconds(60 * 60 * 24 * 30)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/member/login/**", "/member/login-proc", "/api/chat/auth/currentUser").permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers("/member/login/**").permitAll()
+                                .requestMatchers("/member/login-proc").permitAll()
+                                .requestMatchers("/ws/**").permitAll() // WebSocket 경로에 대한 권한 설정
+                                .requestMatchers("/order/**").permitAll() // WebSocket 경로에 대한 권한 설정
+                                .requestMatchers("/topic/**").permitAll() // WebSocket 경로에 대한 권한 설정
+                                .requestMatchers("/queue/**").permitAll() // WebSocket 경로에 대한 권한 설정
+                                .requestMatchers("/error/**").permitAll() // WebSocket 경로에 대한 권한 설정
+                                .requestMatchers("/api/chat/auth/currentUser").permitAll() // WebSocket 경로에 대한 권한 설정
+
+//                        .requestMatchers("/home").authenticated()
+                                .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/member/login")   // 로그인 페이지 경로
@@ -105,7 +114,6 @@ public class CustomerSecurityConfig {
             return config;
         };
     }
-
 
     @Bean
     public PersistentTokenRepository persistentTokenRepository() {
