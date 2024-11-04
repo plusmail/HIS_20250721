@@ -17,7 +17,15 @@ public class RedisMessageListener {
     public void receiveMessage(String message) {
         // /topic/patientUpdates 채널로 WebSocket 메시지 전송
 
-        log.info("받은 메세지......receive message: " + message);
+        log.info("받은 메세지......receive message: {}", message);
         messagingTemplate.convertAndSend("/topic/patientUpdates", message);
     }
+
+    public void receiveChatMessage(String message) {
+        // /topic/patientUpdates 채널로 WebSocket 메시지 전송
+
+        log.info("받은 메세지......receive Chat message: {}", message);
+        messagingTemplate.convertAndSend("/topic/rooms", message);
+    }
+
 }

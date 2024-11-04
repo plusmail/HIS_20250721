@@ -96,7 +96,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatMessage lastMessage = chatMessageRepository.findTopByChatRoomOrderByTimestampDesc(chatRoom);
         if (lastMessage != null) {
             ChatMessageDTO lastMessageDto = ChatMessageDTO.builder()
-                    .id(lastMessage.getId())
+                    .roomId(lastMessage.getId())
                     .content(lastMessage.getContent())
                     .timestamp(lastMessage.getTimestamp())
                     .senderId(lastMessage.getSender().getMid())
@@ -125,7 +125,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomId(roomId);
         return messages.stream()
                 .map(message -> ChatMessageDTO.builder()
-                        .id(message.getId())
+                        .roomId(message.getId())
                         .content(message.getContent())
                         .timestamp(message.getTimestamp())
                         .senderId(message.getSender().getMid())
@@ -135,7 +135,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .collect(Collectors.toList());
     }
 
-    public ChatMessageDTO createMessage(Long roomId, String content, String senderId, String recipientId) {
+    public ChatMessageDTO createMessage(Long roomId, String content, String senderId, String recipientId, String sendName, LocalDateTime timestamp ) {
         if (recipientId == null) {
             throw new IllegalArgumentException("Recipient ID must be provided to send a message.");
         }
@@ -145,27 +145,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         Member sender = memberRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
-        Member recipient = memberRepository.findById(recipientId)
-                .orElseThrow(() -> new IllegalArgumentException("Recipient not found"));
+//        Member recipient = memberRepository.findById(recipientId)
+//                .orElseThrow(() -> new IllegalArgumentException("Recipient not found"));
 
         ChatMessage message = ChatMessage.builder()
                 .content(content)
                 .timestamp(LocalDateTime.now())
                 .sender(sender)
-                .recipient(recipient)
+//                .recipient(recipient)
                 .chatRoom(chatRoom)
                 .build();
 
         chatMessageRepository.save(message);
 
         return ChatMessageDTO.builder()
-                .id(message.getId())
+                .roomId(message.getId())
                 .content(message.getContent())
-                .timestamp(message.getTimestamp())
-                .roomId(chatRoom.getId())
                 .senderId(sender.getMid())
                 .senderName(sender.getName())
-                .recipientId(recipient.getMid())
+                .recipientId(sender.getMid())
+                .timestamp(message.getTimestamp())
                 .build();
     }
 

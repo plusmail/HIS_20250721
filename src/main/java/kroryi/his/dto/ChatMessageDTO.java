@@ -12,13 +12,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageDTO {
-    private Long id;
-    private String content;
-    private LocalDateTime timestamp;
     private Long roomId;
+    private String content;
     private String senderId;
+    private String recipientId;
     private String senderName;
-    private String recipientId;  // 수신자 ID 추가
+    private LocalDateTime timestamp;
 }
 
 

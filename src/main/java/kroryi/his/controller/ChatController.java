@@ -1,5 +1,7 @@
 package kroryi.his.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import kroryi.his.domain.ChatRoom;
 import kroryi.his.domain.Member;
@@ -12,9 +14,13 @@ import kroryi.his.service.ChatRoomService;
 import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,7 +46,10 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomService chatRoomService;
     private final ChatRoomRepository chatRoomRepository;
-
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/auth/currentUser")
     public ResponseEntity<MemberJoinDTO> getCurrentUser() {
@@ -136,7 +145,9 @@ public class ChatController {
                 roomId,
                 messageDTO.getContent(),
                 messageDTO.getSenderId(),
-                messageDTO.getRecipientId()
+                messageDTO.getRecipientId(),
+                messageDTO.getSenderName(),
+                messageDTO.getTimestamp()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
     }
@@ -156,19 +167,31 @@ public class ChatController {
     }
 
     @MessageMapping("/chat.send")
-    public void sendMessage(ChatMessageDTO message) {
+    @SendTo("/topic/rooms")
+    public void sendMessage(ChatMessageDTO message, SimpMessageHeaderAccessor headerAccessor) throws JsonProcessingException {
+        log.info("Received message: {}", message); // 디버깅 로그 추가
+
+        if (message.getRoomId() == null || message.getContent() == null) {
+            log.error("Message is missing required fields: {}", message);
+            return;
+        }
+
         ChatMessageDTO savedMessage = chatRoomService.createMessage(
                 message.getRoomId(),
                 message.getContent(),
                 message.getSenderId(),
-                message.getRecipientId()
+                message.getRecipientId(),
+                message.getSenderName(),
+                message.getTimestamp()
         );
 
+        log.info("Saved message: {}", savedMessage);
+
+        String messageChat = objectMapper.writeValueAsString(savedMessage);
+
         // 채팅방 구독자에게 메시지 전송
-        messagingTemplate.convertAndSend("/topic/rooms/" + message.getRoomId(), savedMessage);
+        redisTemplate.convertAndSend("chatChannel", messageChat);
     }
-
-
     // WebSocket에서 사용자 추가 처리
     @MessageMapping("/chat.addUser")
     public void addUser(ChatMessageDTO message) {

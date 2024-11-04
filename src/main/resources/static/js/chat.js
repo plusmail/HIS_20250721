@@ -21,22 +21,18 @@ let loggedInUserId = null;
 // WebSocket 설정 및 연결
 document.addEventListener('DOMContentLoaded', () => {
     // 중복 방지를 위해 한 번만 초기화
-    if (!socket && !stompClient) {
-        socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-    }else{
 
-        stompClient.connect({}, function (frame) {
-            console.log('Connected to server:', frame);
+    window.stompClient.connect({}, function (frame) {
+        console.log('Connected to server:', frame);
 
-            // 현재 열려 있는 채팅방의 메시지를 수신하고 목록을 업데이트
-            stompClient.subscribe(`/topic/rooms/${currentRoomId}`, function (message) {
-                const newMessage = JSON.parse(message.body);
-                addMessageToChat(newMessage); // 새로운 메시지를 채팅 UI에 추가
-                loadChatRooms(); // 채팅방 목록을 업데이트하여 최신 메시지 표시
-            });
+        // 현재 열려 있는 채팅방의 메시지를 수신하고 목록을 업데이트
+        window.stompClient.subscribe(`/topic/rooms`, function (message) {
+            const newMessage = JSON.parse(message.body);
+            addMessageToChat(newMessage); // 새로운 메시지를 채팅 UI에 추가
+            loadChatRooms(); // 채팅방 목록을 업데이트하여 최신 메시지 표시
         });
-    }
+    });
+
 
     // 사용자 정보 가져오기 및 채팅방 목록 초기화
     fetchCurrentUser();
@@ -303,7 +299,6 @@ function addMessageToChat(message) {
 }
 
 
-
 // 메시지 전송 버튼 클릭 이벤트
 sendMessageButton.addEventListener('click', () => {
     const message = messageInput.value.trim();
@@ -314,17 +309,24 @@ sendMessageButton.addEventListener('click', () => {
     }
 
     const newMessage = {
+        roomId:currentRoomId,
         content: message,
         senderId: loggedInUserId,
         recipientId: recipientId,
+        senderName:'홍길동',
         timestamp: new Date().toISOString()
     };
 
+
+    console.log("newMessage->", newMessage);
+
     // WebSocket을 통해 서버로 메시지 전송
-    stompClient.send(`/app/chat/${currentRoomId}`, {}, JSON.stringify(newMessage));
+    stompClient.send(`/app/chat.send`, {}, JSON.stringify(newMessage));
 
     // UI에 메시지 추가
     addMessageToChat(newMessage);
+
+
     messageInput.value = '';
 });
 

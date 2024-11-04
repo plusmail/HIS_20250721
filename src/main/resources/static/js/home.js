@@ -34,11 +34,11 @@ function goToMaterialManagementPage() {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const stompClient = Stomp.over(socket);
+    // const stompClient = Stomp.over(socket);
 
     fetchPatientStatus();
 
-    stompClient.connect({}, function(frame) {
+    window.stompClient.connect({}, function(frame) {
         console.log('WebSocket connected:', frame);
 
         // 환자 수 업데이트 메시지 구독

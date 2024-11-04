@@ -4,6 +4,7 @@ import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
 import kroryi.his.dto.MemberJoinDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +15,13 @@ public interface ChatRoomService {
 
     List<ChatRoomDTO> getAllChatRoomsForUserWithLastMessage(String userId);
 
-    ChatMessageDTO createMessage(Long roomId, String content, String senderId, String recipientId);
+    ChatMessageDTO createMessage(
+                                 Long roomId,
+                                 String content,
+                                 String senderId,
+                                 String recipientId,
+                                 String senderName,
+                                 LocalDateTime timestamp);
 
     void deleteChatRoom(Long roomId);
 }
