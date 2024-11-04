@@ -41,6 +41,11 @@ public class ChartServiceImpl implements ChartService {
         return medicalChartRepository.findMedicalChartByChartNum(chartNum);
     }
 
+    @Override
+    public List<MedicalChart> PLANChart(String chartNum, String medicalDivision) {
+        return medicalChartRepository.findMedicalChartByChartNumAndMedicalDivision(chartNum, medicalDivision);
+    }
+
 
     @Override
     public MedicalChartDTO addMedicalChart(MedicalChartDTO dto) {
@@ -117,16 +122,15 @@ public class ChartServiceImpl implements ChartService {
     }
 
     @Override
-    public MedicalChartDTO addMedicalChart(String teethNum, String plan, String chartNum, String paName) {
-
+    public MedicalChartDTO MedicalChartSave(MedicalChartDTO dto) {
         MedicalChart chartPlan = MedicalChart.builder()
-                .teethNum(teethNum)
-                .medicalDivision(plan)
-                .mdTime(LocalDate.now())
-                .medicalContent("")
-                .checkDoc("의사")
-                .paName(paName)
-                .chartNum(chartNum)
+                .teethNum(dto.getTeethNum())
+                .medicalDivision(dto.getMedicalDivision())
+                .mdTime(dto.getMdTime())
+                .medicalContent(dto.getMedicalContent())
+                .checkDoc(dto.getCheckDoc())
+                .paName(dto.getPaName())
+                .chartNum(dto.getChartNum())
                 .build();
 
         medicalChartRepository.save(chartPlan);
