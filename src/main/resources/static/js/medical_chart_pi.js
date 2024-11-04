@@ -233,7 +233,8 @@ if (!window.MedicalChartModule) {
                     }
                 })
                 .then(data => {
-                    let tableBody = $("#paChart-list");
+                    readPaChart();
+                  /*  let tableBody = $("#paChart-list");
 
                     let previousMdTime = null;  // 이전 mdTime을 저장할 변수
                     // 이전 mdTime과 현재 mdTime이 같은 경우 빈 값을 출력, 다르면 mdTime을 출력
@@ -249,7 +250,7 @@ if (!window.MedicalChartModule) {
                     tableBody.append(row);  // 새로운 행을 테이블에 추가
 
                     // 현재 mdTime 값을 이전 값으로 저장
-                    previousMdTime = data.mdTime;
+                    previousMdTime = data.mdTime;*/
                     // JSON 데이터를 사용하여 UI 업데이트 등을 수행
                     alert('저장되었습니다.');
                 })
