@@ -75,9 +75,10 @@ function readPaChart() {
 
                 let row = `<tr>
                   <td>${mdTimeCell}</td>
-                  <td>${chart.teethNum}</td>
+                  <td style="font-size: 0.9rem;">${chart.teethNum}</td>
                   <td>${chart.medicalDivision}</td>
                   <td>${chart.medicalContent}</td>
+                  <td>${chart.checkDoc}</td>
                </tr>`;
                 tableBody.append(row);  // 새로운 행을 테이블에 추가
 

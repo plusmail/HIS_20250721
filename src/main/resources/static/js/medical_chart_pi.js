@@ -2,12 +2,10 @@ if (!window.MedicalChartModule) {
     window.MedicalChartModule = (() => {
         let toothList = [];
         let symptomList = [];
-        let memoList = [];
-        let frequentlyUsedPhrases = [];
         let listIndex = 0;
 
-        let tooth, symptom, memo, savePi, upTooth, downTooth, allTooth, upToothY, downToothY, allToothY;
-        let upToothValues, downToothValues, yUpToothValues, yDownToothValues, modalData, allToothLists, allsymptomLists;
+        let tooth, symptom, memo, savePi, mUpTooth, mDownTooth, mAllTooth, mUpToothY, mDownToothY, mAllToothY;
+        let mUpToothValues, mDownToothValues, mYUpToothValues, mYDownToothValues, modalData, allToothLists;
 
         // 초기화 함수
         function init() {
@@ -15,21 +13,19 @@ if (!window.MedicalChartModule) {
             symptom = document.querySelector(".pi-symptom");
             memo = document.querySelector(".memo");
             savePi = document.querySelector(".save-pi");
-            upTooth = document.querySelector(".up-control");
-            downTooth = document.querySelector(".down-control");
-            allTooth = document.querySelector(".all-control");
-            upToothY = document.querySelector(".y-up-control");
-            downToothY = document.querySelector(".y-down-control");
-            allToothY = document.querySelector(".y-all-control");
+            mUpTooth = document.querySelector(".up-control");
+            mDownTooth = document.querySelector(".down-control");
+            mAllTooth = document.querySelector(".all-control");
+            mUpToothY = document.querySelector(".y-up-control");
+            mDownToothY = document.querySelector(".y-down-control");
+            mAllToothY = document.querySelector(".y-all-control");
 
-            upToothValues = document.querySelectorAll(".up-tooth");
-            downToothValues = document.querySelectorAll(".down-tooth");
-            yUpToothValues = document.querySelectorAll(".y-up-tooth");
-            yDownToothValues = document.querySelectorAll(".y-down-tooth");
+            mUpToothValues = document.querySelectorAll(".up-tooth");
+            mDownToothValues = document.querySelectorAll(".down-tooth");
+            mYUpToothValues = document.querySelectorAll(".y-up-tooth");
+            mYDownToothValues = document.querySelectorAll(".y-down-tooth");
             modalData = document.querySelectorAll(".modal-tr");
-
             allToothLists = tooth.querySelectorAll('button');
-            allsymptomLists = symptom.querySelectorAll('input');
 
             setupEventListeners();
         }
@@ -56,8 +52,6 @@ if (!window.MedicalChartModule) {
 
             toothList = [];
             symptomList = [];
-            memoList = [];
-            frequentlyUsedPhrases = [];
             listIndex = 0;
         }
 
@@ -77,6 +71,91 @@ if (!window.MedicalChartModule) {
                 e.target.classList.toggle("opacity-50");
             }
         }
+        function toothTerminal(id) {
+            toothList = []; // Initialize an empty list to store only numeric tooth values
+
+            switch (id) {
+                case "upTooth":
+                    // Filter only numeric values for upper teeth
+                    mUpToothValues.forEach(upToothValue => {
+                        if (!isNaN(upToothValue.value)) {  // Ensure the value is numeric
+                            toothList.push(upToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mUpTooth, mUpToothValues, "상악");
+                    break;
+
+                case "allTooth":
+                    // Filter only numeric values for both upper and lower teeth
+                    mUpToothValues.forEach(upToothValue => {
+                        if (!isNaN(upToothValue.value)) {
+                            toothList.push(upToothValue.value);
+                        }
+                    });
+                    mDownToothValues.forEach(downToothValue => {
+                        if (!isNaN(downToothValue.value)) {
+                            toothList.push(downToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                    break;
+
+                case "downTooth":
+                    // Filter only numeric values for lower teeth
+                    mDownToothValues.forEach(downToothValue => {
+                        if (!isNaN(downToothValue.value)) {
+                            toothList.push(downToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mDownTooth, mDownToothValues, "하악");
+                    break;
+
+                case "upToothY":
+                    // Filter only numeric values for deciduous upper teeth
+                    mYUpToothValues.forEach(yUpToothValue => {
+                        if (!isNaN(yUpToothValue.value)) {
+                            toothList.push(yUpToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
+                    break;
+
+                case "allToothY":
+                    // Filter only numeric values for deciduous upper and lower teeth
+                    mYUpToothValues.forEach(yUpToothValue => {
+                        if (!isNaN(yUpToothValue.value)) {
+                            toothList.push(yUpToothValue.value);
+                        }
+                    });
+                    mYDownToothValues.forEach(yDownToothValue => {
+                        if (!isNaN(yDownToothValue.value)) {
+                            toothList.push(yDownToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                    break;
+
+                case "downToothY":
+                    // Filter only numeric values for deciduous lower teeth
+                    mYDownToothValues.forEach(yDownToothValue => {
+                        if (!isNaN(yDownToothValue.value)) {
+                            toothList.push(yDownToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
+                    break;
+
+                default:
+                    alert("올바르지 않은 버튼을 선택하였습니다.");
+                    break;
+            }
+        }
+
+// Helper function to toggle opacity and log messages
+        function toggleOpacity(button, elements, logMessage) {
+            button.classList.toggle("opacity-50");
+            elements.forEach(element => element.classList.toggle("opacity-50"));
+        }
 
         // 증상 체크박스 클릭
         function handleSymptomClick(e) {
@@ -95,7 +174,6 @@ if (!window.MedicalChartModule) {
         // 모든 치아와 증상 선택을 초기 상태로 돌림
         function toothValueReset() {
             allToothLists.forEach(button => button.classList.remove("opacity-50"));
-            allsymptomLists.forEach(input => input.checked = false);
             toothList = [];
             symptomList = [];
             memo.value = ''; // 메모 초기화
@@ -119,8 +197,7 @@ if (!window.MedicalChartModule) {
             let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient')) || {};
 
             const mdTime = document.getElementById('mdTime').value;
-            const checkDoc = document.getElementById('checkDoc').value;
-            console.log('주치의 확인11111111:', checkDoc);
+            const piCheckDoc = document.getElementById('piCheckDoc').value;
 
             const memoContent = memo.value;
             const paName = patientInfos.name || '';
@@ -128,7 +205,7 @@ if (!window.MedicalChartModule) {
 
             const medicalChartData = {
                 mdTime: mdTime,
-                checkDoc: checkDoc,
+                checkDoc: piCheckDoc,
                 teethNum: toothList.join(', '),
                 medicalContent: memoContent,
                 medicalDivision: "PI",
