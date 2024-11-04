@@ -394,12 +394,7 @@ function saveTerm(button) {
             return response.json();
         })
         .then(newTerm => {
-            row.cells[0].textContent = newTerm.name; // 입력 필드를 텍스트로 변경
-            row.cells[1].innerHTML = `
-    <button onclick="addTermByNote('${newTerm.name}')" class="btn btn-success">추가</button>`;
-            row.cells[2].innerHTML = `
-    <button onclick="deleteTerm(this)" class="btn btn-danger">삭제</button>`;
-
+            fetchTerms();
         })
         .catch(error => {
             alert(error.message);
