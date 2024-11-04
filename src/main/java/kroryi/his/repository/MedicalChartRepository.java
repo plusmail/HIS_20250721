@@ -19,7 +19,8 @@ public interface MedicalChartRepository extends JpaRepository<MedicalChart, Inte
 //    @Query("SELECT  new kroryi.his.dto.MedicalChartDTO(m.chartNum) FROM MedicalChart m WHERE m.chartNum = :chartNum")
 //    List<MedicalChartDTO> findMedicalChartsByChartNum(@Param("chartNum") String chartNum);
 
-    List<MedicalChart> findMedicalChartByChartNum(String chartNum);
+    List<MedicalChart> findMedicalChartByChartNumOrderByMdTimeAsc(String chartNum);
+
 
 
     @Transactional

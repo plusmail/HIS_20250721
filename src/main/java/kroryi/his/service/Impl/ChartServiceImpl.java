@@ -38,7 +38,7 @@ public class ChartServiceImpl implements ChartService {
     }
     @Override
     public List<MedicalChart> getChart(String chartNum) {
-        return medicalChartRepository.findMedicalChartByChartNum(chartNum);
+        return medicalChartRepository.findMedicalChartByChartNumOrderByMdTimeAsc(chartNum);
     }
 
 

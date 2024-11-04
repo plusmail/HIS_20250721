@@ -19,15 +19,27 @@
                                 <div class="col-md-6">
                                     <!-- 검색 섹션 -->
                                     <div class="mb-3">
-                                        <div class="col-md-12 text-end mb-3">
-                                            <button type="button" class="btn btn-primary" onclick="searchChart()">검색</button>
-                                        </div>
-                                        <div class="row g-2">
-                                            <div class="col-md-3">
+                                        <div class="row g-2 align-items-end flex-nowrap">
+                                            <div class="col">
+                                                <label for="appointmentDateStart" class="form-label">진료일자</label>
+                                                <input type="date" class="form-control" id="appointmentDateStart" placeholder="시작일자">
+                                            </div>
+
+                                            <!-- ~ 표시를 위한 작은 col-auto -->
+                                            <div class="col-auto d-flex justify-content-center align-items-center">
+                                                <span>~</span>
+                                            </div>
+
+                                            <div class="col">
+                                                <input type="date" class="form-control" id="appointmentDateEnd" placeholder="종료일자">
+                                            </div>
+
+                                            <div class="col">
                                                 <label for="toothNumber" class="form-label">치아번호</label>
                                                 <input type="text" class="form-control" id="toothNumber" placeholder="치아번호">
                                             </div>
-                                            <div class="col-md-3">
+
+                                            <div class="col">
                                                 <label for="checkDoc" class="form-label">의사</label>
                                                 <select class="form-select" name="checkDoc" id="checkDoc" required>
                                                     <option value="" disabled selected>주치의</option>
@@ -36,27 +48,24 @@
                                                     </th:block>
                                                 </select>
                                             </div>
-                                            <div class="col-md-3">
-                                                <label for="appointmentDate" class="form-label">진료일자</label>
-                                                <input type="date" class="form-control" id="appointmentDate">
-                                            </div>
-                                            <div class="col-md-3">
+
+                                            <div class="col">
                                                 <label for="keyword" class="form-label">내역키워드</label>
                                                 <input type="text" class="form-control" id="keyword" placeholder="내역키워드">
                                             </div>
-
                                         </div>
                                     </div>
 
+
                                     <!-- 테이블 섹션 -->
-                                    <div>
+                                    <div style="max-height: 850px; overflow-y: auto;">
                                         <table class="table mt-3">
-                                            <thead>
+                                            <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
                                             <tr>
-                                                <th scope="col" class="col-md-3">진료일</th>
-                                                <th scope="col" class="col-md-3">선택치아</th>
-                                                <th scope="col" class="col-md-3">구분</th>
-                                                <th scope="col" class="col-md-3">내역</th>
+                                                <th scope="col" class="col-md-2">진료일</th>
+                                                <th scope="col" class="col-md-2">선택치아</th>
+                                                <th scope="col" class="col-md-1">구분</th> <!-- 구분 열을 좁게 설정 -->
+                                                <th scope="col" class="col-md-4">내역</th>
                                                 <th scope="col" class="col-md-3">진료의</th>
                                             </tr>
                                             </thead>
@@ -127,7 +136,6 @@
                                                 }
                                             });
                                         }else if(page === '/medical_chart_plan'){
-                                            console.log("초기화 2" + MedicalChartModule)
                                             $.getScript("/js/medical_chart_plan.js", function() {
                                                 if (typeof MedicalPlanModule !== "undefined") {
                                                     MedicalPlanModule.init();
