@@ -55,4 +55,9 @@ public class MemberJoinDTO {
         this.zipCode = zipCode;
 
     }
+
+    public MemberJoinDTO(String mid, String name) {
+        this.mid = mid;
+        this.name = name;
+    }
 }
