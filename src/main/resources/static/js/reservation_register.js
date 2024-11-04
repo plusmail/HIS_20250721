@@ -336,39 +336,29 @@ function deleteReservation() {
 
 }
 
-let currentInputRow = null; // 현재 입력 중인 행을 추적하는 변수
-
 function addRow() {
-    // 이전에 추가된 행이 있다면 삭제
-    if (currentInputRow) {
-        currentInputRow.remove();
-    }
-
     const termList = document.getElementById('termList');
     const newRow = document.createElement('tr');
-    currentInputRow = newRow; // 현재 입력 중인 행 저장
 
+    // 진료명 입력 필드
     const termCell = document.createElement('td');
-    termCell.innerHTML = '<input type="text" placeholder="진료명을 입력하세요" />';
+    termCell.innerHTML = '<input type="text" placeholder="진료명을 입력하세요" />'; // 빈 입력 필드
     newRow.appendChild(termCell);
 
+    // 저장 버튼
     const saveCell = document.createElement('td');
-    saveCell.innerHTML = '<button onclick="saveTerm(this)" class="btn btn-success">저장</button>';
+    saveCell.innerHTML = '<button onclick="saveTerm(this)" class="btn btn-success">저장</button>'; // 저장 버튼 추가
     newRow.appendChild(saveCell);
 
+    // 삭제 버튼
     const deleteCell = document.createElement('td');
-    deleteCell.innerHTML = '<button onclick="deleteCurrentRow()" class="btn btn-danger">삭제</button>'; // 수정된 삭제 버튼
+    deleteCell.innerHTML = '<button onclick="deleteTerm(this)" class="btn btn-danger">삭제</button>'; // 삭제 버튼 추가
     newRow.appendChild(deleteCell);
 
     termList.appendChild(newRow);
 }
 
-function deleteCurrentRow() {
-    if (currentInputRow) {
-        currentInputRow.remove(); // 현재 입력 중인 행 삭제
-        currentInputRow = null; // 현재 입력 중인 행 초기화
-    }
-}
+
 
 function saveTerm(button) {
     const row = button.parentNode.parentNode;
@@ -459,24 +449,37 @@ function addTermByNote(name) {
     }
 }
 
-function deleteTerm(id) {
-    console.log('Deleting term with ID:', id);
-    fetch(`reservation/deleteTerm?seq=${id}`, {
-        method: 'DELETE',
-    })
-        .then(response => {
-            if (response.ok) {
-                // 성공적으로 삭제되었을 때 실행할 동작
-                alert('성공적으로 삭제 되었습니다.');
-                // 테이블에서 행 삭제
-                fetchTerms();
-            } else {
-                throw new Error('삭제 실패');
-            }
+function deleteTerm(param) {
+    if (param instanceof HTMLElement) {
+        // 'this'가 전달된 경우, 즉 버튼 클릭
+        const row = param.closest('tr'); // 버튼이 있는 행 찾기
+        const termInput = row.querySelector('input'); // 입력 필드 찾기
+        if (termInput) {
+            row.remove(); // 해당 행 삭제
+        }
+    } else if (typeof param === 'string') {
+        // ID가 문자열로 전달된 경우
+        const id = param;
+        console.log('Deleting term with ID:', id);
+        fetch(`reservation/deleteTerm?seq=${id}`, {
+            method: 'DELETE',
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting term.');
-        });
-
+            .then(response => {
+                if (response.ok) {
+                    // 성공적으로 삭제되었을 때 실행할 동작
+                    alert('성공적으로 삭제 되었습니다.');
+                    // 테이블에서 데이터 새로 고침
+                    fetchTerms();
+                } else {
+                    throw new Error('삭제 실패');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting term.');
+            });
+    } else {
+        console.error("유효하지 않은 매개변수입니다.");
+    }
 }
+
