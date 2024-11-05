@@ -39,121 +39,104 @@ const socket = new SockJS("http://localhost:8080/ws");
 document.addEventListener("DOMContentLoaded", function () {
     const stompClient = Stomp.over(socket);
 
-    fetchPatientStatus();
-
     stompClient.connect({}, function(frame) {
-        console.log('WebSocket connected:', frame);
+        console.log('WebSocket 연결됨:', frame);
 
         // 환자 수 업데이트 메시지 구독
         stompClient.subscribe('/topic/patientUpdates', function (message) {
-            console.log("11111111111111111111")
             const datas = JSON.parse(message.body);
-            console.log(datas);
-            const { status, count } = datas;
-
-            // 상태 및 카운트를 출력하여 확인
-            console.log(`Status: ${status}, Count: ${count}`);
-            if(datas.status1 !== undefined){
-                document.getElementById('home-waitingCount').textContent = datas.status1;
-            }
-            if(datas.status2 !== undefined){
-                document.getElementById('home-inTreatmentCount').textContent = datas.status2;
-            }
-            if(datas.status3 !== undefined){
-                document.getElementById('home-completedCount').textContent = datas.status3;
-            }
-            console.warn(`Unknown status: ${datas}`);
-
+            console.log("환자 업데이트 데이터:", datas);
+            updatePatientStatus(datas);
         });
+
+        // 환자 수 메시지 구독
+        stompClient.subscribe('/topic/patientCounts', function (message) {
+            console.log("수신된 원본 메시지:", message.body);
+            try {
+                const counts = JSON.parse(message.body);
+                console.log("업데이트된 환자 수:", counts);
+                updatePatientCounts(counts);
+            } catch (error) {
+                console.error('메시지 파싱 오류:', error);
+            }
+        });
+
+        // 환자 상태 가져오기
+        fetchPatientStatus();
+        requestPatientCounts();
+
     }, function(error) {
-        console.error('WebSocket connection error:', error);
+        console.error('WebSocket 연결 오류:', error);
     });
 });
 
+// 환자 상태 업데이트 함수
+function updatePatientStatus(datas) {
+    if (datas.status1 !== undefined) {
+        document.getElementById('home-waitingCount').textContent = datas.status1;
+    }
+    if (datas.status2 !== undefined) {
+        document.getElementById('home-inTreatmentCount').textContent = datas.status2;
+    }
+    if (datas.status3 !== undefined) {
+        document.getElementById('home-completedCount').textContent = datas.status3;
+    }
+}
+
+// 환자 상태 가져오기
 function fetchPatientStatus() {
     fetch("/api/patient-admission/status")
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('네트워크 응답이 좋지 않습니다');
             }
             return response.json();
         })
         .then(data => {
             if (data) {
-                document.getElementById('home-waitingCount').textContent = data.status1;
-                document.getElementById('home-inTreatmentCount').textContent = data.status2;
-                document.getElementById('home-completedCount').textContent = data.status3;
+                updatePatientStatus(data);
             }
         })
-        .catch(error => console.error('Error fetching patient status:', error));
+        .catch(error => console.error('환자 상태 가져오기 오류:', error));
 }
-
-
-// 페이지 로드 시 호출
-function goToReception() {
-    window.location.href = "http://localhost:8080/reception";
-}
-
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const socket = new SockJS('/ws'); // WebSocket 엔드포인트
-    const stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, function(frame) {
-        console.log('WebSocket connected:', frame);
-
-        requestPatientCounts();
-
-        stompClient.subscribe('/topic/patientCounts', function (message) {
-            console.log("Raw message received:", message.body); // 수신된 원본 메시지 로그
-            try {
-                const counts = JSON.parse(message.body);
-                console.log("Updated counts:", counts); // 수신된 데이터 로그
-
-                // 환자 수 업데이트
-                updatePatientCounts(counts);
-            } catch (error) {
-                console.error('Error parsing message:', error);
-            }
-        });
-    }, function(error) {
-        console.error('WebSocket connection error:', error);
-    });
-});
 
 // 환자 수 요청 함수
 function requestPatientCounts() {
     fetch('/api/patient-status')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('네트워크 응답이 좋지 않습니다');
             }
             return response.json();
         })
         .then(data => {
-            console.log('환자 수:', data);
-            // 환자 수 업데이트
+            console.log('환자---- 수:', data);
             updatePatientCounts(data);
         })
         .catch(error => {
-            console.error('Fetch error:', error);
+            console.error('가져오기 오류:', error);
         });
 }
 
 // 환자 수 업데이트를 위한 함수
 function updatePatientCounts(counts) {
-    // 기본값 설정
-    const generalCount = counts.generalPatientCount !== undefined ? counts.generalPatientCount : 0;
-    const surgeryCount = counts.surgeryCount !== undefined ? counts.surgeryCount : 0;
-    const newCount = counts.newPatientCount !== undefined ? counts.newPatientCount : 0;
+    console.log("updatePa----->", counts)
+    console.log("updatePa----->", counts.homeGeneralPatientCount)
+    const generalCount = counts.homeGeneralPatientCount !== null ? counts.homeGeneralPatientCount : 0;
+    const surgeryCount = counts.homeSurgeryCount !== undefined ? counts.homeSurgeryCount : 0;
+    const newCount = counts.homeNewPatientCount !== undefined ? counts.homeNewPatientCount : 0;
 
-    document.getElementById('home-generalPatientCount').textContent = generalCount;
-    document.getElementById('home-surgeryCount').textContent = surgeryCount;
-    document.getElementById('home-newPatientCount').textContent = newCount;
+    document.getElementById('homeGeneralPatientCount').textContent = counts.homeGeneralPatientCount;
+    document.getElementById('homeSurgeryCount').textContent = surgeryCount;
+    document.getElementById('homeNewPatientCount').textContent = newCount;
 }
 
+// 진료 접수 페이지로 이동
+function goToReception() {
+    window.location.href = "http://localhost:8080/reception";
+}
+
+// 진료 예약 페이지로 이동
 function goToReservation() {
     window.location.href = "http://localhost:8080/reservation";
 }

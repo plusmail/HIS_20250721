@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 public class PatientStatusDTO {
-    private int generalPatientCount;
-    private int surgeryCount;
-    private int newPatientCount;
+    private int homeGeneralPatientCount;
+    private int homeSurgeryCount;
+    private int homeNewPatientCount;
 }

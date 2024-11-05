@@ -93,9 +93,9 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
         int newCount = reservationRepository.getTodayNewPatientCount();
 
         Map<String, Integer> counts = new HashMap<>();
-        counts.put("generalPatientCount", generalCount);
-        counts.put("surgeryCount", surgeryCount);
-        counts.put("newPatientCount", newCount);
+        counts.put("homeGeneralPatientCount", generalCount);
+        counts.put("homeSurgeryCount", surgeryCount);
+        counts.put("homeNewPatientCount", newCount);
         return counts;
     }
 
