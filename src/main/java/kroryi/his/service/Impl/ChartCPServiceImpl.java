@@ -1,18 +1,12 @@
 package kroryi.his.service.Impl;
 
-import kroryi.his.controller.ChartController;
 import kroryi.his.domain.MedicalChart;
 import kroryi.his.dto.MedicalChartDTO;
-import kroryi.his.dto.RequestData;
 import kroryi.his.repository.MedicalChartRepository;
-import kroryi.his.service.ChartPiService;
+import kroryi.his.service.ChartCPService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +14,7 @@ import java.util.List;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class ChartPiServiceImpl implements ChartPiService {
+public class ChartCPServiceImpl implements ChartCPService {
 
     private final MedicalChartRepository medicalChartRepository;
 
@@ -47,7 +41,7 @@ public class ChartPiServiceImpl implements ChartPiService {
     }
 
     @Override
-    public MedicalChartDTO saveMedicalChart(MedicalChartDTO medicalChartDTO) {
+    public void saveMedicalChart(MedicalChartDTO medicalChartDTO) {
         MedicalChart medicalChart = MedicalChart.builder()
                 .mdTime(medicalChartDTO.getMdTime())
                 .checkDoc(medicalChartDTO.getCheckDoc())
@@ -59,6 +53,5 @@ public class ChartPiServiceImpl implements ChartPiService {
                 .build();
 
         medicalChartRepository.save(medicalChart);
-        return medicalChartDTO;
     }
 }

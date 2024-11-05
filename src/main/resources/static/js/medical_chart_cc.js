@@ -1,29 +1,29 @@
-if (!window.MedicalChartPIModule) {
-    window.MedicalChartPIModule = (() => {
+if (!window.MedicalChartCCModule) {
+    window.MedicalChartCCModule = (() => {
         let toothList = [];
         let symptomList = [];
         let listIndex = 0;
 
-        let tooth, symptom, memo, savePi, mUpTooth, mDownTooth, mAllTooth, mUpToothY, mDownToothY, mAllToothY;
-        let mUpToothValues, mDownToothValues, mYUpToothValues, mYDownToothValues, modalData, allToothLists;
+        let tooth, symptom, memo, saveCc, UpTooth, DownTooth, AllTooth, UpToothY, DownToothY, AllToothY;
+        let UpToothValues, DownToothValues, YUpToothValues, YDownToothValues, modalData, allToothLists;
 
         // 초기화 함수
         function init() {
             tooth = document.querySelector(".tooth-container");
-            symptom = document.querySelector(".pi-symptom");
-            memo = document.querySelector(".memo");
-            savePi = document.querySelector(".save-pi");
-            mUpTooth = document.querySelector(".up-control");
-            mDownTooth = document.querySelector(".down-control");
-            mAllTooth = document.querySelector(".all-control");
-            mUpToothY = document.querySelector(".y-up-control");
-            mDownToothY = document.querySelector(".y-down-control");
-            mAllToothY = document.querySelector(".y-all-control");
+            symptom = document.querySelector(".cc-symptom");
+            memo = document.querySelector(".ccMemo");
+            saveCc = document.querySelector(".save-cc");
+            UpTooth = document.querySelector(".up-control");
+            DownTooth = document.querySelector(".down-control");
+            AllTooth = document.querySelector(".all-control");
+            UpToothY = document.querySelector(".y-up-control");
+            DownToothY = document.querySelector(".y-down-control");
+            AllToothY = document.querySelector(".y-all-control");
 
-            mUpToothValues = document.querySelectorAll(".up-tooth");
-            mDownToothValues = document.querySelectorAll(".down-tooth");
-            mYUpToothValues = document.querySelectorAll(".y-up-tooth");
-            mYDownToothValues = document.querySelectorAll(".y-down-tooth");
+            UpToothValues = document.querySelectorAll(".up-tooth");
+            DownToothValues = document.querySelectorAll(".down-tooth");
+            YUpToothValues = document.querySelectorAll(".y-up-tooth");
+            YDownToothValues = document.querySelectorAll(".y-down-tooth");
             modalData = document.querySelectorAll(".modal-tr");
             allToothLists = tooth.querySelectorAll('button');
 
@@ -32,23 +32,17 @@ if (!window.MedicalChartPIModule) {
 
         // 주요 요소 이벤트 리스너 등록
         function setupEventListeners() {
-            tooth.addEventListener("click", handleToothClick);
-            symptom.addEventListener("click", handleSymptomClick);
-
-            // 체크박스에 이벤트 리스너 추가
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateTextarea);
-            });
+            tooth.addEventListener("click", handleToothClickCc);
+            symptom.addEventListener("dblclick", handleSymptomClickCc);
 
             // 저장 버튼 클릭 이벤트 리스너 추가
-            savePi.addEventListener('click', saveMedicalPiChart);
+            saveCc.addEventListener('click', saveMedicalCcChart);
         }
 
         // 모듈 초기화 및 정리
-        function cleanup() {
-            tooth.removeEventListener("click", handleToothClick);
-            symptom.removeEventListener("click", handleSymptomClick);
+        function cleanUp() {
+            tooth.removeEventListener("click", handleToothClickCc);
+            symptom.removeEventListener("click", handleSymptomClickCc);
 
             toothList = [];
             symptomList = [];
@@ -56,7 +50,7 @@ if (!window.MedicalChartPIModule) {
         }
 
         // 치아 버튼 클릭시 호출
-        function handleToothClick(e) {
+        function handleToothClickCc(e) {
             modalToothList = [];
             modalToothList.push(e.target.value);
             if (e.target.tagName === "BUTTON" && e.target.id === '') {
@@ -71,76 +65,77 @@ if (!window.MedicalChartPIModule) {
 
                 // 버튼의 스타일을 업데이트
                 e.target.classList.toggle("opacity-50");
-            }else if (e.target.tagName === "BUTTON") {
-                toothTerminal(e.target.id);
+            } else if (e.target.tagName === "BUTTON") {
+                toothTerminalCc(e.target.id);
             }
         }
-        function toothTerminal(id) {
+
+        function toothTerminalCc(id) {
             toothList = [];
 
             switch (id) {
                 case "upTooth":
-                    mUpToothValues.forEach(upToothValue => {
+                    UpToothValues.forEach(upToothValue => {
                         if (!isNaN(upToothValue.value)) {
                             toothList.push(upToothValue.value);
                         }
                     });
-                    toggleOpacity(mUpTooth, mUpToothValues, "상악");
+                    toggleOpacityCc(UpTooth, UpToothValues, "상악");
                     break;
 
                 case "allTooth":
-                    mUpToothValues.forEach(upToothValue => {
+                    UpToothValues.forEach(upToothValue => {
                         if (!isNaN(upToothValue.value)) {
                             toothList.push(upToothValue.value);
                         }
                     });
-                    mDownToothValues.forEach(downToothValue => {
+                    DownToothValues.forEach(downToothValue => {
                         if (!isNaN(downToothValue.value)) {
                             toothList.push(downToothValue.value);
                         }
                     });
-                    toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                    toggleOpacityCc(AllTooth, [...UpToothValues, ...DownToothValues], "전부");
                     break;
 
                 case "downTooth":
-                    mDownToothValues.forEach(downToothValue => {
+                    DownToothValues.forEach(downToothValue => {
                         if (!isNaN(downToothValue.value)) {
                             toothList.push(downToothValue.value);
                         }
                     });
-                    toggleOpacity(mDownTooth, mDownToothValues, "하악");
+                    toggleOpacityCc(DownTooth, DownToothValues, "하악");
                     break;
 
                 case "upToothY":
-                    mYUpToothValues.forEach(yUpToothValue => {
+                    YUpToothValues.forEach(yUpToothValue => {
                         if (!isNaN(yUpToothValue.value)) {
                             toothList.push(yUpToothValue.value);
                         }
                     });
-                    toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
+                    toggleOpacityCc(UpToothY, YUpToothValues, "유치상악");
                     break;
 
                 case "allToothY":
-                    mYUpToothValues.forEach(yUpToothValue => {
+                    YUpToothValues.forEach(yUpToothValue => {
                         if (!isNaN(yUpToothValue.value)) {
                             toothList.push(yUpToothValue.value);
                         }
                     });
-                    mYDownToothValues.forEach(yDownToothValue => {
+                    YDownToothValues.forEach(yDownToothValue => {
                         if (!isNaN(yDownToothValue.value)) {
                             toothList.push(yDownToothValue.value);
                         }
                     });
-                    toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                    toggleOpacityCc(AllToothY, [...YUpToothValues, ...YDownToothValues], "유치전부");
                     break;
 
                 case "downToothY":
-                    mYDownToothValues.forEach(yDownToothValue => {
+                    YDownToothValues.forEach(yDownToothValue => {
                         if (!isNaN(yDownToothValue.value)) {
                             toothList.push(yDownToothValue.value);
                         }
                     });
-                    toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
+                    toggleOpacityCc(DownToothY, YDownToothValues, "유치하악");
                     break;
 
                 default:
@@ -149,52 +144,36 @@ if (!window.MedicalChartPIModule) {
             }
         }
 
-        function toggleOpacity(button, elements, logMessage) {
+        function toggleOpacityCc(button, elements, logMessage) {
             button.classList.toggle("opacity-50");
             elements.forEach(element => element.classList.toggle("opacity-50"));
         }
 
-        // 증상 체크박스 클릭
-        function handleSymptomClick(e) {
-            if (e.target.tagName === "INPUT") {
-                const symptomValue = e.target.value;
+        // 증상 항목 클릭 시 메모에 추가하는 함수
+        function handleSymptomClickCc(e) {
+            if (e.target.tagName === "TD") {
+                const symptomText = e.target.textContent.trim();
 
-                // 증상 리스트에 추가하거나 제거
-                if (symptomList.includes(symptomValue)) {
-                    symptomList = symptomList.filter(symptom => symptom !== symptomValue);
-                } else {
-                    symptomList.push(symptomValue);
+                // 메모에 해당 항목이 없을 경우 추가
+                if (!memo.value.includes(symptomText)) {
+                    memo.value += `${symptomText}\n`;
                 }
             }
         }
 
         // 모든 치아와 증상 선택을 초기 상태로 돌림
-        function toothValueReset() {
+        function toothValueResetCc() {
             allToothLists.forEach(button => button.classList.remove("opacity-50"));
             toothList = [];
             symptomList = [];
             memo.value = ''; // 메모 초기화
         }
 
-        function updateTextarea() {
-            const memoTextarea = document.getElementById('memo-textarea');
-            const checkboxes = document.querySelectorAll('.form-check-input');
-            const selectedValues = [];
-
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedValues.push(checkbox.value);
-                }
-            });
-
-            memoTextarea.value = selectedValues.join(', ');
-        }
-
-        function saveMedicalPiChart() {
+        function saveMedicalCcChart() {
             let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient')) || {};
 
             const mdTime = document.getElementById('mdTime').value;
-            const piCheckDoc = document.getElementById('piCheckDoc').value;
+            const ccCheckDoc = document.getElementById('ccCheckDoc').value;
 
             const memoContent = memo.value;
             const paName = patientInfos.name || '';
@@ -202,15 +181,15 @@ if (!window.MedicalChartPIModule) {
 
             const medicalChartData = {
                 mdTime: mdTime,
-                checkDoc: piCheckDoc,
+                checkDoc: ccCheckDoc,
                 teethNum: toothList.join(', '),
                 medicalContent: memoContent,
-                medicalDivision: "PI",
+                medicalDivision: "CC",
                 chartNum: chartNum,
                 paName: paName
             };
 
-            fetch('/medical_chart/savePiChart', {
+            fetch('/medical_chart/saveCcChart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -220,7 +199,7 @@ if (!window.MedicalChartPIModule) {
                 .then(response => {
                     if (response.ok) {
                         alert('저장되었습니다.');
-                        toothValueReset();
+                        toothValueResetCc();
                         readPaChart();
                     } else {
                         alert('저장 실패.');
@@ -232,7 +211,6 @@ if (!window.MedicalChartPIModule) {
                 });
         }
 
-
-        return { init, cleanup };
+        return { init, cleanUp };
     })();
 }

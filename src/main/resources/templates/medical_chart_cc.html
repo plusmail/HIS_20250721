@@ -205,7 +205,7 @@
     <div class="container mt-4" style="max-width: 100%;">
         <div class="row border rounded">
             <label class="btn btn-outline-secondary btn-sm no-hover">자주 쓰는 CC 선택</label>
-            <div class="border rounded col-12 p-0 m-0" style="max-height: 300px; overflow-y: auto;">
+            <div class="border rounded col-12 p-0 m-0 cc-symptom"  style="max-height: 300px; overflow-y: auto;">
                 <table class="table table-hover table-bordered">
                     <tbody>
                     <tr>
@@ -218,7 +218,7 @@
                         <td class="text-start">양치할 때 피가 나요.</td>
                     </tr>
                     <tr>
-                        <td class="text-start">치아가 시려요..</td>
+                        <td class="text-start">치아가 시려요.</td>
                     </tr>
                     <tr>
                         <td class="text-start">음식이 끼고 빼기 힘들어요.</td>
@@ -268,7 +268,8 @@
                 </button>
             </div>
             <div class="col-6 p-0">
-                <textarea class="form-control h-100 memo" rows="5" placeholder="PI를 입력하세요"></textarea>
+                <textarea class="form-control h-100 ccMemo" rows="5" id="cc-textarea"
+                          placeholder="CC를 입력하세요"></textarea>
             </div>
             <div class="col-3 bg-light d-flex justify-content-center align-items-center py-3">
                 <div class="row gx-2">
@@ -279,6 +280,6 @@
         </div>
     </div>
 </div>
-
 </body>
+<script src="/js/medical_chart_cc.js"></script>
 </html>

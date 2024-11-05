@@ -29,4 +29,6 @@ public interface ChartService {
     MedicalChartDTO MedicalChartSave(MedicalChartDTO dto);
 
     MedicalChartDTO deleteChart(String charNum, String paName, String teethNum, String plan);
+
+    void deleteChart(Integer cnum);
 }

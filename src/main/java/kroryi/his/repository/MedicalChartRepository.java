@@ -42,5 +42,8 @@ public interface MedicalChartRepository extends JpaRepository<MedicalChart, Inte
             LocalDate mdTime
     );
 
+    @Transactional
+    @Modifying
+    void deleteByCnum(Integer cnum);
 
 }

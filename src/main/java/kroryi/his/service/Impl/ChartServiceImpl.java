@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -168,6 +169,17 @@ public class ChartServiceImpl implements ChartService {
     // 새로운 메모를 저장
     public ChartMemo saveMemo(ChartMemo newMemo) {
         return chartMemoRepository.save(newMemo);  // 메모를 데이터베이스에 저장
+    }
+
+    @Override
+    @Transactional
+    public void deleteChart(Integer cnum) {
+        try {
+            medicalChartRepository.deleteByCnum(cnum);
+        } catch (Exception e) {
+            log.error("삭제 중 오류 발생: ", e);
+            throw new RuntimeException("삭제에 실패했습니다.");
+        }
     }
 
 }
