@@ -35,14 +35,7 @@ public class ChartController {
     private ResponseEntity<?> savePaList(@RequestBody ChartPaData paData) {
         paName = paData.getPaName();
         chartNum = paData.getChartNum();
-
-        log.info("chartNum:{} ", chartNum + ", paName:{} ", paName);
-
-
-
         return ResponseEntity.ok(paName);
-
-
     }
 
 
