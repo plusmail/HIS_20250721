@@ -8,11 +8,10 @@ import kroryi.his.repository.ReservationRepository;
 import kroryi.his.service.ReservationRegisterService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +30,15 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
         this.modelMapper = modelMapper;
     }
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    private int generalPatientCount = 0;
+    private int surgeryCount = 0;
+    private int newPatientCount = 0;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     // 캘린더에서 날짜 선택시
     public List<ReservationDTO> selectedDatePatientList(ReservationDTO dto) {
@@ -65,11 +73,30 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
         // 예약 정보 저장
         reRepo.save(reservation);
 
+        // 데이터베이스에서 현재 환자 수를 가져오기 위한 메서드 호출
+        Map<String, Integer> counts = getPatientCounts();
+
+        // 웹소켓을 통해 카운트 전송
+        messagingTemplate.convertAndSend("/topic/patientCounts", counts);
+
         // 저장된 예약 정보를 다시 DTO로 변환
         ReservationDTO savedDto = modelMapper.map(reservation, ReservationDTO.class);
 
         // 결과를 리스트에 담아 반환
         return Collections.singletonList(savedDto);
+    }
+
+    // 데이터베이스에서 환자 수를 가져오는 메서드
+    public Map<String, Integer> getPatientCounts() {
+        int generalCount = reservationRepository.getTodayGeneralPatientCount();
+        int surgeryCount = reservationRepository.getTodaySurgeryCount();
+        int newCount = reservationRepository.getTodayNewPatientCount();
+
+        Map<String, Integer> counts = new HashMap<>();
+        counts.put("generalPatientCount", generalCount);
+        counts.put("surgeryCount", surgeryCount);
+        counts.put("newPatientCount", newCount);
+        return counts;
     }
 
 
@@ -112,6 +139,21 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
                         reservation.getReservationStatusCheck()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public int getGeneralPatientCount() {
+        return reservationRepository.getTodayGeneralPatientCount();
+    }
+
+    @Override
+    public int getSurgeryCount() {
+        return reservationRepository.getTodaySurgeryCount();
+    }
+
+    @Override
+    public int getNewPatientCount() {
+        return reservationRepository.getTodayNewPatientCount();
     }
 }
 

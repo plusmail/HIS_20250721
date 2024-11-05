@@ -19,5 +19,6 @@ public class RedisMessageListener {
 
         log.info("받은 메세지......receive message: " + message);
         messagingTemplate.convertAndSend("/topic/patientUpdates", message);
+        messagingTemplate.convertAndSend("/topic/patientCounts", message);
     }
 }

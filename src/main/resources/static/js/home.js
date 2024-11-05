@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function fetchPatientStatus() {
-    fetch("/api/patient-admission/status") // API 엔드포인트를 호출
+    fetch("/api/patient-admission/status")
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -79,7 +79,6 @@ function fetchPatientStatus() {
             return response.json();
         })
         .then(data => {
-            // 초기 환자 상태 업데이트
             if (data) {
                 document.getElementById('home-waitingCount').textContent = data.status1;
                 document.getElementById('home-inTreatmentCount').textContent = data.status2;
@@ -98,5 +97,65 @@ function goToReception() {
 
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const socket = new SockJS('/ws'); // WebSocket 엔드포인트
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('WebSocket connected:', frame);
+
+        requestPatientCounts();
+
+        stompClient.subscribe('/topic/patientCounts', function (message) {
+            console.log("Raw message received:", message.body); // 수신된 원본 메시지 로그
+            try {
+                const counts = JSON.parse(message.body);
+                console.log("Updated counts:", counts); // 수신된 데이터 로그
+
+                // 환자 수 업데이트
+                updatePatientCounts(counts);
+            } catch (error) {
+                console.error('Error parsing message:', error);
+            }
+        });
+    }, function(error) {
+        console.error('WebSocket connection error:', error);
+    });
+});
+
+// 환자 수 요청 함수
+function requestPatientCounts() {
+    fetch('/api/patient-status')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('환자 수:', data);
+            // 환자 수 업데이트
+            updatePatientCounts(data);
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+}
+
+// 환자 수 업데이트를 위한 함수
+function updatePatientCounts(counts) {
+    // 기본값 설정
+    const generalCount = counts.generalPatientCount !== undefined ? counts.generalPatientCount : 0;
+    const surgeryCount = counts.surgeryCount !== undefined ? counts.surgeryCount : 0;
+    const newCount = counts.newPatientCount !== undefined ? counts.newPatientCount : 0;
+
+    document.getElementById('home-generalPatientCount').textContent = generalCount;
+    document.getElementById('home-surgeryCount').textContent = surgeryCount;
+    document.getElementById('home-newPatientCount').textContent = newCount;
+}
+
+function goToReservation() {
+    window.location.href = "http://localhost:8080/reservation";
+}
 
 
