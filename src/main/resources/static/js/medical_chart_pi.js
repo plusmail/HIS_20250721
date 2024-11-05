@@ -28,6 +28,17 @@ if (!window.MedicalChartPIModule) {
             allToothLists = tooth.querySelectorAll('button');
 
             setupEventListeners();
+
+            // 날짜를 오늘 날짜로 설정
+            const mdTime = document.getElementById("mdTime");
+            const today = new Date().toISOString().split("T")[0];
+            mdTime.value = today;
+
+            // 주치의 목록에서 첫 번째 항목이 선택되도록 설정
+            const piCheckDoc = document.getElementById("piCheckDoc");
+            if (!piCheckDoc.value) {
+                piCheckDoc.selectedIndex = 1;
+            }
         }
 
         // 주요 요소 이벤트 리스너 등록
