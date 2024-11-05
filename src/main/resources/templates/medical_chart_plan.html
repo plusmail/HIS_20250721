@@ -5,30 +5,15 @@
     <title>진료차트 입력 시스템</title>
 </head>
 <body>
-<!-- 치료 계획 선택 박스 -->
-<div class="row mt-2" style="width: 600px">
-    <div class="input-group col">
-        <span class="input-group-text" style="width: 6rem;">진료일</span>
-        <input type="date" name="mdTime" id="mdTime" class=" form-control" required>
-    </div>
-    <div class="input-group col">
-        <span class="input-group-text" style="width: 6rem;">진료의</span>
-        <select class="form-select" name="checkDoc" id="planCheckDoc" required>
-            <option value="" disabled selected>진료의</option>
-            <th:block th:each="doctor : ${doctorNames}">
-                <option th:value="${doctor}" th:text="${doctor}"></option>
-            </th:block>
-        </select>
-    </div>
-</div>
 <div class="container mt-2 overflow-auto border-box" style="height: 700px;">
     <table class="table">
         <thead class="table-dark">
         <tr>
+            <th>진료일</th>
+            <th>진료의</th>
             <th>치식</th>
             <th>내역</th>
-            <th>저장</th>
-            <th>삭제</th>
+            <th></th>
         </tr>
         </thead>
         <tbody id="plan-data">

@@ -98,7 +98,33 @@ function readPaChart() {
                             type: 'DELETE',
                             data: { cnum: cnum },
                             success: function(response) {
+                                let tableBody = $("#plan-data");
+                                tableBody.empty();  // 기존 내용을 비움
+                                $.ajax({
+                                    url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
+                                    type: 'GET',  // GET 요청
+                                    dataType: 'json',  // 서버에서 JSON 응답을 기대
+                                    success: function (data) {
+
+                                        console.log("차트 보여주는 메소드 실행")
+
+                                        let previousMdTime = null;  // 이전 mdTime을 저장할 변수
+
+// 데이터를 순회하여 테이블에 추가
+                                        data.forEach(chart => {
+                                            createTableRowWithData(chart, rowIndex, doctorNames, tableBody);
+                                            rowIndex++
+                                        })
+                                        createNewTableRow(rowIndex, doctorNames, tableBody);
+                                        rowIndex++
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error('Error:', error);  // 에러 처리
+                                    }
+                                });
+
                                 readPaChart();
+
                             },
                             error: function(xhr, status, error) {
                                 console.error('Error:', error);

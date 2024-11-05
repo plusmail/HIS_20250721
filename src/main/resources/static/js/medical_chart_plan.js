@@ -7,7 +7,6 @@ if (!window.MedicalPlanModule) {
         let modal, toothModal, saveBtn, planData, mTooth, saveToothBtn;
         let mUpTooth, mUpToothValues, mDownTooth, mDownToothValues, mAllTooth;
         let mUpToothY, mDownToothY, mAllToothY, mYUpToothValues, mYDownToothValues;
-        let mdTime, checkDoc;
         let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
 
         function init() {
@@ -30,11 +29,9 @@ if (!window.MedicalPlanModule) {
             mYUpToothValues = document.querySelectorAll(".modal-y-up-tooth");
             mYDownToothValues = document.querySelectorAll(".modal-y-down-tooth");
 
-            mdTime = document.getElementById("mdTime");
-            checkDoc = document.getElementById("planCheckDoc");
+
 
             setupEventListeners();
-            addNewRow();
         }
 
         function setupEventListeners() {
@@ -46,8 +43,10 @@ if (!window.MedicalPlanModule) {
             saveToothBtn.addEventListener('click', saveSelectedTeeth); // 치아 저장 버튼 이벤트 리스너 추가
             mTooth.addEventListener("click", handleToothClick);
 
-            planData.on('click', 'button.save-db-btn', handleSaveButtonClick);
-            planData.on('click', 'button.del-db-btn', handleDeleteButtonClick);
+            $(planData).on('click', 'button.save-db-btn', function() {
+                const index = $(this).closest('tr').index(); // 버튼이 포함된 행의 인덱스
+                handleSaveButtonClick(index);
+            });
         }
 
         function cleanup() {
@@ -60,7 +59,6 @@ if (!window.MedicalPlanModule) {
             mTooth.removeEventListener("click", handleToothClick);
 
             planData.off('click', 'button.save-db-btn', handleSaveButtonClick);
-            planData.off('click', 'button.del-db-btn', handleDeleteButtonClick);
 
             selectedPTag = null;
             modalToothList = [];
@@ -234,13 +232,20 @@ if (!window.MedicalPlanModule) {
             }
         }
 
-
-        function handleSaveButtonClick() {
-
+        function handleSaveButtonClick(index) {
+            const mdTime = document.getElementById(`mdTime${index}`);
+            const checkDoc = document.getElementById(`planCheckDoc${index}`);
             const rowData = [];
-            $(this).closest('tr').find('p.select-pTag').each(function () {
+
+            // index를 사용하여 tableBody 내에서 해당하는 행을 선택
+            const row = document.querySelectorAll("#plan-data tr")[index];
+            // 선택한 행(row)에서 'p.select-pTag' 요소들을 찾고 텍스트 값을 rowData 배열에 추가
+            $(row).find('p.select-pTag').each(function () {
                 rowData.push($(this).text().trim());
             });
+
+            console.log("rowData:", rowData); // rowData 배열 출력하여 확인
+
             $.ajax({
                 url: '/medical_chart/savePlan',
                 method: 'POST',
@@ -255,6 +260,13 @@ if (!window.MedicalPlanModule) {
                     checkDoc: checkDoc.value
                 }),
                 success: function (response) {
+                    // 저장 성공 후 해당 행의 버튼을 "수정" 버튼으로 변경
+                    const saveButton = row.querySelector('.save-db-btn');
+                    if (saveButton) {
+                        saveButton.classList.remove('btn-primary', 'save-db-btn');
+                        saveButton.classList.add('btn-success', 'update-db-btn');
+                        saveButton.textContent = '수정';
+                    }
                     readPaChart();
                     addNewRow();
                 },
@@ -264,49 +276,24 @@ if (!window.MedicalPlanModule) {
             });
 
         }
-
-        function handleDeleteButtonClick() {
-            const row = $(this).closest('tr');
-            const rowData = [];
-            row.find('p.select-pTag').each(function () {
-                rowData.push($(this).text().trim());
-            });
-            row.remove();
-            $.ajax({
-                url: '/medical_chart/delPlan',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    teethNum: rowData[0],
-                    medicalContent: rowData[1]
-                }),
-                success: function (response) {
-                    console.log("Data deleted from DB:", response);
-                    // 행이 없으면 새로운 행 추가
-                    if ($('#plan-data tr').length === 0) {
-                        addNewRow(); // 새로운 행 추가 함수 호출
-                    }
-                },
-                error: function (error) {
-                    console.error('Error deleting data:', error);
-                }
-            });
-        }
-console.log("!!!!!!!!")
-        function ChartList() {
-
-        }
-
         function addNewRow() {
             const newRow = `
                 <tr>
+                     <td><input type="date" name="mdTime" id="mdTime${rowIndex}" class="form-control" required></td>
+            <td>
+                <select class="form-select" name="checkDoc" id="planCheckDoc${rowIndex}" required>
+                    <option value="" selected>진료의</option>
+                    ${doctorNames.map(doctor => `<option value="${doctor}">${doctor}</option>`).join('')}
+                </select>
+            </td>
                     <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
                     <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
-                    <td><button class="btn save-db-btn" type="button">저장</button></td>
-                    <td><button class="btn del-db-btn" type="button">삭제</button></td>
+                    <td><button class="btn btn-primary save-db-btn" type="button">저장</button></td>
                 </tr>
             `;
             planData.append(newRow);
+
+            rowIndex++;
         }
 
         return {

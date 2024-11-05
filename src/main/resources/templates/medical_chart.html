@@ -110,6 +110,62 @@
 
                         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                         <script type="text/javascript">
+                            // JavaScript로 <select> 요소에서 모든 <option> 값을 가져오기
+                            const selectElement = document.getElementById("checkDoc");
+                            const doctorNames = Array.from(selectElement.options)
+                                .map(option => option.value)
+                                .filter(value => value);
+
+                            let rowIndex = 0;
+
+                            // 데이터를 기반으로 행을 생성하고 추가하는 함수
+                            function createTableRowWithData(chart, rowIndex, doctorNames, tableBody) {
+                                const option = doctorNames.map(doctor =>
+                                    `<option value="${doctor}" ${doctor === chart.checkDoc ? 'selected' : ''}>${doctor}</option>`
+                                ).join('');
+
+                                let row = `
+        <tr>
+            <td><input type="date" name="mdTime" id="mdTime${rowIndex}" class="form-control" required value="${chart.mdTime}"></td>
+            <td>
+                <select class="form-select" name="checkDoc" id="planCheckDoc${rowIndex}" required>
+                    <option value="" disabled selected>진료의</option>
+                    ${option}
+                </select>
+            </td>
+             <td><p class="select-pTag" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" style="cursor: pointer;">
+        ${chart.teethNum}
+    </p></td>
+            <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">${chart.medicalContent}</p></td>
+            <td><button class="btn btn-success update-db-btn" type="button">수정</button></td>
+        </tr>`;
+
+                                tableBody.append(row);  // 새로운 행을 테이블에 추가
+                            }
+
+                            // 새로운 빈 행을 추가하는 함수
+                            function createNewTableRow(rowIndex, doctorNames, tableBody) {
+                                const options = doctorNames.map(doctor =>
+                                    `<option value="${doctor}">${doctor}</option>`
+                                ).join('');
+
+                                const newRow = `
+        <tr>
+            <td><input type="date" name="mdTime" id="mdTime${rowIndex}" class="form-control" required></td>
+            <td>
+                <select class="form-select" name="checkDoc" id="planCheckDoc${rowIndex}" required>
+                    <option value="" selected>진료의</option>
+                    ${options}
+                </select>
+            </td>
+            <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
+            <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
+            <td><button class="btn btn-primary save-db-btn" type="button">저장</button></td>
+        </tr>`;
+
+                                tableBody.append(newRow);  // 새로운 빈 행을 테이블에 추가
+                            }
+
                             // 페이지가 로드되면 기본 콘텐츠 로드
                             $(document).ready(function () {
                                 loadContent('/medical_chart_cc');
@@ -153,28 +209,11 @@
 
 // 데이터를 순회하여 테이블에 추가
                                                             data.forEach(chart => {
-                                                                // 이전 mdTime과 현재 mdTime이 같은 경우 빈 값을 출력, 다르면 mdTime을 출력
-
-                                                                let row =
-                                                                    `<tr>
-                                                                <td>${chart.teethNum}</td>
-                                                                <td>${chart.medicalContent}</td>
-                                                                <td><button class="btn save-db-btn" type="button">저장</button></td>
-                                                                <td><button class="btn del-db-btn" type="button">삭제</button></td>
-                                                                    </tr>`;
-                                                                tableBody.append(row);  // 새로운 행을 테이블에 추가
-
+                                                                createTableRowWithData(chart, rowIndex, doctorNames, tableBody);
+                                                                rowIndex++
                                                             })
-                                                            const newRow = `
-                                                         <tr>
-                                                             <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
-                                                             <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
-                                                             <td><button class="btn save-db-btn" type="button">저장</button></td>
-                                                             <td><button class="btn del-db-btn" type="button">삭제</button></td>
-                                                         </tr>
-                                                     `;
-                                                            tableBody.append(newRow);
-
+                                                            createNewTableRow(rowIndex, doctorNames, tableBody);
+                                                            rowIndex++
                                                         },
                                                         error: function (xhr, status, error) {
                                                             console.error('Error:', error);  // 에러 처리
