@@ -8,7 +8,7 @@ window.addEventListener('sessionStorageChanged', (event) => {
 //세션 시작
 // 세션 데이터 가져오기
 function saveChartNum() {
-    if(patientInfos){
+    if (patientInfos) {
         $.ajax({
             url: '/medical_chart/savePaList',
             method: 'POST',
@@ -33,7 +33,8 @@ function fetchSessionItems() {
     $.ajax({
         url: '/medical_chart/get-session-items',
         method: 'GET',
-        success: function (response) {renderItems(response);
+        success: function (response) {
+            renderItems(response);
         },
         error: function (xhr, status, error) {
             console.error('Failed to fetch session items:', error);
@@ -53,7 +54,7 @@ $(document).ready(function () {
 });
 
 function readPaChart() {
-    if(patientInfos){
+    if (patientInfos) {
         $.ajax({
             url: '/medical_chart/getChartData?chartNum=' + patientInfos.chartNum,
             type: 'GET',
@@ -61,68 +62,128 @@ function readPaChart() {
             success: function (data) {
                 let tableBody = $("#paChart-list");
                 tableBody.empty();
-
                 let previousMdTime = null;
 
-                // 데이터를 순회하여 테이블에 추가
+                // 각 사분면별 치아 번호와 색상
+                const upperLeftRed = [18, 17, 16, 15, 14, 13, 12, 11];
+                const upperLeftBlack = [55, 54, 53, 52, 51];
+                const upperRightRed = [21, 22, 23, 24, 25, 26, 27, 28];
+                const upperRightBlack = [61, 62, 63, 64, 65];
+                const lowerLeftRed = [48, 47, 46, 45, 44, 43, 42, 41];
+                const lowerLeftBlack = [85, 84, 83, 82, 81];
+                const lowerRightRed = [31, 32, 33, 34, 35, 36, 37, 38];
+                const lowerRightBlack = [71, 72, 73, 74, 75];
+
+// 1의 자리를 문자로 변환하는 함수
+                function convertDigitToLetter(digit) {
+                    switch (digit) {
+                        case 1:
+                            return 'A';
+                        case 2:
+                            return 'B';
+                        case 3:
+                            return 'C';
+                        case 4:
+                            return 'D';
+                        case 5:
+                            return 'E';
+                        default:
+                            return digit;  // 변환되지 않는 경우 숫자를 그대로 사용
+                    }
+                }
+
+// 치아 번호에 따라 색상 및 표시할 문자 처리
+                function getTeethCellContent(teethNum) {
+                    let color = 'black';
+                    let displayNum;
+
+                    // 빨간색으로 표시할 치아 번호
+                    if (upperLeftRed.includes(teethNum) || lowerLeftRed.includes(teethNum) || upperRightRed.includes(teethNum) || lowerRightRed.includes(teethNum)) {
+                        color = 'red';
+                        displayNum = teethNum % 10;  // 1의 자리 숫자만 표시
+                    }
+                    // 검은색으로 표시할 치아 번호
+                    else {
+                        displayNum = convertDigitToLetter(teethNum % 10);  // 1의 자리 숫자를 문자로 변환
+                    }
+
+                    return `<span style="color: ${color};">${displayNum}</span>`;
+                }
+
+// 데이터를 순회하여 테이블에 추가
                 data.forEach(chart => {
                     let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
 
+                    // 각 치아 번호를 분할하여 사분면 형식으로 정렬
+                    let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
+                    let upperLeft = teethNums.filter(num => upperLeftRed.includes(num) || upperLeftBlack.includes(num)).map(getTeethCellContent).join(', ');
+                    let upperRight = teethNums.filter(num => upperRightRed.includes(num) || upperRightBlack.includes(num)).map(getTeethCellContent).join(', ');
+                    let lowerLeft = teethNums.filter(num => lowerLeftRed.includes(num) || lowerLeftBlack.includes(num)).map(getTeethCellContent).join(', ');
+                    let lowerRight = teethNums.filter(num => lowerRightRed.includes(num) || lowerRightBlack.includes(num)).map(getTeethCellContent).join(', ');
+
+                    // 사분면 형식으로 테이블 셀 생성
+                    let teethNumCell = `
+        <td style="font-size: 0.9rem; width: 100px">
+            <div class="quadrant-container">
+                <div class="quadrant upper-left">${upperLeft}</div>
+                <div class="quadrant upper-right">${upperRight}</div>
+                <div class="quadrant lower-left">${lowerLeft}</div>
+                <div class="quadrant lower-right">${lowerRight}</div>
+            </div>
+        </td>
+    `;
+
                     // 행 생성
                     let row = $(`
-                    <tr>
-                        <td>${mdTimeCell}</td>
-                        <td style="font-size: 0.9rem;">${chart.teethNum}</td>
-                        <td>${chart.medicalDivision}</td>
-                        <td>${chart.medicalContent}</td>
-                        <td class="medical-content-cell">${chart.checkDoc}</td>
-                    </tr>
-                `);
+                        <tr>
+                            <td>${mdTimeCell}</td>
+                            ${teethNumCell}
+                            <td>${chart.medicalDivision}</td>
+                            <td>${chart.medicalContent}</td>
+                            <td class="medical-content-cell">${chart.checkDoc}</td>
+                        </tr>
+                    `);
 
                     // 각 데이터 클릭 이벤트 추가
                     row.on('click', function () {
                         $('.medical-content-cell .delete-icon').remove();
-
-                        // 클릭한 행에서 "X" 아이콘 추가 또는 제거
                         let medicalContentCell = row.find('.medical-content-cell');
                         if (!medicalContentCell.find('.delete-icon').length) {
                             medicalContentCell.append('<span class="delete-icon">X</span>');
                         }
-
-                        // 삭제 아이콘 클릭 이벤트
                         medicalContentCell.on('click', '.delete-icon', function (event) {
                             event.stopPropagation();
                             let cnum = chart.cnum;
                             $.ajax({
                                 url: '/medical_chart/deleteChart',
                                 type: 'DELETE',
-                                data: { cnum: cnum },
-                                success: function(response) {
+                                data: {cnum: cnum},
+                                success: function (response) {
                                     $.ajax({
-                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
-                                        type: 'GET',  // GET 요청
-                                        dataType: 'json',  // 서버에서 JSON 응답을 기대
+                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
+                                        type: 'GET',
+                                        dataType: 'json',
                                         success: function (data) {
                                             let tableBody = $("#plan-data");
-                                            tableBody.empty();  // 기존 내용을 비움
-
+                                            tableBody.empty();
                                             data.forEach(chart => {
                                                 createTableRowWithData(chart, doctorNames, tableBody);
-                                            })
+                                            });
                                             createNewTableRow(doctorNames, tableBody);
                                         },
                                         error: function (xhr, status, error) {
-                                            console.error('Error:', error);  // 에러 처리
+                                            console.error('Error:', error);
                                         }
                                     });
                                     readPaChart();
                                 },
-                                error: function(xhr, status, error) {
+                                error: function (xhr, status, error) {
                                     console.error('Error:', error);
                                 }
                             });
                         });
                     });
+
                     tableBody.append(row);
                     previousMdTime = chart.mdTime;
                 });
@@ -133,6 +194,7 @@ function readPaChart() {
         });
     }
 }
+
 
 // HTML에 데이터 렌더링
 function renderItems(itemsArray) {
