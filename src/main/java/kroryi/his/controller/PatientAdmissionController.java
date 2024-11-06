@@ -84,16 +84,21 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setTreatStatus("1"); // 대기 상태는 1
 
         // DB에 저장
-        PatientAdmission patientAdmissionDTO1 = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+        PatientAdmission savedPatientAdmission = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 
-        messagingTemplate.convertAndSend("/topic/waitingPatients", patientAdmissionDTO1);
+        System.out.println("저장된 환자 ID (pid): " + savedPatientAdmission.getPid());
+        System.out.println("저장된 예약 시간 (rvTime): " + savedPatientAdmission.getRvTime());
 
-        response.put("data", patientAdmissionDTO1);
+        messagingTemplate.convertAndSend("/topic/waitingPatients", savedPatientAdmission);
+
+        // 저장된 객체에서 pid와 rvTime을 가져와 응답에 포함
+        response.put("data", savedPatientAdmission);
         response.put("message", "환자가 대기 상태로 등록되었습니다.");
-        response.put("rvTime", patientAdmissionDTO.getRvTime());
+        response.put("rvTime", savedPatientAdmission.getRvTime());  // 저장된 객체에서 가져오기
 
         return ResponseEntity.ok(response);
     }
+
 
 
     @MessageMapping("/waitingPatients")

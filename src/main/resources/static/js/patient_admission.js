@@ -36,7 +36,7 @@ function loadWaiting() {
             data.forEach(patient => {
                 // 대기 환자 목록에 추가
                 waitingPatients.push(patient);
-                // addPatientToWaitingTable(patient); // 테이블에 환자 목록 추가
+                addPatientToWaitingTable(patient); // 테이블에 환자 목록 추가
             });
         })
         .catch(error => {
@@ -143,22 +143,35 @@ document.addEventListener("DOMContentLoaded", function () {
     stompClient.connect({}, function (frame) {
         console.log('WebSocket 연결 성공: ' + frame);
 
-        // 대기 환자 목록을 받기 위한 구독
         stompClient.subscribe('/topic/waitingPatients', function (message) {
-            const newPatient = JSON.parse(message.body);
+            console.log("수신된 메시지:", message.body);
+            const patient = JSON.parse(message.body);
 
-            // 중복 환자 체크 후 추가
-            const isPatientAlreadyAdded = waitingPatients.some(patient => patient.pid === newPatient.pid);
-            if (!isPatientAlreadyAdded) {
-                waitingPatients.push(newPatient);
-                addPatientToWaitingTable(newPatient);
+            // 환자 객체가 null인지 확인
+            if (!patient) {
+                console.error("수신된 환자 데이터가 없습니다:", message.body);
+                return; // 환자 데이터가 없으면 처리하지 않음
             }
+
+            console.log("환자 ID (pid):", patient.pid); // 환자 ID 로그 출력
+
+            if (!patient.pid) {
+                console.error("환자 ID (pid)가 없습니다. 수신된 데이터:", patient);
+                return; // pid가 없으면 처리하지 않음
+            }
+
+            // 대기 환자 목록에 바로 추가
+            waitingPatients.push(patient);
+            console.log("대기 환자 목록에 추가된 환자:", patient);
+
+            // 대기 테이블에 환자 추가
+            addPatientToWaitingTable(patient);
         });
 
         // 진료 중 환자 목록을 받기 위한 구독
         stompClient.subscribe('/topic/inTreatmentPatients', function (message) {
             const newPatient = JSON.parse(message.body);
-            console.log('진료 중 환자 수신:', newPatient);
+            console.log('진료 중 환자 수신:', newPatient);  // 추가된 로그
 
             // 중복 환자 체크 후 추가
             const isPatientAlreadyAdded = treatmentPatients.some(patient => patient.pid === newPatient.pid);
@@ -170,9 +183,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log(`중복된 환자 제외: ${newPatient.paName} (PID: ${newPatient.pid})`);
             }
         });
+
+        // 진료 완료 환자 목록을 받기 위한 구독
         stompClient.subscribe('/topic/inCompletePatients', function (message) {
             const newPatient = JSON.parse(message.body);
-            console.log('진료 중 환자 수신:', newPatient);
+            console.log('진료 완료 환자 수신:', newPatient);  // 추가된 로그
 
             // 중복 환자 체크 후 추가
             const isPatientAlreadyAdded = completePatients.some(patient => patient.pid === newPatient.pid);
@@ -184,9 +199,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log(`중복된 환자 제외: ${newPatient.paName} (PID: ${newPatient.pid})`);
             }
         });
-
-
     });
+
 
 // 접수 버튼 클릭 이벤트
     receptionBtn.addEventListener("click", function () {
@@ -208,14 +222,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (selectedPatient) {
             console.log("가져온 환자 정보:", selectedPatient);
 
-            // 환자 데이터 객체 생성
+            // 서버에 저장하기 위해 환자 데이터 객체 생성
             const patientData = {
                 chartNum: selectedPatient.chartNum,
                 paName: selectedPatient.name || "N/A",
                 mainDoc: null,
                 rvTime: null,
                 receptionTime: new Date().toISOString(),
-                pid: selectedPatient.pid
+                // pid는 서버에서 받아올 예정
             };
 
             // 환자 등록을 위한 AJAX 요청
@@ -235,17 +249,31 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then(data => {
+                    // 서버에서 받은 데이터에 pid와 rvTime이 포함된 상태
+                    console.log("서버 응답으로 받은 환자 데이터:", data);
+
+                    // 응답에서 pid 값을 잘 받아오는지 확인
+                    if (data && data.data && data.data.pid) {
+                        patientData.pid = data.data.pid;  // pid 설정
+                    } else {
+                        console.error("pid가 서버 응답에 포함되지 않았습니다.");
+                    }
+                    patientData.rvTime = data.rvTime;
+
+                    // 대기 테이블에 추가할 환자 데이터
                     console.log("대기 테이블에 추가할 환자 데이터:", patientData);
-                    console.log(data);
+
                     alert("환자 접수가 완료되었습니다.");
 
-                    // 예약 시간도 포함된 환자 데이터 추가
-                    patientData.rvTime = data.rvTime;
-                    callPatientListRender()
-
+                    // 환자 리스트 갱신 함수 호출
+                    callPatientListRender();
 
                     // WebSocket을 통해 대기 환자 데이터 브로드캐스트
                     stompClient.send("/topic/waitingPatients", {}, JSON.stringify(patientData));
+
+                    // 테이블에 추가
+                    loadWaiting();
+
                 })
                 .catch(error => {
                     console.error("에러 발생:", error);
@@ -256,6 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("선택된 환자가 없습니다.");
         }
     });
+
 
 
     treatmentPatientsTable.addEventListener('click', (event) => {
@@ -675,6 +704,7 @@ function addPatientToWaitingTable(patient) {
     }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
     `;
+    console.log("11111111111111",patient.pid);
     // updateRowNumbers();
     console.log("접수 시간", patient.receptionTime);
 
@@ -1097,7 +1127,7 @@ function callPatientListRender() {
 
                 // 대기환자 추가
                 if (patient.treatStatus === '1') { // 대기 상태 코드
-                    addPatientToWaitingTable(patient);
+                    loadWaiting();
                     updateWaitingPatientCount();
                 }
 
