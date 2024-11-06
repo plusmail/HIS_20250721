@@ -7,34 +7,44 @@
 <body>
 <!-- 예약 -->
 <div class="container-fluid">
-    <div class="row d-flex justify-content-center">
+    <div class="row  justify-content-center">
 
         <!-- 중앙 구간 (예약 폼) -->
-        <div class="col-md-4" style="padding: 20px 50px;">
-            <h2>예약 정보</h2>
+        <div class="col-md-6" style="padding: 20px 50px;">
+            <h2 class="text-center mb-4">예약 정보</h2>
+
             <div class="form-group">
                 <label for="reservation-date">예약일자</label>
-                <input type="date" id="reservation-date" name="reservation-date">
-                <label for="test_time">예약시간</label>
-                <select id="test_time" name="test_time"></select>
+                <input type="date" id="reservation-date" name="reservation-date" class="form-control" >
             </div>
+
+            <div class="form-group">
+                <label for="test_time">예약시간</label>
+                <select id="test_time" name="test_time" class="form-control">
+                    <!-- 옵션 추가 필요 -->
+                </select>
+            </div>
+
 
             <div class="form-group">
                 <label for="departmentInput">환자이름</label>
-                <input type="text" id="departmentInput" name="department">
+                <input type="text" id="departmentInput" name="department" class="form-control">
             </div>
+
             <div class="form-group">
                 <label for="sns-notification">SNS 발송</label>
-                <input type="checkbox" id="sns-notification" name="sns-notification">
+                <input type="checkbox" id="sns-notification" name="sns-notification" class="form-check-input">
+                <label class="form-check-label" for="sns-notification">발송 여부</label>
             </div>
 
             <div class="form-group">
                 <label for="chart-numberInput">차트번호</label>
-                <input type="text" id="chart-numberInput" name="chart-number">
+                <input type="text" id="chart-numberInput" name="chart-number" class="form-control">
             </div>
+
             <div class="form-group">
                 <label for="doctor">진료의사</label>
-                <select id="doctor" name="doctor">
+                <select id="doctor" name="doctor" class="form-control">
                     <option value="-----">-----</option>
                     <th:block th:each="doctor : ${doctorNames}">
                         <option th:value="${doctor}" th:text="${doctor}"></option>
@@ -44,67 +54,76 @@
 
             <div class="form-group">
                 <label for="treatment-type">치료유형</label>
-                <select id="treatment-type" name="treatment-type">
+                <select id="treatment-type" name="treatment-type" class="form-control">
                     <option value="일반">일반</option>
                     <option value="수술">수술</option>
                     <option value="리콜">리콜</option>
                     <option value="신환">신환</option>
                 </select>
             </div>
+
             <div class="form-group">
-                <label>노트</label>
-                <input type="text" id="patient-note">
+                <label for="patient-note">노트</label>
+                <input type="text" id="patient-note" name="patient-note" class="form-control">
             </div>
+
+            <div id="taggedWords"></div>
+
             <div class="form-group">
                 <label for="color-select">Color 선택</label>
-                <select id="color-select" name="color-select">
+                <select id="color-select" name="color-select" class="form-control">
                     <option></option>
+                    <!-- 옵션 추가 필요 -->
                 </select>
             </div>
+
             <div class="form-group">
                 <label class="reservation">예약 미이행</label>
-                <div class="row">
-                    <div><input type="radio" id="reservation-status-ca" name="reservation-status">C/A</div>
-                    <div><input type="radio" id="reservation-status-ba" name="reservation-status">B/A</div>
-                    <div><input type="radio" id="reservation-status-none" name="reservation-status">없음</div>
-
+                <div class="form-check">
+                    <input type="radio" id="reservation-status-ca" name="reservation-status" class="form-check-input">
+                    <label class="form-check-label" for="reservation-status-ca">C/A</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" id="reservation-status-ba" name="reservation-status" class="form-check-input">
+                    <label class="form-check-label" for="reservation-status-ba">B/A</label>
+                </div>
+                <div class="form-check">
+                    <input type="radio" id="reservation-status-none" name="reservation-status" class="form-check-input">
+                    <label class="form-check-label" for="reservation-status-none">없음</label>
                 </div>
             </div>
 
-            <!-- 삭제 수정과 신규를 구별하기 위한 인덱스 번호-->
-            <div class="index-number" id="index-number">
-            </div>
+            <!-- 삭제 수정과 신규를 구별하기 위한 인덱스 번호 -->
+            <div class="index-number" id="index-number"></div>
 
-            <div class="btn-group">
-                <button type="button" onclick="saveUpdate()" class="btn btn-success"
-                        style="margin-bottom: 10px">저장
-                </button>
-                <button type="button" onclick="rReset(true)" class="btn btn-warning"
-                        style="margin-bottom: 10px">초기화
-                </button>
-                <button type="button" onclick="deleteReservation()" class="btn btn-danger"
-                        style="margin-bottom: 10px">삭제
-                </button>
+            <div class="btn-group mt-3 d-flex justify-content-between">
+                <button type="button" onclick="saveUpdate()" class="btn btn-success">저장</button>
+                <button type="button" onclick="rReset(true)" class="btn btn-warning">초기화</button>
+                <button type="button" onclick="deleteReservation()" class="btn btn-danger">삭제</button>
             </div>
         </div>
 
+
         <!-- 오른쪽 구간 (진료목록) -->
-        <div class="col-md-4"  style="padding: 20px 50px;">
-            <div class="input-container">
-                <button onclick="addRow()">용어 추가</button> <!-- 빈 행 추가 버튼 -->
+        <div class="col-md-6" style="padding: 20px 50px;">
+            <div class="input-container mb-3" style="text-align: right"> <!-- text-right 클래스를 추가 -->
+                <button onclick="addRow()" class="btn btn-primary">용어 추가</button>
             </div>
-            <table class="table">
-                <thead>
+
+            <table class="table table-bordered">
+                <thead class="thead-light">
                 <tr>
                     <th style="width: 50%;">진료명</th>
                     <th style="width: 14%;">추가</th>
                     <th style="width: 14%;">삭제</th>
                 </tr>
                 </thead>
-                <tbody id="termList"></tbody>
+                <tbody id="termList">
+                <!-- 동적으로 추가되는 내용 -->
+                </tbody>
             </table>
-
         </div>
+
     </div>
 </div>
 <script src="/js/reservation_register.js"></script>
