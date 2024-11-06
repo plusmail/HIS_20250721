@@ -215,9 +215,16 @@ public class PatientAdmissionController {
                 Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())),
                 patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
 
-        // 상태가 2이고 pid가 다른 경우 진료 완료 처리
+        // 확인용 로그 추가: existingPatients가 비어있는지 확인
+        System.out.println("찾은 환자 수: " + existingPatients.size());
+        if (existingPatients.isEmpty()) {
+            response.put("message", "해당하는 환자가 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        // 상태가 2인 환자만 진료 완료 처리
         for (PatientAdmission patient : existingPatients) {
-            if (!patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("2")) {
+            if (patient.getTreatStatus().equals("2")) { // TreatStatus가 "2"인 환자만 진료 완료 처리
                 patient.setTreatStatus("3"); // 치료 상태를 "3"으로 설정
                 patient.setCompletionTime(completionTime); // 진료 완료 시간 설정
 
@@ -232,10 +239,11 @@ public class PatientAdmissionController {
             }
         }
 
-        // 모든 환자가 이미 진료 완료 상태이거나 업데이트할 환자가 없는 경우
+        // 상태가 2인 환자가 없을 경우
         response.put("message", "이미 진료 완료 상태이거나 업데이트할 환자가 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 
 
