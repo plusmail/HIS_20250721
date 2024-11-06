@@ -62,3 +62,27 @@
 .medical-content-cell {
     position: relative;
 }
+
+/* 사분면 경계를 위한 스타일 */
+.quadrant-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-align: center;
+    gap: 5px;
+}
+
+.quadrant {
+    padding: 5px;
+}
+
+.upper-left, .upper-right {
+    border-bottom: 2px solid red; /* 상단 사분면 하단에 빨간색 경계 */
+}
+
+.upper-left, .lower-left {
+    border-right: 2px solid red; /* 왼쪽 사분면 오른쪽에 빨간색 경계 */
+}
