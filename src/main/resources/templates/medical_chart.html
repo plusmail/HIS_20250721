@@ -116,19 +116,19 @@
                                 .map(option => option.value)
                                 .filter(value => value);
 
-                            let rowIndex = 0;
 
                             // 데이터를 기반으로 행을 생성하고 추가하는 함수
-                            function createTableRowWithData(chart, rowIndex, doctorNames, tableBody) {
+                            function createTableRowWithData(chart, doctorNames, tableBody) {
                                 const option = doctorNames.map(doctor =>
                                     `<option value="${doctor}" ${doctor === chart.checkDoc ? 'selected' : ''}>${doctor}</option>`
                                 ).join('');
 
                                 let row = `
         <tr>
-            <td><input type="date" name="mdTime" id="mdTime${rowIndex}" class="form-control" required value="${chart.mdTime}"></td>
+            <td><input type="hidden" name="cnum" id="${chart.cnum}" value="${chart.cnum}"></td>
+            <td><input type="date" name="mdTime" id="mdTime${chart.cnum}" class="form-control" required value="${chart.mdTime}"></td>
             <td>
-                <select class="form-select" name="checkDoc" id="planCheckDoc${rowIndex}" required>
+                <select class="form-select" name="checkDoc" id="planCheckDoc${chart.cnum}" required>
                     <option value="" disabled selected>진료의</option>
                     ${option}
                 </select>
@@ -144,16 +144,17 @@
                             }
 
                             // 새로운 빈 행을 추가하는 함수
-                            function createNewTableRow(rowIndex, doctorNames, tableBody) {
+                            function createNewTableRow(doctorNames, tableBody) {
                                 const options = doctorNames.map(doctor =>
                                     `<option value="${doctor}">${doctor}</option>`
                                 ).join('');
 
                                 const newRow = `
         <tr>
-            <td><input type="date" name="mdTime" id="mdTime${rowIndex}" class="form-control" required></td>
+            <td><input type="hidden" name="cnum" id=""></td>
+            <td><input type="date" name="mdTime" id="mdTime" class="form-control" required></td>
             <td>
-                <select class="form-select" name="checkDoc" id="planCheckDoc${rowIndex}" required>
+                <select class="form-select" name="checkDoc" id="planCheckDoc" required>
                     <option value="" selected>진료의</option>
                     ${options}
                 </select>
@@ -186,14 +187,12 @@
                                         // 필요한 스크립트를 동적으로 로드
                                         if (page === '/medical_chart_pi') {
                                             $.getScript("/js/medical_chart_pi.js", function () {
-                                                console.log("초기화 1" + MedicalChartPIModule)
                                                 if (typeof MedicalChartPIModule !== "undefined") {
                                                     MedicalChartPIModule.init();
                                                 }
                                             });
                                         }else if(page === '/medical_chart_cc') {
                                             $.getScript("/js/medical_chart_cc.js", function () {
-                                                console.log("초기화 1" + MedicalChartCCModule)
                                                 if (typeof MedicalChartCCModule !== "undefined") {
                                                     MedicalChartCCModule.init();
                                                 }
@@ -202,30 +201,25 @@
                                             $.getScript("/js/medical_chart_plan.js", function() {
                                                 if (typeof MedicalPlanModule !== "undefined") {
                                                     MedicalPlanModule.init();
-                                                    $.ajax({
-                                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
-                                                        type: 'GET',  // GET 요청
-                                                        dataType: 'json',  // 서버에서 JSON 응답을 기대
-                                                        success: function (data) {
+                                                    if(patientInfos){
+                                                        $.ajax({
+                                                            url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
+                                                            type: 'GET',  // GET 요청
+                                                            dataType: 'json',  // 서버에서 JSON 응답을 기대
+                                                            success: function (data) {
+                                                                let tableBody = $("#plan-data");
+                                                                tableBody.empty();  // 기존 내용을 비움
 
-                                                            console.log("차트 보여주는 메소드 실행")
-                                                            let tableBody = $("#plan-data");
-                                                            tableBody.empty();  // 기존 내용을 비움
-
-                                                            let previousMdTime = null;  // 이전 mdTime을 저장할 변수
-
-// 데이터를 순회하여 테이블에 추가
-                                                            data.forEach(chart => {
-                                                                createTableRowWithData(chart, rowIndex, doctorNames, tableBody);
-                                                                rowIndex++
-                                                            })
-                                                            createNewTableRow(rowIndex, doctorNames, tableBody);
-                                                            rowIndex++
-                                                        },
-                                                        error: function (xhr, status, error) {
-                                                            console.error('Error:', error);  // 에러 처리
-                                                        }
-                                                    });
+                                                                data.forEach(chart => {
+                                                                    createTableRowWithData(chart, doctorNames, tableBody);
+                                                                })
+                                                                createNewTableRow(doctorNames, tableBody);
+                                                            },
+                                                            error: function (xhr, status, error) {
+                                                                console.error('Error:', error);  // 에러 처리
+                                                            }
+                                                        });
+                                                    }
                                                 }
                                             });
                                         }
