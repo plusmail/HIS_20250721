@@ -1,4 +1,158 @@
 let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+document.addEventListener("DOMContentLoaded", function() {
+    let SearchModal = document.getElementById('Search-Modal');
+    let mTooth = document.querySelector("#Search-container"); // id로 수정
+    let saveToothBtn = document.getElementById('search-save-tooth');  // 치아 저장 버튼 ID 수정
+    let mUpTooth = document.querySelector(".modal-up-control");
+    let mUpToothValues = document.querySelectorAll(".modal-up-tooth");
+    let mDownTooth = document.querySelector(".modal-down-control");
+    let mDownToothValues = document.querySelectorAll(".modal-down-tooth");
+    let mAllTooth = document.querySelector(".modal-all-control");
+    let mUpToothY = document.querySelector(".modal-y-up-control");
+    let mDownToothY = document.querySelector(".modal-y-down-control");
+    let mAllToothY = document.querySelector(".modal-y-all-control");
+    let mYUpToothValues = document.querySelectorAll(".modal-y-up-tooth");
+    let mYDownToothValues = document.querySelectorAll(".modal-y-down-tooth");
+    let selectedPTag = null;
+    let modalToothList = [];
+    let toothValues = [];
+
+    setupEventListeners();
+
+    function setupEventListeners() {
+        if (SearchModal) {
+            SearchModal.addEventListener('click', handleModalClick);
+        }
+        document.addEventListener("click", handleDocumentClick);
+        if (saveToothBtn) saveToothBtn.addEventListener('click', saveSelectedTeeth); // 치아 저장 버튼 이벤트 리스너 추가
+        if (mTooth) mTooth.addEventListener("click", handleToothClick); // 수정된 mTooth
+    }
+
+    function handleModalClick(event) {
+        const target = event.target;
+        if (target.closest('button')) {
+            const button = target.closest('button');
+            const checkbox = SearchModal.querySelector(`input[type="checkbox"][value="${button.value}"]`);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+            }
+        }
+    }
+
+    function handleDocumentClick(e) {
+        const target = e.target;
+        if (target.classList.contains("select-pTag")) {
+            savePTag(target);
+        }
+    }
+
+    function savePTag(pTag) {
+        selectedPTag = pTag;
+    }
+
+    function handleToothClick(e) {
+        modalToothList = [];
+        modalToothList.push(e.target.value);
+        if (e.target.tagName === "BUTTON" && e.target.id === '') {
+            e.target.classList.toggle("opacity-50");
+        } else if (e.target.tagName === "BUTTON") {
+            toothTerminal(e.target.id);
+        }
+    }
+
+    function toothTerminal(id) {
+        toothList = []; // Initialize an empty list to store only numeric tooth values
+        switch (id) {
+            case "search-modal-upTooth":
+                mUpToothValues.forEach(upToothValue => {
+                    if (!isNaN(upToothValue.value)) {
+                        toothList.push(upToothValue.value);
+                    }
+                });
+                toggleOpacity(mUpTooth, mUpToothValues, "상악");
+                break;
+            case "search-modal-allTooth":
+                mUpToothValues.forEach(upToothValue => {
+                    if (!isNaN(upToothValue.value)) {
+                        toothList.push(upToothValue.value);
+                    }
+                });
+                mDownToothValues.forEach(downToothValue => {
+                    if (!isNaN(downToothValue.value)) {
+                        toothList.push(downToothValue.value);
+                    }
+                });
+                toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                break;
+            case "search-modal-downTooth":
+                mDownToothValues.forEach(downToothValue => {
+                    if (!isNaN(downToothValue.value)) {
+                        toothList.push(downToothValue.value);
+                    }
+                });
+                toggleOpacity(mDownTooth, mDownToothValues, "하악");
+                break;
+            case "search-modal-upToothY":
+                mYUpToothValues.forEach(yUpToothValue => {
+                    if (!isNaN(yUpToothValue.value)) {
+                        toothList.push(yUpToothValue.value);
+                    }
+                });
+                toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
+                break;
+            case "search-modal-allToothY":
+                mYUpToothValues.forEach(yUpToothValue => {
+                    if (!isNaN(yUpToothValue.value)) {
+                        toothList.push(yUpToothValue.value);
+                    }
+                });
+                mYDownToothValues.forEach(yDownToothValue => {
+                    if (!isNaN(yDownToothValue.value)) {
+                        toothList.push(yDownToothValue.value);
+                    }
+                });
+                toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                break;
+            case "search-modal-downToothY":
+                mYDownToothValues.forEach(yDownToothValue => {
+                    if (!isNaN(yDownToothValue.value)) {
+                        toothList.push(yDownToothValue.value);
+                    }
+                });
+                toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
+                break;
+            default:
+                alert("올바르지 않은 버튼을 선택하였습니다.");
+                break;
+        }
+    }
+
+    function toggleOpacity(button, elements, logMessage) {
+        button.classList.toggle("opacity-50");
+        elements.forEach(element => element.classList.toggle("opacity-50"));
+    }
+
+    function saveSelectedTeeth() {
+        if (selectedPTag) {
+            const buttons = SearchModal.querySelectorAll('button.opacity-50');
+            let selectedButtons = [];
+            buttons.forEach(button => {
+                if (button.value && !isNaN(button.value)) {
+                    selectedButtons.push(button.value);
+                }
+            });
+            buttons.forEach(button => {
+                button.classList.remove('opacity-50');
+            });
+            selectedPTag.value = selectedButtons.join(', ') || "치아 선택";
+            const bootstrapModal = bootstrap.Modal.getInstance(SearchModal);
+            bootstrapModal.hide();
+        } else {
+            console.error("No p tag was selected to display the results.");
+        }
+    }
+});
+
 
 // 이벤트 리스너 등록
 window.addEventListener('sessionStorageChanged', (event) => {
@@ -74,7 +228,7 @@ function readPaChart() {
                 const lowerRightRed = [31, 32, 33, 34, 35, 36, 37, 38];
                 const lowerRightBlack = [71, 72, 73, 74, 75];
 
-// 1의 자리를 문자로 변환하는 함수
+                // 1의 자리를 문자로 변환하는 함수
                 function convertDigitToLetter(digit) {
                     switch (digit) {
                         case 1:
@@ -88,50 +242,47 @@ function readPaChart() {
                         case 5:
                             return 'E';
                         default:
-                            return digit;  // 변환되지 않는 경우 숫자를 그대로 사용
+                            return digit; // 변환되지 않는 경우 숫자를 그대로 사용
                     }
                 }
 
-// 치아 번호에 따라 색상 및 표시할 문자 처리
-                function getTeethCellContent(teethNum) {
-                    let color = 'black';
-                    let displayNum;
-
-                    // 빨간색으로 표시할 치아 번호
-                    if (upperLeftRed.includes(teethNum) || lowerLeftRed.includes(teethNum) || upperRightRed.includes(teethNum) || lowerRightRed.includes(teethNum)) {
-                        color = 'red';
-                        displayNum = teethNum % 10;  // 1의 자리 숫자만 표시
-                    }
-                    // 검은색으로 표시할 치아 번호
-                    else {
-                        displayNum = convertDigitToLetter(teethNum % 10);  // 1의 자리 숫자를 문자로 변환
-                    }
-
-                    return `<span style="color: ${color};">${displayNum}</span>`;
+                // 치아 번호에 따라 색상 및 표시할 문자 처리
+                function getTeethCellContent(teethNum, isRed) {
+                    let displayNum = isRed ? teethNum % 10 : convertDigitToLetter(teethNum % 10); // 빨간색은 숫자, 검은색은 문자 변환
+                    return `<span style="color: ${isRed ? 'red' : 'black'};">${displayNum}</span>`;
                 }
 
-// 데이터를 순회하여 테이블에 추가
+                // 데이터를 순회하여 테이블에 추가
                 data.forEach(chart => {
                     let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
 
                     // 각 치아 번호를 분할하여 사분면 형식으로 정렬
                     let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
-                    let upperLeft = teethNums.filter(num => upperLeftRed.includes(num) || upperLeftBlack.includes(num)).map(getTeethCellContent).join(', ');
-                    let upperRight = teethNums.filter(num => upperRightRed.includes(num) || upperRightBlack.includes(num)).map(getTeethCellContent).join(', ');
-                    let lowerLeft = teethNums.filter(num => lowerLeftRed.includes(num) || lowerLeftBlack.includes(num)).map(getTeethCellContent).join(', ');
-                    let lowerRight = teethNums.filter(num => lowerRightRed.includes(num) || lowerRightBlack.includes(num)).map(getTeethCellContent).join(', ');
+
+                    // 각 사분면의 텍스트를 빨간색과 검은색으로 분리하여 정렬
+                    let upperLeftRedText = teethNums.filter(num => upperLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+                    let upperLeftBlackText = teethNums.filter(num => upperLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+
+                    let upperRightRedText = teethNums.filter(num => upperRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+                    let upperRightBlackText = teethNums.filter(num => upperRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+
+                    let lowerLeftBlackText = teethNums.filter(num => lowerLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+                    let lowerLeftRedText = teethNums.filter(num => lowerLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+
+                    let lowerRightBlackText = teethNums.filter(num => lowerRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+                    let lowerRightRedText = teethNums.filter(num => lowerRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
 
                     // 사분면 형식으로 테이블 셀 생성
                     let teethNumCell = `
-        <td style="font-size: 0.9rem; width: 100px">
-            <div class="quadrant-container">
-                <div class="quadrant upper-left">${upperLeft}</div>
-                <div class="quadrant upper-right">${upperRight}</div>
-                <div class="quadrant lower-left">${lowerLeft}</div>
-                <div class="quadrant lower-right">${lowerRight}</div>
-            </div>
-        </td>
-    `;
+                        <td style="font-size: 0.9rem; width: 100px">
+                            <div class="quadrant-container">
+                                <div class="quadrant upper-left">${upperLeftRedText}<br>${upperLeftBlackText}</div>
+                                <div class="quadrant upper-right">${upperRightRedText}<br>${upperRightBlackText}</div>
+                                <div class="quadrant lower-left">${lowerLeftBlackText}<br>${lowerLeftRedText}</div>
+                                <div class="quadrant lower-right">${lowerRightBlackText}<br>${lowerRightRedText}</div>
+                            </div>
+                        </td>
+                    `;
 
                     // 행 생성
                     let row = $(`
@@ -144,46 +295,6 @@ function readPaChart() {
                         </tr>
                     `);
 
-                    // 각 데이터 클릭 이벤트 추가
-                    row.on('click', function () {
-                        $('.medical-content-cell .delete-icon').remove();
-                        let medicalContentCell = row.find('.medical-content-cell');
-                        if (!medicalContentCell.find('.delete-icon').length) {
-                            medicalContentCell.append('<span class="delete-icon">X</span>');
-                        }
-                        medicalContentCell.on('click', '.delete-icon', function (event) {
-                            event.stopPropagation();
-                            let cnum = chart.cnum;
-                            $.ajax({
-                                url: '/medical_chart/deleteChart',
-                                type: 'DELETE',
-                                data: {cnum: cnum},
-                                success: function (response) {
-                                    $.ajax({
-                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
-                                        type: 'GET',
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            let tableBody = $("#plan-data");
-                                            tableBody.empty();
-                                            data.forEach(chart => {
-                                                createTableRowWithData(chart, doctorNames, tableBody);
-                                            });
-                                            createNewTableRow(doctorNames, tableBody);
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error:', error);
-                                        }
-                                    });
-                                    readPaChart();
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error('Error:', error);
-                                }
-                            });
-                        });
-                    });
-
                     tableBody.append(row);
                     previousMdTime = chart.mdTime;
                 });
@@ -194,6 +305,7 @@ function readPaChart() {
         });
     }
 }
+
 
 
 // HTML에 데이터 렌더링

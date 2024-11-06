@@ -1,7 +1,6 @@
 if (!window.MedicalPlanModule) {
     window.MedicalPlanModule = (() => {
         let selectedPTag = null;
-        let modalToothList = [];
         let toothValues = [];
 
         let modal, toothModal, saveBtn, planData, mTooth, saveToothBtn;
@@ -46,7 +45,7 @@ if (!window.MedicalPlanModule) {
             mTooth.addEventListener("click", handleToothClick);
 
             planData.on('click', 'button.save-db-btn', handleSaveButtonClick);
-            planData.on('click', 'button.update-db-btn', handleUpdateButtonClick);
+            // planData.on('click', 'button.update-db-btn', handleUpdateButtonClick);
         }
 
         function cleanup() {
@@ -63,7 +62,6 @@ if (!window.MedicalPlanModule) {
 
 
             selectedPTag = null;
-            modalToothList = [];
             toothValues = [];
         }
 
@@ -108,8 +106,6 @@ if (!window.MedicalPlanModule) {
         }
 
         function handleToothClick(e) {
-            modalToothList = [];
-            modalToothList.push(e.target.value);
             if (e.target.tagName === "BUTTON" && e.target.id === '') {
                 e.target.classList.toggle("opacity-50");
             } else if (e.target.tagName === "BUTTON") {
