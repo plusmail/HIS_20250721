@@ -299,36 +299,44 @@ function addMessageToChat(message) {
 }
 
 
-// 메시지 전송 버튼 클릭 이벤트
-sendMessageButton.addEventListener('click', () => {
-    const message = messageInput.value.trim();
+document.addEventListener('DOMContentLoaded', () => {
+    // 메시지 전송 버튼 클릭 이벤트
+    sendMessageButton.addEventListener('click', () => {
+        const message = messageInput.value.trim();
 
-    if (!message || !currentRoomId || !recipientId) {
-        alert('메시지를 보내기 전에 사용자를 선택하세요.');
-        return;
-    }
+        if (!message || !currentRoomId || !recipientId) {
+            alert('메시지를 보내기 전에 사용자를 선택하세요.');
+            return;
+        }
 
-    const newMessage = {
-        roomId:currentRoomId,
-        content: message,
-        senderId: loggedInUserId,
-        recipientId: recipientId,
-        senderName:'홍길동',
-        timestamp: new Date().toISOString()
-    };
+        const newMessage = {
+            roomId: currentRoomId,
+            content: message,
+            senderId: loggedInUserId,
+            recipientId: recipientId,
+            senderName: '홍길동',
+            timestamp: new Date().toISOString()
+        };
 
+        console.log("newMessage->", newMessage);
 
-    console.log("newMessage->", newMessage);
+        // WebSocket을 통해 서버로 메시지 전송
+        stompClient.send(`/app/chat.send`, {}, JSON.stringify(newMessage));
 
-    // WebSocket을 통해 서버로 메시지 전송
-    stompClient.send(`/app/chat.send`, {}, JSON.stringify(newMessage));
+        messageInput.value = '';
+    });
 
-    // UI에 메시지 추가
-    addMessageToChat(newMessage);
-
-
-    messageInput.value = '';
+    // Enter 키로 메시지 전송 기능 추가
+    messageInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // 기본 엔터 동작 방지
+            sendMessageButton.click(); // 전송 버튼 클릭 이벤트 트리거
+        }
+    });
 });
+
+
+
 
 
 
