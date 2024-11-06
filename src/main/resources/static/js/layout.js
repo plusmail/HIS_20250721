@@ -223,7 +223,8 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
                     ageInput.value = menu_age;
                 }
             })
-        } else if (window.location.href.includes("/reservation")) {
+        }
+        else if (window.location.href.includes("/reservation")) {
             let department = document.getElementById('departmentInput');
             let chartNumber = document.getElementById('chart-numberInput');
             if (department) {

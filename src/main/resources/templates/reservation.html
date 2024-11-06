@@ -94,6 +94,7 @@
 
     </div>
 
+    <script src="/js/layout.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         const reservationTimes = [
@@ -123,9 +124,15 @@
                     $("#bodyContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
                 } else {
                     $("#bodyContent").html(response);
+
+                    patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+
+
                 }
             });
+
         }
+
 
 
         function renderCalendar() {

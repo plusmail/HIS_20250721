@@ -1,3 +1,17 @@
+patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+console.log(patientInfos);
+sessionCallData(patientInfos);
+
+// 이벤트 리스너 등록
+window.addEventListener('sessionStorageChanged', (event) => {
+    console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
+    patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+
+    sessionCallData(patientInfos);
+    console.log(patientInfos);
+});
+
+
 // 드롭다운 메뉴 초기화
 reservationTimes.forEach((time, index) => {
     const test_time = document.getElementById('test_time');
@@ -96,6 +110,20 @@ function rReset(reset) {
 
 }
 
+function sessionCallData(responseData) {
+    const departmentElement = document.getElementById('departmentInput');
+    const chartNumberElement = document.getElementById('chart-numberInput');
+
+    // 받아온 데이터로 데이터 새로 등록
+        // 환자 이름
+        departmentElement.value = responseData.name;
+        // 차트 번호
+        chartNumberElement.value = responseData.chartNum;
+
+}
+
+
+
 function rReset2(responseData) {
     const reservationDateElement = document.getElementById('reservation-date');
     const reservationTimeElement = document.getElementById('test_time'); // 예약시간 요소 추가
@@ -112,6 +140,7 @@ function rReset2(responseData) {
     const taggedWordsDiv = document.getElementById('taggedWords');
 
 
+    console.log(("9999999999999999"))
     // 받아온 데이터로 데이터 새로 등록
 
     if (responseData.length > 0) {
