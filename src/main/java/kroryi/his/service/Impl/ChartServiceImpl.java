@@ -2,6 +2,7 @@ package kroryi.his.service.Impl;
 
 import kroryi.his.domain.ChartMemo;
 import kroryi.his.domain.MedicalChart;
+import kroryi.his.domain.PatientRegister;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.repository.ChartMemoRepository;
 import kroryi.his.repository.MedicalChartRepository;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -136,6 +138,22 @@ public class ChartServiceImpl implements ChartService {
 
         medicalChartRepository.save(chartPlan);
         return null;
+    }
+
+    @Override
+    public MedicalChart MedicalChartUpdate(MedicalChartDTO dto) {
+        Optional<MedicalChart> medicalChartOptional = medicalChartRepository.findById(dto.getCnum());
+
+        MedicalChart medicalChart = medicalChartOptional.orElseThrow();
+
+        // 기존 객체의 필드를 수정
+        medicalChart.setTeethNum(dto.getTeethNum());
+        medicalChart.setMdTime(dto.getMdTime());
+        medicalChart.setMedicalContent(dto.getMedicalContent());
+        medicalChart.setCheckDoc(dto.getCheckDoc());
+
+
+        return medicalChartRepository.save(medicalChart);
     }
 
     @Override

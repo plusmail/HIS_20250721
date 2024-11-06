@@ -3,6 +3,8 @@ package kroryi.his.service;
 
 import kroryi.his.domain.ChartMemo;
 import kroryi.his.domain.MedicalChart;
+import kroryi.his.domain.PatientRegister;
+import kroryi.his.dto.BoardDTO;
 import kroryi.his.dto.MedicalChartDTO;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ public interface ChartService {
     MedicalChartDTO addMedicalChart(List<List<String>> piList, String paName, String chartNum);
 
     MedicalChartDTO MedicalChartSave(MedicalChartDTO dto);
+
+    MedicalChart MedicalChartUpdate(MedicalChartDTO dto);
 
     MedicalChartDTO deleteChart(String charNum, String paName, String teethNum, String plan);
 

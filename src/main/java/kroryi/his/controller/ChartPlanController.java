@@ -1,5 +1,7 @@
 package kroryi.his.controller;
 
+import kroryi.his.domain.MedicalChart;
+import kroryi.his.domain.PatientRegister;
 import kroryi.his.dto.ChartPlan;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.service.Impl.ChartServiceImpl;
@@ -38,6 +40,7 @@ public class ChartPlanController {
         responseData.put("medicalDivision", medicalChart.getMedicalDivision());
         responseData.put("mdTime", medicalChart.getMdTime());
         responseData.put("checkDoc", medicalChart.getCheckDoc());
+        responseData.put("cnum", medicalChart.getCnum());
 
         service.MedicalChartSave(medicalChart);
 
@@ -45,6 +48,25 @@ public class ChartPlanController {
         return ResponseEntity
                 .status(HttpStatus.CREATED) // Set HTTP status to 201 Created
                 .body(responseData);        // Include response data in the body
+    }
+
+    @PostMapping("/medical_chart/updatePlan")
+    private Map<String, Object> updatePlan(@RequestBody MedicalChartDTO medicalChart) {
+        service.MedicalChartUpdate(medicalChart);
+        // Create response data map with saved details
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("chartNum", medicalChart.getChartNum());
+        responseData.put("paName", medicalChart.getPaName());
+        responseData.put("teethNum", medicalChart.getTeethNum());
+        responseData.put("medicalContent", medicalChart.getMedicalContent());
+        responseData.put("medicalDivision", medicalChart.getMedicalDivision());
+        responseData.put("mdTime", medicalChart.getMdTime());
+        responseData.put("checkDoc", medicalChart.getCheckDoc());
+        responseData.put("cnum", medicalChart.getCnum());
+
+
+        // Return ResponseEntity with custom message and data
+        return responseData;      // Include response data in the body
     }
 
 
