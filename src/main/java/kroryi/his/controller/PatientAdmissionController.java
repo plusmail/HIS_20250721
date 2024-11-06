@@ -165,8 +165,9 @@ public class PatientAdmissionController {
 
         // 새로 접수된 환자 처리
         for (PatientAdmission patient : existingPatients) {
-            // PID가 다르고 TreatStatus가 "1"인 환자만 업데이트
-            if (!patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("1")) {
+            // PID가 같은 환자만 처리
+            if (patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("1")) {
+                // 진료 시작 처리
                 patient.setViTime(LocalDateTime.now());
                 patient.setTreatStatus("2");
                 patient.setMainDoc(patientAdmissionDTO.getMainDoc());
@@ -183,11 +184,12 @@ public class PatientAdmissionController {
             }
         }
 
-        // 모든 환자가 이미 진료 중인 경우
+        // 모든 환자가 이미 진료 중이거나 업데이트할 환자가 없을 경우
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", "이미 진료 중이거나 업데이트할 환자가 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
 
 
     //    진료완료

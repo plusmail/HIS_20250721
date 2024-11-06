@@ -160,6 +160,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 return; // pid가 없으면 처리하지 않음
             }
 
+            // 대기 환자 목록에 중복된 환자가 있는지 확인
+            const isDuplicate = waitingPatients.some(existingPatient => existingPatient.pid === patient.pid);
+
+            if (isDuplicate) {
+                console.log("이미 대기 목록에 존재하는 환자입니다. 추가하지 않습니다:", patient);
+                return; // 중복 환자는 추가하지 않음
+            }
+
             // 대기 환자 목록에 바로 추가
             waitingPatients.push(patient);
             console.log("대기 환자 목록에 추가된 환자:", patient);
@@ -167,6 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // 대기 테이블에 환자 추가
             addPatientToWaitingTable(patient);
         });
+
 
         // 진료 중 환자 목록을 받기 위한 구독
         stompClient.subscribe('/topic/inTreatmentPatients', function (message) {
@@ -398,8 +407,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             throw new Error(err.message || '진료 시작 실패');
                         });
                     }
-                    callPatientListRender()
-
+                    callPatientListRender();
+                    const rowIndex = Array.from(waitingPatientsTable.rows).indexOf(selectedRow);
+                    deletePatientFromWaitingTable(rowIndex);
                     updateWaitingPatientCount();
                     treatmentModal.hide();
                 })
@@ -679,7 +689,17 @@ function formatRvTime(rvTime) {
 
 // 대기 중 테이블에 환자 추가
 function addPatientToWaitingTable(patient) {
+    // 대기 테이블에 추가된 환자 목록을 확인 (pid 기반으로 중복 체크)
     const existingRows = waitingPatientsTable.getElementsByTagName('tr');
+    const isDuplicate = Array.from(existingRows).some(row => {
+        const pidCell = row.querySelector('td:nth-child(7)'); // 7번째 열 (pid 열)
+        return pidCell && pidCell.textContent === patient.pid.toString(); // pid 비교
+    });
+
+    if (isDuplicate) {
+        console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다. 추가하지 않습니다.`);
+        return; // 중복된 환자는 추가하지 않음
+    }
 
     // 새로운 환자 데이터 추가
     const row = waitingPatientsTable.insertRow();
@@ -704,9 +724,8 @@ function addPatientToWaitingTable(patient) {
     }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
     `;
-    console.log("11111111111111",patient.pid);
-    // updateRowNumbers();
-    console.log("접수 시간", patient.receptionTime);
+    console.log("환자 pid:", patient.pid);
+    console.log("접수 시간:", patient.receptionTime);
 
     // 클릭 이벤트 추가
     row.addEventListener('click', () => {
@@ -718,8 +737,9 @@ function addPatientToWaitingTable(patient) {
         // 현재 행 선택
         row.classList.add('selected');
     });
+
     updateWaitingPatientCount(); // 대기 환자 수 업데이트
-    updateRowNumbers();
+    updateRowNumbers(); // 행 번호 업데이트
 }
 
 
