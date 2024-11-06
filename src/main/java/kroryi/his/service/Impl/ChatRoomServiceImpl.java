@@ -16,10 +16,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,16 +29,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final MemberRepository memberRepository;
 
     @Override
-    public ChatRoomDTO createChatRoom(String roomName, List<String> memberMids, String recipientId) {
+    public ChatRoomDTO createChatRoom(String roomName, List<String> memberMids, List<String> recipientIds) {
         log.info("Starting createChatRoom with roomName: {} and memberMids: {}", roomName, memberMids);
 
-        String senderId = memberMids.get(0); // 첫 번째 사용자를 방 생성자 (보내는 사람)로 설정
-
-        log.info("SenderId determined as: {}, RecipientId determined as: {}", senderId, recipientId);
+        // 다중 채팅방의 경우 recipientIds를 빈 리스트로 설정
+        if (memberMids.size() > 2) {
+            recipientIds = new ArrayList<>();
+        }
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .roomName(roomName)
-                .recipientId(recipientId) // 대화 상대를 기본 수신자로 설정
+                .recipientIds(recipientIds)
                 .build();
         chatRoom = chatRoomRepository.save(chatRoom);
 
@@ -53,19 +51,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
 
         chatRoom.setMembers(members);
-        chatRoom = chatRoomRepository.save(chatRoom); // 업데이트된 멤버와 함께 다시 저장
+        chatRoom = chatRoomRepository.save(chatRoom);
 
-        ChatRoomDTO chatRoomDTO = ChatRoomDTO.builder()
+        return ChatRoomDTO.builder()
                 .id(chatRoom.getId())
                 .roomName(chatRoom.getRoomName())
                 .memberMids(members.stream().map(Member::getMid).collect(Collectors.toSet()))
-                .recipientId(chatRoom.getRecipientId()) // 생성된 방의 recipientId 설정
+                .recipientIds(new ArrayList<>(recipientIds)) // 다중 채팅방이면 빈 리스트로 설정됨
                 .lastMessage(null)
                 .build();
-
-        log.info("Created chat room DTO with recipientId: {}", chatRoomDTO.getRecipientId());
-
-        return chatRoomDTO;
     }
 
     // 모든 채팅방 목록을 DTO로 반환하는 메서드
@@ -78,11 +72,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 
     private ChatRoomDTO convertToDto(ChatRoom chatRoom, String currentUserId) {
-        String recipientId = chatRoom.getMembers().stream()
-                .filter(member -> !member.getMid().equals(currentUserId))
+        List<String> recipientIds = chatRoom.getMembers().stream()
+                .filter(member -> !member.getMid().equals(currentUserId)) // 현재 사용자를 제외한 모든 멤버
                 .map(Member::getMid)
-                .findFirst()
-                .orElse(null);
+                .collect(Collectors.toList());
 
         ChatRoomDTO dto = ChatRoomDTO.builder()
                 .id(chatRoom.getId())
@@ -90,24 +83,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .memberMids(chatRoom.getMembers().stream()
                         .map(Member::getMid)
                         .collect(Collectors.toSet()))
-                .recipientId(recipientId) // 기본 recipientId 설정
+                .recipientIds(recipientIds) // recipientIds 필드에 모든 수신자 ID 설정
                 .build();
 
         ChatMessage lastMessage = chatMessageRepository.findTopByChatRoomOrderByTimestampDesc(chatRoom);
         if (lastMessage != null) {
             ChatMessageDTO lastMessageDto = ChatMessageDTO.builder()
-                    .roomId(lastMessage.getId())
+                    .messageId(lastMessage.getMessageId()) // 메시지 ID 설정
+                    .roomId(lastMessage.getChatRoom().getId()) // 채팅방 ID 설정
                     .content(lastMessage.getContent())
                     .timestamp(lastMessage.getTimestamp())
                     .senderId(lastMessage.getSender().getMid())
                     .senderName(lastMessage.getSender().getName())
-                    .recipientId(lastMessage.getRecipient() != null ? lastMessage.getRecipient().getMid() : null)
+                    .recipientIds(lastMessage.getRecipient() != null
+                            ? Collections.singletonList(lastMessage.getRecipient().getMid())
+                            : Collections.emptyList()) // 빈 리스트로 설정
                     .build();
-
             dto.setLastMessage(lastMessageDto);
         }
-
         return dto;
+
     }
 
     @Override
@@ -125,49 +120,48 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomId(roomId);
         return messages.stream()
                 .map(message -> ChatMessageDTO.builder()
-                        .roomId(message.getId())
+                        .messageId(message.getMessageId()) // 메시지 ID 설정
+                        .roomId(message.getChatRoom().getId()) // 채팅방 ID 설정
                         .content(message.getContent())
                         .timestamp(message.getTimestamp())
                         .senderId(message.getSender().getMid())
                         .senderName(message.getSender().getName())
-                        .recipientId(message.getRecipient() != null ? message.getRecipient().getMid() : null)
+                        .recipientIds(message.getRecipient() != null
+                                ? Collections.singletonList(message.getRecipient().getMid())
+                                : Collections.emptyList()) // 수신자가 없을 경우 빈 리스트
                         .build())
                 .collect(Collectors.toList());
+
     }
 
-    public ChatMessageDTO createMessage(Long roomId, String content, String senderId, String recipientId, String sendName, LocalDateTime timestamp ) {
-        if (recipientId == null) {
-            throw new IllegalArgumentException("Recipient ID must be provided to send a message.");
-        }
-
+    public ChatMessageDTO createMessage(Long roomId, String content, String senderId, List<String> recipientIds, String senderName, LocalDateTime timestamp) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
 
         Member sender = memberRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
-//        Member recipient = memberRepository.findById(recipientId)
-//                .orElseThrow(() -> new IllegalArgumentException("Recipient not found"));
 
         ChatMessage message = ChatMessage.builder()
                 .content(content)
-                .timestamp(LocalDateTime.now())
+                .timestamp(timestamp != null ? timestamp : LocalDateTime.now())
                 .sender(sender)
-//                .recipient(recipient)
                 .chatRoom(chatRoom)
                 .build();
 
-        chatMessageRepository.save(message);
+        // 메시지를 DB에 저장하여 자동 생성된 messageId를 얻음
+        ChatMessage savedMessage = chatMessageRepository.save(message);
 
+        // messageId를 포함하여 ChatMessageDTO 반환
         return ChatMessageDTO.builder()
-                .roomId(message.getId())
-                .content(message.getContent())
+                .messageId(savedMessage.getMessageId()) // 자동 생성된 messageId
+                .roomId(chatRoom.getId())
+                .content(savedMessage.getContent())
                 .senderId(sender.getMid())
                 .senderName(sender.getName())
-                .recipientId(sender.getMid())
-                .timestamp(message.getTimestamp())
+                .recipientIds(recipientIds != null ? recipientIds : Collections.emptyList())
+                .timestamp(savedMessage.getTimestamp())
                 .build();
     }
-
 }
 
 

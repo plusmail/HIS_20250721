@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -28,10 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -65,26 +64,19 @@ public class ChatController {
     // 채팅방 생성
     @PostMapping("/rooms")
     public ResponseEntity<ChatRoomDTO> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO, @AuthenticationPrincipal UserDetails userDetails) {
-        String currentUserId = userDetails.getUsername(); // 현재 로그인된 사용자 ID를 가져옴
+        String currentUserId = userDetails.getUsername();
         List<String> memberMidsList = new ArrayList<>(chatRoomDTO.getMemberMids());
 
-        // 현재 사용자가 채팅방에 포함되지 않으면 추가
+        // 채팅방에 현재 사용자가 포함되지 않았다면 추가
         if (!memberMidsList.contains(currentUserId)) {
             memberMidsList.add(currentUserId);
         }
 
-        // recipientId를 두 번째 사용자로 설정
-        String recipientId = memberMidsList.size() > 1 ? memberMidsList.get(1) : null;
+        // 다인 채팅을 위해 recipientIds를 전체 멤버로 설정
+        List<String> recipientIds = memberMidsList.size() > 1 ? memberMidsList : null;
 
-        // 채팅방 생성 서비스 호출
-        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList, recipientId);
-
-        if (createdRoom.getId() == null) {
-            log.error("채팅방 생성 실패 - 방 ID가 null입니다.");
-            throw new IllegalStateException("채팅방 생성 실패 - 방 ID가 null입니다.");
-        }
-
-        log.info("채팅방 생성 성공 - 방 ID: {}", createdRoom.getId());
+        // 채팅방 생성
+        ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList, recipientIds);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
     }
@@ -134,18 +126,18 @@ public class ChatController {
         messageDTO.setRoomId(roomId);
 
         // 수신자가 지정되지 않은 경우 기본 수신자를 설정
-        if (messageDTO.getRecipientId() == null) {
-            String recipientId = determineRecipientId(roomId, messageDTO.getSenderId());
-            messageDTO.setRecipientId(recipientId);
+        if (messageDTO.getRecipientIds() == null) {
+            List<String> recipientIds = determineRecipientIds(roomId, messageDTO.getSenderId());
+            messageDTO.setRecipientIds(recipientIds); // List<String>으로 설정
         }
 
-        log.info("Sending message from senderId: {} to recipientId: {}", messageDTO.getSenderId(), messageDTO.getRecipientId());
+        log.info("Sending message from senderId: {} to recipientIds: {}", messageDTO.getSenderId(), messageDTO.getRecipientIds());
 
         ChatMessageDTO savedMessage = chatRoomService.createMessage(
                 roomId,
                 messageDTO.getContent(),
                 messageDTO.getSenderId(),
-                messageDTO.getRecipientId(),
+                messageDTO.getRecipientIds(),
                 messageDTO.getSenderName(),
                 messageDTO.getTimestamp()
         );
@@ -153,45 +145,72 @@ public class ChatController {
     }
 
     // roomId와 senderId를 기반으로 수신자 ID를 결정하는 메서드
-    private String determineRecipientId(Long roomId, String senderId) {
-        // 로직: 채팅방의 멤버 중 senderId가 아닌 다른 사용자 찾기
+    private List<String> determineRecipientIds(Long roomId, String senderId) {
         ChatRoom room = chatRoomRepository.findById(roomId).orElse(null);
         if (room != null) {
-            for (Member member : room.getMembers()) {
-                if (!member.getMid().equals(senderId)) {
-                    return member.getMid();  // sender가 아닌 다른 멤버의 ID 반환
-                }
-            }
+            return room.getMembers().stream()
+                    .map(Member::getMid)
+                    .filter(mid -> !mid.equals(senderId)) // senderId가 아닌 모든 멤버의 ID
+                    .collect(Collectors.toList());
         }
-        return null;  // 기본 수신자가 없으면 null 반환
+        return Collections.emptyList();  // 기본 수신자가 없을 경우 빈 리스트 반환
     }
 
-    @MessageMapping("/chat.send")
-    @SendTo("/topic/rooms")
-    public void sendMessage(ChatMessageDTO message, SimpMessageHeaderAccessor headerAccessor) throws JsonProcessingException {
-        log.info("Received message: {}", message); // 디버깅 로그 추가
 
-        if (message.getRoomId() == null || message.getContent() == null) {
-            log.error("Message is missing required fields: {}", message);
-            return;
-        }
+//    @MessageMapping("/chat.send")
+//    @SendTo("/topic/rooms")
+//    public void sendMessage(ChatMessageDTO message, SimpMessageHeaderAccessor headerAccessor) throws JsonProcessingException {
+//        log.info("Received message: {}", message);
+//
+//        if (message.getRoomId() == null || message.getContent() == null) {
+//            log.error("Message is missing required fields: {}", message);
+//            return;
+//        }
+//
+//        ChatMessageDTO savedMessage = chatRoomService.createMessage(
+//                message.getRoomId(),
+//                message.getContent(),
+//                message.getSenderId(),
+//                message.getRecipientIds(),
+//                message.getSenderName(),
+//                message.getTimestamp()
+//        );
+//
+//        log.info("Saved message: {}", savedMessage);
+//
+//        String messageChat = objectMapper.writeValueAsString(savedMessage);
+//
+//        // 각 roomId에 대한 채널로 전송
+//        String roomChannel = "chatChannel-" + message.getRoomId();
+//        redisTemplate.convertAndSend(roomChannel, messageChat);
+//    }
 
+    // WebSocket 메시지 전송 메서드 - 다중 및 1:1 채팅 지원
+    @MessageMapping("/chat.send/{roomId}")
+    public void sendMessage(@Payload String messageJson) throws JsonProcessingException {
+        log.info("Received raw JSON message: {}", messageJson);
+
+        // JSON을 ChatMessageDTO로 변환
+        ChatMessageDTO message = objectMapper.readValue(messageJson, ChatMessageDTO.class);
+        log.info("Parsed ChatMessageDTO: {}", message);
+
+        // 메시지 저장
         ChatMessageDTO savedMessage = chatRoomService.createMessage(
                 message.getRoomId(),
                 message.getContent(),
                 message.getSenderId(),
-                message.getRecipientId(),
+                message.getRecipientIds(),
                 message.getSenderName(),
                 message.getTimestamp()
         );
 
-        log.info("Saved message: {}", savedMessage);
-
+        // 메시지를 JSON으로 변환 후 WebSocket으로 전송
         String messageChat = objectMapper.writeValueAsString(savedMessage);
-
-        // 채팅방 구독자에게 메시지 전송
+        String roomChannel = "/topic/rooms/" + message.getRoomId();
+        log.info("전송 중인 메시지: {}", messageChat);
         redisTemplate.convertAndSend("chatChannel", messageChat);
     }
+
     // WebSocket에서 사용자 추가 처리
     @MessageMapping("/chat.addUser")
     public void addUser(ChatMessageDTO message) {
