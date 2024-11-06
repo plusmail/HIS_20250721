@@ -5,6 +5,7 @@ import kroryi.his.dto.ChatMessageDTO;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,7 +38,8 @@ public class ChatRoom {
     @ElementCollection
     private Set<String> memberMids;
 
-    private String recipientId;  // 기본 수신자 ID
+    @ElementCollection
+    private List<String> recipientIds;  // 기본 수신자 ID
 
     public ChatRoom(String roomName) {
         this.roomName = roomName;

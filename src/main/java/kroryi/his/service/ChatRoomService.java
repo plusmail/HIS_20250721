@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ChatRoomService {
-    ChatRoomDTO createChatRoom(String roomName, List<String> memberMids, String recipientId);
+    ChatRoomDTO createChatRoom(String roomName, List<String> memberMids, List<String> recipientIds);
 
     List<ChatMessageDTO> getMessagesByRoomId(Long roomId);
 
@@ -19,7 +19,7 @@ public interface ChatRoomService {
                                  Long roomId,
                                  String content,
                                  String senderId,
-                                 String recipientId,
+                                 List<String> recipientId,
                                  String senderName,
                                  LocalDateTime timestamp);
 

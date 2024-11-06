@@ -11,5 +11,9 @@ public interface ReservationRegisterService {
     void updateReservationInformation(ReservationDTO dto);
     void deleteReservation(Long seq);
     List<ReservationDTO> getReservations(String chartNumber, String reservationDate);
+
+    int getGeneralPatientCount();
+    int getSurgeryCount();
+    int getNewPatientCount();
 }
 

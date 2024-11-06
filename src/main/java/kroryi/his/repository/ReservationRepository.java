@@ -26,4 +26,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
     Optional<Reservation> findFirstByChartNumber(String chartNumber);
 
     List<Reservation> findByChartNumberAndReservationDate(String chartNumber, String reservationDate);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.treatmentType = '일반' AND r.reservationDate LIKE CONCAT(CURRENT_DATE, '%')")
+    int getTodayGeneralPatientCount();
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.treatmentType = '수술' AND r.reservationDate LIKE CONCAT(CURRENT_DATE, '%')")
+    int getTodaySurgeryCount();
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.treatmentType = '신환' AND r.reservationDate LIKE CONCAT(CURRENT_DATE, '%')")
+    int getTodayNewPatientCount();
 }
