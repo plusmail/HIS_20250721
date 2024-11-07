@@ -145,6 +145,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 button.classList.remove('opacity-50');
             });
             selectedPTag.value = selectedButtons.join(', ') || "치아 선택";
+            const filterButton = document.querySelector('.select-pTag');
+            filterButton.innerHTML = '<i class="bi bi-hourglass-split"></i> 필터 적용중';
             const bootstrapModal = bootstrap.Modal.getInstance(SearchModal);
             bootstrapModal.hide();
         } else {
