@@ -1,6 +1,7 @@
 package kroryi.his.repository;
 
 import kroryi.his.domain.MedicalChart;
+import kroryi.his.domain.QMedicalChart;
 import kroryi.his.dto.MedicalChartDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface MedicalChartRepository extends JpaRepository<MedicalChart, Integer> {
 
@@ -42,5 +44,6 @@ public interface MedicalChartRepository extends JpaRepository<MedicalChart, Inte
     @Modifying
     void deleteByCnum(Integer cnum);
 
+    Optional<MedicalChart> findByCnum(Integer cnum);
 
 }

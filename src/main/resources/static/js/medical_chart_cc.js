@@ -5,7 +5,7 @@ if (!window.MedicalChartCCModule) {
         let listIndex = 0;
 
         let tooth, symptom, memo, saveCc, UpTooth, DownTooth, AllTooth, UpToothY, DownToothY, AllToothY;
-        let UpToothValues, DownToothValues, YUpToothValues, YDownToothValues, modalData, allToothLists;
+        let UpToothValues, DownToothValues, YUpToothValues, YDownToothValues, allToothLists;
 
         // 초기화 함수
         function init() {
@@ -24,7 +24,6 @@ if (!window.MedicalChartCCModule) {
             DownToothValues = document.querySelectorAll(".down-tooth");
             YUpToothValues = document.querySelectorAll(".y-up-tooth");
             YDownToothValues = document.querySelectorAll(".y-down-tooth");
-            modalData = document.querySelectorAll(".modal-tr");
             allToothLists = tooth.querySelectorAll('button');
 
             setupEventListeners();
@@ -62,8 +61,6 @@ if (!window.MedicalChartCCModule) {
 
         // 치아 버튼 클릭시 호출
         function handleToothClickCc(e) {
-            modalToothList = [];
-            modalToothList.push(e.target.value);
             if (e.target.tagName === "BUTTON" && e.target.id === '') {
                 const toothValue = e.target.value;
 
@@ -221,6 +218,9 @@ if (!window.MedicalChartCCModule) {
                     alert('저장 중 오류가 발생했습니다.');
                 });
         }
+
+
+
 
         return { init, cleanUp };
     })();

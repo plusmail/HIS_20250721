@@ -1,5 +1,6 @@
 package kroryi.his.service.Impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import kroryi.his.domain.MedicalChart;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.repository.MedicalChartRepository;
@@ -54,4 +55,12 @@ public class ChartCPServiceImpl implements ChartCPService {
 
         medicalChartRepository.save(medicalChart);
     }
+
+
+    @Override
+    public MedicalChart getChartDataByCnum(Integer cnum) {
+        return medicalChartRepository.findByCnum(cnum)
+                .orElseThrow(() -> new EntityNotFoundException("Chart data not found for cnum: " + cnum));
+    }
+
 }

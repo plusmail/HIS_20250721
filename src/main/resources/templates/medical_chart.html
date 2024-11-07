@@ -456,10 +456,6 @@
                 if (status === "error") {
                     $("#tabContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
                 } else {
-                    // // 이전 스크립트가 로드되어 있다면 제거
-                    // $('script[src="/js/medical_chart_pi.js"]').remove();
-                    // $('script[src="/js/medical_chart_plan.js"]').remove();
-
                     // 필요한 스크립트를 동적으로 로드
                     if (page === '/medical_chart_pi') {
                         $.getScript("/js/medical_chart_pi.js", function () {
@@ -506,25 +502,28 @@
         // 차트 내역 더블클릭시 탭이동 이벤트
         $(document).on('dblclick', '#paChart-list tr', function() {
             const medicalDivision = $(this).find('td:eq(2)').text().trim();
-            const mdTime = $(this).find('td:eq(0)').text(); // 날짜 데이터
-            const medicalContent = $(this).find('td:eq(3)').text(); // 진료 내역
-            const checkDoc = $(this).find('.medical-content-cell').text(); // 진료의
-            const teethNum = $(this).find('td:eq(1)').text(); // 선택 치아
+            const cnum = $(this).find('input[name="cnum"]').val();
 
             let targetTab, targetTabSelector;
             if (medicalDivision === 'CC') {
                 targetTab = '/medical_chart_cc';
                 targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_cc"]';
+                activateTab(targetTabSelector);
+                loadContent(targetTab, function() {
+                    populateFieldsWithCC(cnum);
+                });
             } else if (medicalDivision === 'PI') {
                 targetTab = '/medical_chart_pi';
                 targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_pi"]';
+                activateTab(targetTabSelector);
+                loadContent(targetTab);
             } else if (medicalDivision === 'PLAN') {
                 targetTab = '/medical_chart_plan';
                 targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_plan"]';
+                activateTab(targetTabSelector);
+                loadContent(targetTab);
             }
-            activateTab(targetTabSelector);
 
-            loadContent(targetTab);
         });
 
         // 탭 활성화 함수
@@ -535,6 +534,25 @@
             // 선택된 탭에만 active 클래스와 aria-selected="true" 추가
             $(selector).addClass('active').attr('aria-selected', 'true');
         }
+
+        function populateFieldsWithCC(cnum) {
+            $.ajax({
+                url: `/medical_chart/getDataByCnum?cnum=`+cnum,
+                method: 'GET',
+                success: function(response) {
+                    $('#mdTime').val(response.mdTime);  // 날짜 입력 필드
+                    $('#ccCheckDoc').val(response.checkDoc);  // 진료의 필드
+                    $('#cc-textarea').val(response.medicalContent);  // CC 메모 필드
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to fetch data for cnum:', error);
+                    alert('해당 데이터를 가져오지 못했습니다.');
+                }
+            });
+        }
+
+
+
     </script>
 </div>
 <script layout:fragment="chartscript" src="/js/medical_chart.js"></script>

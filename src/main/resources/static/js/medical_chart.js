@@ -257,6 +257,8 @@ function readPaChart() {
                 // 데이터를 순회하여 테이블에 추가
                 data.forEach(chart => {
                     let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
+                    let cnum = chart.cnum;
+                    populateFieldsWithCC(cnum);
 
                     // 각 치아 번호를 분할하여 사분면 형식으로 정렬
                     let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
