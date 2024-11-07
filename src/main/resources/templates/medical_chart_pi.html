@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="/css/medical_chart.css">
+    <title>진료차트 입력 시스템</title>
+</head>
+<body>
+<div class="row">
+    <div class="container text-center tooth-container" id="tooth-container">
+        <div class="row mt-2" style="width: 600px">
+            <div class="input-group col">
+                <span class="input-group-text" style="width: 6rem;">날짜</span>
+                <input type="date" name="mdTime" id="mdTime" class=" form-control" required>
+            </div>
+            <div class="input-group col">
+                <span class="input-group-text" style="width: 6rem;">진료의</span>
+                <label for="piCheckDoc"></label>
+                <select class="form-select" name="checkDoc" id="piCheckDoc" required>
+                    <option value="" disabled selected>주치의</option>
+                    <th:block th:each="doctor : ${doctorNames}">
+                        <option th:value="${doctor}" th:text="${doctor}"></option>
+                    </th:block>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <!--치아 배열 시작-->
+            <!-- 상악 (윗니) -->
+            <div class="tooth-row">
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="18">18
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="17">17
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="16">16
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="15">15
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="14">14
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="13">13
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="12">12
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="11">11
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="21">21
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="22">22
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="23">23
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="24">24
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="25">25
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="26">26
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="27">27
+                </button>
+                <button class="btn btn-danger tooth-btn up-tooth" type="button" value="28">28
+                </button>
+            </div>
+
+            <!-- 메뉴바 (상악 하악 사이) -->
+            <div class="menu-section" style="display: flex">
+                <!-- 왼쪽: 영구치 메뉴 -->
+                <div class="menu-column">
+                    <button class="btn btn-secondary control-btn up-control" id="upTooth"
+                            type="button">영구치 상악
+                    </button>
+                    <button class="btn btn-secondary control-btn all-control" id="allTooth"
+                            type="button">영구치 전체선택
+                    </button>
+                    <button class="btn btn-secondary control-btn down-control" id="downTooth"
+                            type="button">영구치 하악
+                    </button>
+                </div>
+
+                <!-- 55번부터 85번까지의 치아 (작은 버튼) -->
+                <div class="container mt-4">
+                    <!-- 상악 (윗줄) -->
+                    <div class="tooth-row">
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="55">55
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="54">54
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="53">53
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="52">52
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="51">51
+                        </button>
+                        <span class="upper-gap"></span>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="61">61
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="62">62
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="63">63
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="64">64
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-up-tooth" type="button"
+                                value="65">65
+                        </button>
+                    </div>
+
+                    <!-- 하악 (아랫줄) -->
+                    <div class="tooth-row">
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="85">85
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="84">84
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="83">83
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="82">82
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="81">81
+                        </button>
+                        <span class="lower-gap"></span>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="71">71
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="72">72
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="73">73
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="74">74
+                        </button>
+                        <button class="btn btn-light small-tooth-btn y-down-tooth" type="button"
+                                value="75">75
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 유치 상악/하악 메뉴 -->
+                <div class="menu-column flex-column">
+                    <button class="btn btn-secondary control-btn y-up-control" id="upToothY"
+                            type="button">유치 상악
+                    </button>
+                    <button class="btn btn-secondary control-btn y-all-control" id="allToothY"
+                            type="button">유치전체선택
+                    </button>
+                    <button class="btn btn-secondary control-btn y-down-control" id="downToothY"
+                            type="button">유치 하악
+                    </button>
+                </div>
+            </div>
+
+            <!-- 하악 (아랫니) -->
+            <div class="tooth-row">
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="48">48
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="47">47
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="46">46
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="45">45
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="44">44
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="43">43
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="42">42
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="41">41
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="31">31
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="32">32
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="33">33
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="34">34
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="35">35
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="36">36
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="37">37
+                </button>
+                <button class="btn btn-danger tooth-btn down-tooth" type="button" value="38">38
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!--치아배열 끝-->
+
+    <!-- 우측 PI 선택 영역 -->
+    <div class="container mt-4" style="max-width: 100%;">
+        <div class="row border rounded">
+
+            <label class="btn btn-outline-secondary btn-sm no-hover">자주 쓰는 PI 선택</label>
+            <div class="border rounded col-12 overflow-auto pi-symptom" style="max-height: 300px;">
+                <!-- 첫 번째 행: Per, Air, Bite 등 -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="per-plus" value="Per(+)">
+                        <label class="form-check-label" for="per-plus"
+                               style="color: #d63384;">Per(+)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="air-plus" value="Air(+)">
+                        <label class="form-check-label" for="air-plus"
+                               style="color: #d63384;">Air(+)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="bite-plus" value="Bite(+)">
+                        <label class="form-check-label" for="bite-plus"
+                               style="color: #d63384;">Bite(+)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cold-plus" value="Cold(+)">
+                        <label class="form-check-label" for="cold-plus"
+                               style="color: #d63384;">Cold(+)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="hot-plus" value="Hot(+)">
+                        <label class="form-check-label" for="hot-plus"
+                               style="color: #d63384;">Hot(+)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="ept-minus" value="EPT(-)">
+                        <label class="form-check-label" for="ept-minus"
+                               style="color: #d63384;">EPT(-)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="pain"
+                               value="Spontaneous Pain">
+                        <label class="form-check-label" for="pain" style="color: #d63384;">자발통</label>
+                    </div>
+                </div>
+
+                <!-- 두 번째 행: Per(-), Air(-), Bite(-) -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="per-minus" value="Per(-)">
+                        <label class="form-check-label" for="per-minus"
+                               style="color: #adb5bd;">Per(-)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="air-minus" value="Air(-)">
+                        <label class="form-check-label" for="air-minus"
+                               style="color: #adb5bd;">Air(-)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="bite-minus" value="Bite(-)">
+                        <label class="form-check-label" for="bite-minus"
+                               style="color: #adb5bd;">Bite(-)</label>
+                    </div>
+                </div>
+
+                <!-- 세 번째 행: 우식 관련 체크박스 -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="occlusal"
+                               value="Occlusal Caries">
+                        <label class="form-check-label" for="occlusal" style="color: #0d6efd;">교합면
+                            우식</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="proximal"
+                               value="Proximal Caries">
+                        <label class="form-check-label" for="proximal" style="color: #0d6efd;">인접면
+                            우식</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cervical"
+                               value="Lingual Caries">
+                        <label class="form-check-label" for="cervical" style="color: #0d6efd;">설면
+                            우식</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="root-caries"
+                               value="Root Caries">
+                        <label class="form-check-label" for="root-caries" style="color: #0d6efd;">치근
+                            우식</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="restoration-failure"
+                               value="Restoration Failure">
+                        <label class="form-check-label" for="restoration-failure"
+                               style="color: #0d6efd;">보철물 탈락</label>
+                    </div>
+                </div>
+
+                <!-- 네 번째 행: 진단 및 치근 관련 -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="implant" value="Implant">
+                        <label class="form-check-label" for="implant"
+                               style="color: #0d6efd;">임플란트</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="inlay" value="Inlay">
+                        <label class="form-check-label" for="inlay" style="color: #0d6efd;">인레이</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="filling"
+                               value="Filling Status">
+                        <label class="form-check-label" for="filling"
+                               style="color: #0d6efd;">충전상태</label>
+                    </div>
+                </div>
+
+                <!-- 다섯 번째 행: CA 치경부마모, 치아상실 -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="ca-abrasion"
+                               value="CA Abrasion">
+                        <label class="form-check-label" for="ca-abrasion" style="color: #6f42c1;">CA
+                            치경부마모</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="tooth-loss"
+                               value="Tooth Loss">
+                        <label class="form-check-label" for="tooth-loss"
+                               style="color: #6f42c1;">치아상실/결손</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="tooth-crack"
+                               value="Tooth Crack">
+                        <label class="form-check-label" for="tooth-crack" style="color: #6f42c1;">Tooth
+                            Crack</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="fracture"
+                               value="Tooth Fracture">
+                        <label class="form-check-label" for="fracture" style="color: #6f42c1;">치아
+                            파절</label>
+                    </div>
+                </div>
+                <!-- 여섯 번째 행: 농양, Pus, Cellulitis -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="pus" value="Pus">
+                        <label class="form-check-label" for="pus" style="color: #198754;">Pus 나옴</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="abscess" value="Abscess">
+                        <label class="form-check-label" for="abscess" style="color: #198754;">농양
+                            존재</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="cellulitis"
+                               value="Cellulitis">
+                        <label class="form-check-label" for="cellulitis" style="color: #198754;">Cellulitis</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="periostitis"
+                               value="pericoronitis">
+                        <label class="form-check-label" for="periostitis"
+                               style="color: #198754;">치관주위염</label>
+                    </div>
+                </div>
+
+                <!-- 일곱 번째 행: 연조직 및 교합 관련 -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="gingival-calc"
+                               value="Gingival Calculus">
+                        <label class="form-check-label" for="gingival-calc" style="color: #dc3545;">치은
+                            연상/연하 치석</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="tooth-fracture"
+                               value="Gingival Swelling/Bleeding">
+                        <label class="form-check-label" for="tooth-fracture" style="color: #dc3545;">치은
+                            부종/출혈</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="mobility1"
+                               value="Mobility(1)">
+                        <label class="form-check-label" for="mobility1"
+                               style="color: #dc3545;">Mob(1)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="mobility2"
+                               value="Mobility(2)">
+                        <label class="form-check-label" for="mobility2"
+                               style="color: #dc3545;">Mob(2)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="mobility3"
+                               value="Mobility(3)">
+                        <label class="form-check-label" for="mobility3"
+                               style="color: #dc3545;">Mob(3)</label>
+                    </div>
+                </div>
+
+                <!-- 마지막 행: 교정, 치아 외관 -->
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="orthodontics-1"
+                               value="Attrition">
+                        <label class="form-check-label" for="orthodontics-1"
+                               style="color: #0d6efd;">교모</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="crowding-1"
+                               value="Extrusion">
+                        <label class="form-check-label" for="crowding-1"
+                               style="color: #0d6efd;">정출</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="impacted-1"
+                               value="Dens Invaginatus">
+                        <label class="form-check-label" for="impacted-1"
+                               style="color: #0d6efd;">치내치</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="hyperdontia-1"
+                               value="Supernumerary Tooth">
+                        <label class="form-check-label" for="hyperdontia-1"
+                               style="color: #0d6efd;">치외치</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="hyperdontia-2"
+                               value="hyperdontia">
+                        <label class="form-check-label" for="hyperdontia-2"
+                               style="color: #0d6efd;">과잉치</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="impacted-2"
+                               value="Impacted Tooth">
+                        <label class="form-check-label" for="impacted-2"
+                               style="color: #0d6efd;">매복치</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="external-resorption-1"
+                               value="External Resorption">
+                        <label class="form-check-label" for="external-resorption-1"
+                               style="color: #0d6efd;">외흡수</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="internal-resorption-1"
+                               value="Internal Resorption">
+                        <label class="form-check-label" for="internal-resorption-1"
+                               style="color: #0d6efd;">내흡수</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="unErupted-1"
+                               value="unErupted Tooth">
+                        <label class="form-check-label" for="unErupted-1"
+                               style="color: #0d6efd;">미맹출</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 우측 PI 저장 영역 -->
+    <div class="container mt-4" style="max-width: 100%;">
+        <div class="row border rounded">
+            <label class="btn btn-outline-secondary btn-sm  no-hover">PI 입력</label>
+            <div class="col-3 border-end text-center py-3 d-flex flex-column justify-content-center">
+                <p class="mb-1">내역작성</p>
+                <button class="btn btn-outline-secondary btn-sm btn-modal" data-bs-toggle="modal"
+                        data-bs-target="#piModal" id="pi_modal_onOff" type="button">기존입력
+                </button>
+            </div>
+            <div class="col-6 p-0">
+                <textarea class="form-control h-100 memo" rows="5" id="memo-textarea"
+                          placeholder="내역을 입력하세요"></textarea>
+            </div>
+            <input type="hidden" id="chart-numberInput" name="chart-numberInput">
+            <input type="hidden" id="pa-nameInput" name="pa-nameInput">
+            <div class="col-3 bg-light d-flex justify-content-center align-items-center py-3">
+                <div class="row gx-2">
+                    <button class="btn btn-primary w-100 save-pi py-3">PI 저장</button>
+                    <button class="btn btn-secondary w-100 reset-pi">입력 초기화</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/js/medical_chart_pi.js"></script>
+</html>

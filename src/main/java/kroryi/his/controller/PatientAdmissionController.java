@@ -4,15 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import kroryi.his.domain.PatientAdmission;
 import kroryi.his.domain.Reservation;
 import kroryi.his.dto.PatientAdmissionDTO;
+import kroryi.his.dto.PatientDTO;
 import kroryi.his.repository.PatientAdmissionRepository;
 import kroryi.his.repository.ReservationRepository;
 import kroryi.his.service.PatientAdmissionService;
 import kroryi.his.websocket.MessageRequest;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+@Log4j2
 @RestController
 @RequestMapping("/api/patient-admission")
 public class PatientAdmissionController {
@@ -33,10 +39,12 @@ public class PatientAdmissionController {
 
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
 
 
     // 환자 등록
@@ -78,6 +86,8 @@ public class PatientAdmissionController {
         // DB에 저장
         PatientAdmission patientAdmissionDTO1 = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 
+        messagingTemplate.convertAndSend("/topic/waitingPatients", patientAdmissionDTO1);
+
         response.put("data", patientAdmissionDTO1);
         response.put("message", "환자가 대기 상태로 등록되었습니다.");
         response.put("rvTime", patientAdmissionDTO.getRvTime());
@@ -86,60 +96,94 @@ public class PatientAdmissionController {
     }
 
 
+    @MessageMapping("/waitingPatients")
+    @SendTo("/topic/waitingPatients")
+    public PatientAdmissionDTO broadcastPatient(PatientAdmissionDTO patientAdmissionDTO) {
+        return patientAdmissionDTO;
+    }
 
+    @MessageMapping("/inTreatmentPatients")
+    @SendTo("/topic/inTreatmentPatients")
+    public PatientAdmissionDTO broadcastInTreatmentPatient(PatientAdmissionDTO patientAdmissionDTO) {
+        return patientAdmissionDTO;
+    }
 
+    @MessageMapping("/completePatients")
+    @SendTo("/topic/completePatients")
+    public PatientAdmissionDTO broadcastInCompletePatient(PatientAdmissionDTO patientAdmissionDTO) {
+        return patientAdmissionDTO;
+    }
 
     // 대기 환자 목록 반환
     @GetMapping("/waiting")
-    public ResponseEntity<List<PatientAdmission>> getWaitingPatients() {
+    public ResponseEntity<List<PatientAdmission>> getPatientsWaiting() {
         List<PatientAdmission> waitingPatients = patientAdmissionService.getWaitingPatients();
+
+        log.info("waitig---->{}", waitingPatients);
+
         return ResponseEntity.ok(waitingPatients);
     }
 
-    // 진료 시작
-    @PutMapping("/treatment/start")
-    public ResponseEntity<String> startTreatment(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
-        // 오늘 날짜의 시작 시간을 구함 (예: 2024-10-23 00:00:00)
-        LocalDateTime receptionDateTime = LocalDate.now().atStartOfDay();
+    // 진료 중 대기 환자 목록 반환
+    @GetMapping("/treatment")
+    public ResponseEntity<List<PatientAdmission>> getPatientsForTreatment() {
+        List<PatientAdmission> inTreatmentPatients  = patientAdmissionService.getTreatmentPatients();
 
-        // DTO에 접수 시간 설정
-        patientAdmissionDTO.setReceptionTime(receptionDateTime);
+        log.info("getTreatmentPatients---->{}", inTreatmentPatients);
 
-        // 차트 번호와 접수 시간이 일치하는 환자 조회
-        List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
-                Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())), receptionDateTime);
-
-        if (!existingPatients.isEmpty()) {
-            // 첫 번째 환자를 선택 (중복 처리)
-            PatientAdmission patient = existingPatients.get(0);
-
-//            System.out.println("조회된 환자: 차트 번호: " + patient.getChartNum() + ", 진료 상태: " + patient.getTreatStatus());
-
-            // 피아이디가 같고, 현재 진료 상태가 "1"인 경우
-            if (patient.getTreatStatus().equals("1")) {
-                patient.setViTime(LocalDateTime.now()); // 진료 시작 시간을 현재 시간으로 설정
-                patient.setTreatStatus("2"); // 진료 상태를 "2"로 업데이트
-                patient.setMainDoc(patientAdmissionDTO.getMainDoc()); // 의사 정보 업데이트
-
-                // DB에 업데이트 수행 (여기서는 save가 아닌 update 메서드 사용)
-                patientAdmissionService.updatePatientAdmission(patient); // 업데이트 로직을 구현해야 합니다.
-                return ResponseEntity.ok("환자의 진료 상태가 2로 업데이트되었습니다.");
-            } else if (patient.getTreatStatus().equals("2")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("환자가 이미 진료 중입니다.");
-            }
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("알 수 없는 오류가 발생했습니다.");
+        return ResponseEntity.ok(inTreatmentPatients );
     }
-
 
 
     // 진료 중 대기 환자 목록 반환
-    @GetMapping("/treatment/waiting")
-    public ResponseEntity<List<PatientAdmission>> getWaitingPatientsForTreatment() {
-        List<PatientAdmission> inTreatmentPatients  = patientAdmissionService.getWaitingPatients();
+    @GetMapping("/complete")
+    public ResponseEntity<List<PatientAdmission>> getPatientsForComplete() {
+        List<PatientAdmission> inTreatmentPatients  = patientAdmissionService.getCompletePatients();
+
+        log.info("getCompletePatients---->{}", inTreatmentPatients);
+
         return ResponseEntity.ok(inTreatmentPatients );
     }
+
+
+
+
+    // 진료 시작
+    @PutMapping("/treatment/start")
+    public ResponseEntity<Map<String, String>> startTreatment(@RequestBody PatientAdmissionDTO patientAdmissionDTO) {
+        LocalDateTime receptionDateTime = LocalDate.now().atStartOfDay();
+        patientAdmissionDTO.setReceptionTime(receptionDateTime);
+
+        // 동일한 차트 번호와 접수 시간을 가진 환자들 조회
+        List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
+                Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())), receptionDateTime);
+
+        // 새로 접수된 환자 처리
+        for (PatientAdmission patient : existingPatients) {
+            // PID가 다르고 TreatStatus가 "1"인 환자만 업데이트
+            if (!patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("1")) {
+                patient.setViTime(LocalDateTime.now());
+                patient.setTreatStatus("2");
+                patient.setMainDoc(patientAdmissionDTO.getMainDoc());
+
+                // DB 업데이트 수행
+                patientAdmissionService.updatePatientAdmission(patient);
+
+                // WebSocket 메시지 전송
+                messagingTemplate.convertAndSend("/topic/inTreatmentPatients", patientAdmissionDTO);
+
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "환자의 진료 상태가 2로 업데이트되었습니다.");
+                return ResponseEntity.ok(response);
+            }
+        }
+
+        // 모든 환자가 이미 진료 중인 경우
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("message", "이미 진료 중이거나 업데이트할 환자가 없습니다.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
 
     //    진료완료
     @PutMapping("/completeTreatment")
@@ -159,33 +203,33 @@ public class PatientAdmissionController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // 환자 정보 조회: 차트 번호와 접수 시간을 기준으로
+        // 동일한 차트 번호와 접수 시간을 가진 환자들 조회
         List<PatientAdmission> existingPatients = patientAdmissionService.findByChartNumAndReceptionTime(
                 Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())),
                 patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
 
-        if (!existingPatients.isEmpty()) { // 비어 있지 않을 경우
-            PatientAdmission patient = existingPatients.get(0); // 첫 번째 환자 선택
-
-            // 치료 상태가 2인지 확인
-            if (patient.getTreatStatus().equals("2")) {
-                // 치료 상태를 3으로 업데이트
-                patient.setTreatStatus("3");
+        // 상태가 2이고 pid가 다른 경우 진료 완료 처리
+        for (PatientAdmission patient : existingPatients) {
+            if (!patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("2")) {
+                patient.setTreatStatus("3"); // 치료 상태를 "3"으로 설정
                 patient.setCompletionTime(completionTime); // 진료 완료 시간 설정
 
-                patientAdmissionService.updatePatientAdmission(patient); // 업데이트 수행
+                // DB에 업데이트 수행
+                patientAdmissionService.updatePatientAdmission(patient);
+
+                // WebSocket 메시지 전송
+                messagingTemplate.convertAndSend("/topic/inCompletePatients", patientAdmissionDTO);
 
                 response.put("message", "환자가 진료 완료 상태로 등록되었습니다.");
                 return ResponseEntity.ok(response);
-            } else {
-                response.put("message", "환자는 이미 진료 완료 상태입니다.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
         }
 
-        response.put("message", "환자를 찾을 수 없습니다.");
+        // 모든 환자가 이미 진료 완료 상태이거나 업데이트할 환자가 없는 경우
+        response.put("message", "이미 진료 완료 상태이거나 업데이트할 환자가 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 
 
@@ -204,7 +248,7 @@ public class PatientAdmissionController {
             // 해당 날짜의 환자 접수 정보를 가져옴
             List<PatientAdmissionDTO> admissions = patientAdmissionService.getAdmissionsByReceptionTime(startDate, endDate);
 
-//            System.out.println("가져온 환자 접수 정보: " + admissions); // 가져온 환자 접수 정보 로그
+            System.out.println("가져온 환자 접수 정보: " + admissions); // 가져온 환자 접수 정보 로그
 
             return admissions;
         } catch (Exception e) {

@@ -1,358 +1,390 @@
+if (!window.MedicalPlanModule) {
+    window.MedicalPlanModule = (() => {
+        let selectedPTag = null;
+        let toothValues = [];
+
+        let modal, toothModal, saveBtn, planData, mTooth, saveToothBtn;
+        let mUpTooth, mUpToothValues, mDownTooth, mDownToothValues, mAllTooth;
+        let mUpToothY, mDownToothY, mAllToothY, mYUpToothValues, mYDownToothValues;
+        let mdTime, checkDoc;
+        let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+
+        function init() {
+            modal = document.getElementById('Plan-cure-modal');
+            toothModal = document.getElementById('Plan-tooth-Modal');
+            saveBtn = document.getElementById('saveBtn');
+            saveToothBtn = document.getElementById('save-tooth');  // 치아 저장 버튼 추가
+            planData = $('#plan-data');
+            mTooth = document.querySelector(".modal-tooth-container");
+
+            mUpTooth = document.querySelector(".modal-up-control");
+            mUpToothValues = document.querySelectorAll(".modal-up-tooth");
+            mDownTooth = document.querySelector(".modal-down-control");
+            mDownToothValues = document.querySelectorAll(".modal-down-tooth");
+            mAllTooth = document.querySelector(".modal-all-control");
+
+            mUpToothY = document.querySelector(".modal-y-up-control");
+            mDownToothY = document.querySelector(".modal-y-down-control");
+            mAllToothY = document.querySelector(".modal-y-all-control");
+            mYUpToothValues = document.querySelectorAll(".modal-y-up-tooth");
+            mYDownToothValues = document.querySelectorAll(".modal-y-down-tooth");
+
+            mdTime = document.getElementById("mdTime");
+            checkDoc = document.getElementById("planCheckDoc");
+
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            if (modal) {
+                modal.addEventListener('click', handleModalClick);
+            }
+            document.addEventListener("click", handleDocumentClick);
+            saveBtn.addEventListener('click', saveSelectedLabels);
+            saveToothBtn.addEventListener('click', saveSelectedTeeth); // 치아 저장 버튼 이벤트 리스너 추가
+            mTooth.addEventListener("click", handleToothClick);
+
+            planData.on('click', 'button.save-db-btn', handleSaveButtonClick);
+            // planData.on('click', 'button.update-db-btn', handleUpdateButtonClick);
+        }
+
+        function cleanup() {
+            if (modal) {
+                modal.removeEventListener('click', handleModalClick);
+            }
+            document.removeEventListener("click", handleDocumentClick);
+            saveBtn.removeEventListener('click', saveSelectedLabels);
+            saveToothBtn.removeEventListener('click', saveSelectedTeeth); // 치아 저장 버튼 이벤트 리스너 제거
+            mTooth.removeEventListener("click", handleToothClick);
+
+            planData.off('click', 'button.save-db-btn', handleSaveButtonClick);
+            planData.off('click', 'button.update-db-btn', handleUpdateButtonClick);
 
 
-// 클릭된 p태그 를 저장.
-let selectedPTag = null; // 클릭한 p 태그를 저장할 변수
-const ptag = document.querySelectorAll(".select-pTag")
-const modal = document.getElementById('Plan-cure-modal');
-const toothModal = document.getElementById('Plan-tooth-Modal');
-const toothValues = [];
-// 성인 윗니 모두 선택할 수 있는 btn
-const mUpTooth = document.querySelector(".modal-up-control")
-// 상악 치아 모두 선택
-const mUpToothValues = document.querySelectorAll(".modal-up-tooth")
-// 성인 아랫니 모두 선택하는 btn
-const mDownTooth = document.querySelector(".modal-down-control")
-// 성인 하악 모두 선택
-const mDownToothValues = document.querySelectorAll(".modal-down-tooth")
-// 성인 치아 모두 선택하는 btn
-const mAllTooth = document.querySelector(".modal-all-control")
-// 유치 상악 모두 선택 할 수 있는 btn
-const mUpToothY = document.querySelector(".modal-y-up-control")
-// 유치 하악 모두 선택 할 수 있는 btn
-const mDownToothY = document.querySelector(".modal-y-down-control")
-// 유치 상하악 모두 선택 할 수 있는 btn
-const mAllToothY = document.querySelector(".modal-y-all-control")
-// 유치 상악 모두 선택
-const mYUpToothValues = document.querySelectorAll(".modal-y-up-tooth")
-// 유치 하악 모두 선택
-const mYDownToothValues = document.querySelectorAll(".modal-y-down-tooth")
-const mTooth = document.querySelector(".modal-tooth-container")
-// 세션 데이터(환자정보) 를 가지고옴.
+            selectedPTag = null;
+            toothValues = [];
+        }
 
-
-//세션 시작
-// 세션 데이터 가져오기
-
-
-// 치아 동적 배열 선언
-let modalToothList = []
-
-// DOM이 완전히 로드된 후 실행되도록 설정
-document.addEventListener('DOMContentLoaded', function () {
-});
-
-if (modal) {
-    // 모달 내부에서 클릭 이벤트 감지
-    modal.addEventListener('click', function (event) {
-        const target = event.target;
-
-        // 클릭된 요소가 버튼인지 확인
-        if (target.closest('button')) {
-            const button = target.closest('button'); // 클릭된 버튼 가져오기
-
-            // 버튼의 value와 일치하는 체크박스 선택
-            const checkbox = modal.querySelector(`input[type="checkbox"][value="${button.value}"]`);
-
-            // 체크박스가 존재하면 체크 상태 토글
-            if (checkbox) {
-                checkbox.checked = !checkbox.checked;
+        function handleDocumentClick(e) {
+            const target = e.target;
+            if (target.classList.contains("select-pTag")) {
+                savePTag(target);
             }
         }
-    });
-} else {
-    console.error("Modal not found in DOM.");
-}
 
-document.addEventListener("click", e => {
-    const target = e.target;
-    if (target.classList.contains("select-pTag")) {
-        savePTag(target);
-    }
-})
-
-// 모달을 열 때 호출되는 함수
-function savePTag(pTag) {
-    selectedPTag = pTag; // 클릭한 p 태그를 저장
-    console.log(selectedPTag);
-    // const modal = new bootstrap.Modal(document.getElementById('Plan-cure-modal'));
-    // modal.show(); // 모달 열기
-}
-
-// 저장 버튼 클릭 시 선택된 체크박스 내용을 p 태그에 출력
-
-
-// 선택된 checkbox와 매칭되는 라벨값 을 클릭 이벤트가 발생한 타겟에 출력.
-document.getElementById('saveBtn').addEventListener('click', function () {
-    if (selectedPTag) {
-        const checkboxes = modal.querySelectorAll('input[type="checkbox"]:checked'); // 체크된 항목들 가져오기
-        let selectedLabels = [];
-
-        checkboxes.forEach(checkbox => {
-            const label = modal.querySelector(`label[for="${checkbox.id}"]`);
-            if (label) {
-                selectedLabels.push(label.textContent); // label의 텍스트 값을 수집
-            }
-            // selectedValues.push(checkbox.value); // 체크된 값 수집
-        });
-
-        checkboxes.forEach(checkbox => {
-            checkbox.checked =false
-        })
-
-        // p 태그에 선택된 값을 표시
-        selectedPTag.textContent = selectedLabels.join(', ');
-
-        if (selectedPTag.textContent === '' || selectedPTag.textContent === null) {
-            selectedPTag.textContent = "치료계획 선택";
+        function savePTag(pTag) {
+            selectedPTag = pTag;
         }
-        // 모달 닫기
-        const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        bootstrapModal.hide();
-    } else {
-        console.error("No p tag was selected to display the results.");
-    }
-});
 
-
-// 치아 클릭 시 선택된 치아 value 값을 저장.
-mTooth.addEventListener("click", e => {
-    toothList = []
-    toothList.push(e.target.value)
-    if (e.target.tagName === "BUTTON" && e.target.id === '') {
-        if (e.target.classList.contains("opacity-50")) {
-            e.target.classList.remove("opacity-50")
-        } else {
-            e.target.classList.add("opacity-50")
+        function handleModalClick(event) {
+            const target = event.target;
+            if (target.closest('button')) {
+                const button = target.closest('button');
+                const checkbox = modal.querySelector(`input[type="checkbox"][value="${button.value}"]`);
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                }
+            }
         }
-    } else {
-        if (e.target.tagName === "BUTTON") {
-            toothTerminal(e.target.id)
+
+        function saveSelectedLabels() {
+            if (selectedPTag) {
+                const checkboxes = modal.querySelectorAll('input[type="checkbox"]:checked');
+                const selectedLabels = Array.from(checkboxes).map(checkbox => {
+                    const label = modal.querySelector(`label[for="${checkbox.id}"]`);
+                    return label ? label.textContent : '';
+                }).filter(text => text !== '');
+
+                selectedPTag.textContent = selectedLabels.join(', ') || "치료계획 선택";
+                checkboxes.forEach(checkbox => checkbox.checked = false);
+
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                bootstrapModal.hide();
+            } else {
+                console.error("No p tag was selected to display the results.");
+            }
         }
-    }
-})
 
-
-function toothTerminal(id) {
-    toothList = []
-    switch (id) {
-        case "modal-upTooth":
-            for (i = 0; i < mUpToothValues.length; i++) {
-                toothList[i] = mUpToothValues[i].value;
+        function handleToothClick(e) {
+            if (e.target.tagName === "BUTTON" && e.target.id === '') {
+                e.target.classList.toggle("opacity-50");
+            } else if (e.target.tagName === "BUTTON") {
+                toothTerminal(e.target.id);
             }
-            if (mUpTooth.classList.contains("opacity-50")) {
-                mUpTooth.classList.remove("opacity-50")
-                mUpToothValues.forEach(upToothValue =>
-                    upToothValue.classList.remove("opacity-50"))
-            } else {
-                mUpTooth.classList.add("opacity-50")
-                mUpToothValues.forEach(upToothValue =>
-                    upToothValue.classList.add("opacity-50"))
-            }
-            console.log("상악")
-
-            break;
-        case "modal-allTooth":
-            for (i = 0; i < mUpToothValues.length; i++) {
-                toothList.push(mUpToothValues[i].value)
-                toothList.push(mDownToothValues[i].value)
-            }
-            if (mAllTooth.classList.contains("opacity-50")) {
-                mAllTooth.classList.remove("opacity-50")
-                mUpToothValues.forEach(mUpToothValue =>
-                    mUpToothValue.classList.remove("opacity-50"))
-                mDownToothValues.forEach(mDownToothValue =>
-                    mDownToothValue.classList.remove("opacity-50"))
-            } else {
-                mAllTooth.classList.add("opacity-50")
-                mDownToothValues.forEach(mDownToothValue =>
-                    mDownToothValue.classList.add("opacity-50"))
-                mUpToothValues.forEach(upToothValue =>
-                    upToothValue.classList.add("opacity-50"))
-            }
-            console.log("전부")
-            break;
-        case "modal-downTooth":
-            for (i = 0; i < mDownToothValues.length; i++) {
-                toothList[i] = mDownToothValues[i].value;
-            }
-            if (mDownTooth.classList.contains("opacity-50")) {
-                mDownTooth.classList.remove("opacity-50")
-                mDownToothValues.forEach(downToothValue =>
-                    downToothValue.classList.remove("opacity-50"))
-            } else {
-                mDownTooth.classList.add("opacity-50")
-                mDownToothValues.forEach(downToothValue =>
-                    downToothValue.classList.add("opacity-50"))
-            }
-            console.log("하악")
-            break;
-        case "modal-upToothY":
-            for (i = 0; i < mYUpToothValues.length; i++) {
-                toothList[i] = mYUpToothValues[i].value;
-            }
-            if (mUpToothY.classList.contains("opacity-50")) {
-                mUpToothY.classList.remove("opacity-50")
-                mYUpToothValues.forEach(yUpToothValue =>
-                    yUpToothValue.classList.remove("opacity-50"))
-            } else {
-                mUpToothY.classList.add("opacity-50")
-                mYUpToothValues.forEach(yUpToothValue =>
-                    yUpToothValue.classList.add("opacity-50"))
-            }
-            console.log("유치상악")
-            break;
-        case "modal-allToothY":
-
-            console.log("유치전부")
-            break;
-        case "modal-downToothY":
-            for (i = 0; i < mYDownToothValues.length; i++) {
-                toothList[i] = mYDownToothValues[i].value;
-            }
-            if (mDownToothY.classList.contains("opacity-50")) {
-                mDownToothY.classList.remove("opacity-50")
-                mYDownToothValues.forEach(yDownToothValue =>
-                    yDownToothValue.classList.remove("opacity-50"))
-            } else {
-                mDownToothY.classList.add("opacity-50")
-                mYDownToothValues.forEach(yDownToothValue =>
-                    yDownToothValue.classList.add("opacity-50"))
-            }
-            console.log("유치하악")
-            break;
-        default:
-            console.log("올바르지 않은 버튼을 선택하였습니다.")
-            alert("올바르지 않은 버튼은을 선택하였습니다.")
-            break;
-    }
-}
-
-// 선택된 checkbox와 매칭되는 라벨값 을 클릭 이벤트가 발생한 타겟에 출력.
-document.getElementById('save-tooth').addEventListener('click', function () {
-    if (selectedPTag) {
-        const buttons = toothModal.querySelectorAll('button.opacity-50');
-        let selectedbuttons = [];
-
-        console.log(buttons);
-        buttons.forEach(button => {
-            selectedbuttons.push(button.textContent); // label의 텍스트 값을 수집
-
-            // selectedValues.push(checkbox.value); // 체크된 값 수집
-        });
-        buttons.forEach(button => {
-            button.classList.remove('opacity-50');
-        })
-        console.log(selectedbuttons)
-
-        // p 태그에 선택된 값을 표시
-        selectedPTag.textContent = selectedbuttons.join(', ');
-
-        if (selectedPTag.textContent === '' || selectedPTag.textContent === null) {
-            selectedPTag.textContent = "치아 선택";
         }
-        // 모달 닫기
-        const bootstrapModal = bootstrap.Modal.getInstance(toothModal);
-        bootstrapModal.hide();
-    } else {
-        console.error("No p tag was selected to display the results.");
-    }
-});
 
-$(document).ready(function() {
-    saveChartNum();
+        function toothTerminal(id) {
+            toothList = []; // Initialize an empty list to store only numeric tooth values
 
-    // 저장 버튼 클릭 이벤트
-    $('#plan-data').on('click', 'button.save-db-btn', function() {
-        // 클릭된 버튼의 부모 tr 요소를 찾음
-        const row = $(this).closest('tr');
+            switch (id) {
+                case "modal-upTooth":
+                    // Filter only numeric values for upper teeth
+                    mUpToothValues.forEach(upToothValue => {
+                        if (!isNaN(upToothValue.value)) {  // Ensure the value is numeric
+                            toothList.push(upToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mUpTooth, mUpToothValues, "상악");
+                    break;
 
-        // 현재 tr 안의 모든 p 태그의 값을 가져옴
-        const rowData = [];
-        row.find('p.select-pTag').each(function() {
-            rowData.push($(this).text().trim()); // 각 p 태그의 내용을 수집
-        });
+                case "modal-allTooth":
+                    // Filter only numeric values for both upper and lower teeth
+                    mUpToothValues.forEach(upToothValue => {
+                        if (!isNaN(upToothValue.value)) {
+                            toothList.push(upToothValue.value);
+                        }
+                    });
+                    mDownToothValues.forEach(downToothValue => {
+                        if (!isNaN(downToothValue.value)) {
+                            toothList.push(downToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                    break;
 
-        // DB 저장을 위한 데이터
-        console.log(rowData); // rowData를 서버에 전송하여 DB에 저장하는 로직을 추가
-        // AJAX를 이용해 DB에 저장
-        $.ajax({
-            url: '/medical_chart/savePlan',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({toothOne: rowData[[0]],
-                planOne: rowData[[1]],
-                toothTwo:rowData[[2]],
-                planTwo:rowData[[3]]
-            }),
-            success: function(response) {
-                console.log("Data saved to DB:", response);
-                readPaChart()
+                case "modal-downTooth":
+                    // Filter only numeric values for lower teeth
+                    mDownToothValues.forEach(downToothValue => {
+                        if (!isNaN(downToothValue.value)) {
+                            toothList.push(downToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mDownTooth, mDownToothValues, "하악");
+                    break;
 
-                // 저장이 완료되면 새 행을 추가
-                addNewRow();
-            },
-            error: function(error) {
-                console.error('Error saving data:', error);
+                case "modal-upToothY":
+                    // Filter only numeric values for deciduous upper teeth
+                    mYUpToothValues.forEach(yUpToothValue => {
+                        if (!isNaN(yUpToothValue.value)) {
+                            toothList.push(yUpToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
+                    break;
+
+                case "modal-allToothY":
+                    // Filter only numeric values for deciduous upper and lower teeth
+                    mYUpToothValues.forEach(yUpToothValue => {
+                        if (!isNaN(yUpToothValue.value)) {
+                            toothList.push(yUpToothValue.value);
+                        }
+                    });
+                    mYDownToothValues.forEach(yDownToothValue => {
+                        if (!isNaN(yDownToothValue.value)) {
+                            toothList.push(yDownToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                    break;
+
+                case "modal-downToothY":
+                    // Filter only numeric values for deciduous lower teeth
+                    mYDownToothValues.forEach(yDownToothValue => {
+                        if (!isNaN(yDownToothValue.value)) {
+                            toothList.push(yDownToothValue.value);
+                        }
+                    });
+                    toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
+                    break;
+
+                default:
+                    alert("올바르지 않은 버튼을 선택하였습니다.");
+                    break;
             }
-        });
-    });
-});
+        }
+
+// Helper function to toggle opacity and log messages
+        function toggleOpacity(button, elements, logMessage) {
+            button.classList.toggle("opacity-50");
+            elements.forEach(element => element.classList.toggle("opacity-50"));
+        }
 
 
-$(document).ready(function() {
-    saveChartNum();
+        function saveSelectedTeeth() {
+            if (selectedPTag) {
+                const buttons = toothModal.querySelectorAll('button.opacity-50');
+                let selectedButtons = [];
 
-    // 저장 버튼 클릭 이벤트
-    $('#plan-data').on('click', 'button.del-db-btn', function() {
-        // 클릭된 버튼의 부모 tr 요소를 찾음
-        const row = $(this).closest('tr');
+                buttons.forEach(button => {
+                    // Only add the button's value if it's a valid number
+                    if (button.value && !isNaN(button.value)) {
+                        selectedButtons.push(button.value);  // Collect only numeric values
+                    }
+                });
 
-        // 현재 tr 안의 모든 p 태그의 값을 가져옴
-        const rowData = [];
-        row.find('p.select-pTag').each(function() {
-            rowData.push($(this).text().trim()); // 각 p 태그의 내용을 수집
-        });
+                // Clear selection styles after collecting values
+                buttons.forEach(button => {
+                    button.classList.remove('opacity-50');
+                });
 
-        row.remove();
-        // DB 저장을 위한 데이터
-        console.log(rowData); // rowData를 서버에 전송하여 DB에 저장하는 로직을 추가
-        // AJAX를 이용해 DB에 저장
-        $.ajax({
-            url: '/medical_chart/delPlan',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({toothOne: rowData[[0]],
-                planOne: rowData[[1]],
-                toothTwo:rowData[[2]],
-                planTwo:rowData[[3]]
-            }),
-            success: function(response) {
-                console.log("Data del to DB:", response);
-                readPaChart()
+                // Set the selected P tag's text content with only numeric values joined by ', '
+                selectedPTag.textContent = selectedButtons.join(', ') || "치아 선택";
 
-                // 저장이 완료되면 새 행을 추가
-            },
-            error: function(error) {
-                console.error('Error saving data:', error);
+                // Close the modal
+                const bootstrapModal = bootstrap.Modal.getInstance(toothModal);
+                bootstrapModal.hide();
+            } else {
+                console.error("No p tag was selected to display the results.");
             }
-        });
-    });
-});
+        }
 
+        function fetchChartData() {
+            $.ajax({
+                url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
+                type: 'GET',  // GET 요청
+                dataType: 'json',  // 서버에서 JSON 응답을 기대
+                success: function (data) {
+                    let tableBody = $("#plan-data");
+                    tableBody.empty();  // 기존 내용을 비움
 
-// 새로운 행 추가 함수
-function addNewRow() {
-    const newRow = `
-            <tr>
-                <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
-                <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
-                <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
-                <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
-                <td><button class="btn save-db-btn" type="button">저장</button></td>
-                <td><button class="btn del-db-btn" type="button">삭제</button></td>
-            </tr>
-        `;
+                    data.forEach(chart => {
+                        createTableRowWithData(chart, doctorNames, tableBody);
+                    })
+                    createNewTableRow(doctorNames, tableBody);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);  // 에러 처리
+                }
+            });
+        }
 
-    // 새로운 행을 tbody에 추가
-    $('#plan-data').append(newRow);
+        function handleSaveButtonClick() {
+            const mdTime = document.getElementById(`mdTime`);
+            const checkDoc = document.getElementById(`planCheckDoc`);
+
+            const rowData = [];
+
+            $(this).closest('tr').find('p.select-pTag').each(function () {
+                rowData.push($(this).text().trim());
+            });
+
+            // 모든 필드가 입력되었는지 확인
+            if (!mdTime.value) {
+                alert("진료 시간을 입력해주세요.");
+                return;
+            }
+            if (!checkDoc.value) {
+                alert("진료의를 선택해주세요.");
+                return;
+            }
+            if (!rowData[0] || rowData[0] === '치아 선택') {
+                alert("치아 번호를 선택해주세요.");
+                return;
+            }
+            if (!rowData[1] || rowData[1] === '치료계획 선택') {
+                alert("치료 계획을 선택해주세요.");
+                return;
+            }
+
+            $.ajax({
+                url: '/medical_chart/savePlan',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    chartNum: patientInfos.chartNum,
+                    paName: patientInfos.name,
+                    teethNum: rowData[0],
+                    medicalContent: rowData[1],
+                    medicalDivision: "PLAN",
+                    mdTime: mdTime.value,
+                    checkDoc: checkDoc.value
+                }),
+                success: function (response) {
+                    // 저장 성공 후 해당 행의 버튼을 "수정" 버튼으로 변경
+                    const saveButton = document.querySelector('.save-db-btn');
+                    if (saveButton) {
+                        saveButton.classList.remove('btn-primary', 'save-db-btn');
+                        saveButton.classList.add('btn-success', 'update-db-btn');
+                        saveButton.textContent = '수정';
+                    }
+                    fetchChartData();
+                    readPaChart();
+                    // addNewRow();
+                },
+                error: function (error) {
+                    console.error('Error saving data:', error);
+                }
+            });
+        }
+
+        function handleUpdateButtonClick() {
+            // 버튼이 포함된 <tr> 행을 찾음
+            const row = $(this).closest('tr');
+            // 해당 행에서 cnum 값이 포함된 <input type="hidden"> 요소를 찾음
+            const cnum = row.find('input[name="cnum"]').val();
+
+            const mdTime = document.getElementById(`mdTime${cnum}`);
+            const checkDoc = document.getElementById(`planCheckDoc${cnum}`);
+
+            const rowData = [];
+
+            $(this).closest('tr').find('p.select-pTag').each(function () {
+                rowData.push($(this).text().trim());
+            });
+
+            // 모든 필드가 입력되었는지 확인
+            if (!mdTime.value) {
+                alert("진료 시간을 입력해주세요.");
+                return;
+            }
+            if (!checkDoc.value) {
+                alert("진료의를 선택해주세요.");
+                return;
+            }
+            if (!rowData[0]) {
+                alert("치아 번호를 선택해주세요.");
+                return;
+            }
+            if (!rowData[1]) {
+                alert("치료 계획을 선택해주세요.");
+                return;
+            }
+
+            $.ajax({
+                url: '/medical_chart/updatePlan',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    chartNum: patientInfos.chartNum,
+                    paName: patientInfos.name,
+                    teethNum: rowData[0],
+                    medicalContent: rowData[1],
+                    medicalDivision: "PLAN",
+                    mdTime: mdTime.value,
+                    checkDoc: checkDoc.value,
+                    cnum: cnum // 전체 데이터를 전송
+                }),
+                success: function(response) {
+                    fetchChartData();
+                    readPaChart();
+                },
+                error: function(error) {
+                    console.error('Error updating data:', error);
+                }
+            });
+        }
+
+        function addNewRow() {
+            const newRow = `
+                <tr>
+                     <td><input type="date" name="mdTime" id="mdTime" class="form-control" required></td>
+            <td>
+                <select class="form-select" name="checkDoc" id="planCheckDoc" required>
+                    <option value="" selected>진료의</option>
+                    ${doctorNames.map(doctor => `<option value="${doctor}">${doctor}</option>`).join('')}
+                </select>
+            </td>
+                    <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
+                    <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
+                    <td><button class="btn btn-primary save-db-btn" type="button">저장</button></td>
+                </tr>
+            `;
+            planData.append(newRow);
+        }
+
+        return {
+            init,
+            cleanup
+        };
+    })();
 }

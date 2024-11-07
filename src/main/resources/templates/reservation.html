@@ -146,11 +146,14 @@
             calendarBody.innerHTML = '';
 
             let date = 1;
+
+            // Variable to hold the currently selected cell
+            let selectedCell = null;
+
             for (let i = 0; i < 6; i++) {
                 const row = document.createElement('tr');
 
                 for (let j = 0; j < 7; j++) {
-                    console.log(j);
                     const cell = document.createElement('td');
                     cell.classList.add('calendarDate');
                     if (i === 0 && j < firstDay) {
@@ -168,10 +171,19 @@
                         } else {
                             cell.style.color = 'black';
                         }
-
                         cell.innerHTML = date;
-                        date++;
 
+                        // Highlight today’s date
+                        if (date === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                            cell.classList.add('selected');
+                            // Call for today's date
+                            const todayDate = `${year}-${month + 1}-${date}`;
+                            dateReservationList(todayDate);
+                            console.log("!!!!"+todayDate)
+                            selectedCell = cell; // Keep track of today's cell
+                        }
+
+                        date++;
                     }
                     row.appendChild(cell);
                     console.log(cell);
@@ -232,70 +244,7 @@
             renderCalendar();
         }
 
-        function dateReservationList(selectedDate) {
-            fetch('reservation/selectedDatePatientList', {
 
-                method: 'POST', // POST 요청
-                headers: {
-                    'Content-Type': 'application/json' // JSON 형식으로 데이터 전송
-                },
-                body: JSON.stringify({
-                    reservationDate: selectedDate
-                }) // JSON 객체로 전송
-            })
-                .then(response => {
-                    // 응답 상태가 성공적인 경우 JSON으로 변환
-                    if (!response.ok) {
-                        throw new Error('네트워크 응답이 실패했습니다.');
-                    }
-                    return response.json(); // JSON 데이터로 변환
-                })
-                .then(data => {
-                    // 환자 데이터가 들어갈 ID값 보관
-                    const tableBody = document.querySelector('#reservationTableList');
-
-                    // 테이블의 기존 데이터를 지우고 새 데이터를 추가
-                    // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
-                    tableBody.innerHTML = ''; // 기존 내용 제거
-
-                    const timetable = document.getElementById('timetable');
-                    // 선택된 날짜를 화면에 표시
-                    if (timetable) {
-                        document.getElementById('selectedDate').textContent = `선택된 날짜: ${selectedDate}`;
-                        generateTimetable(data);
-                    }
-                    // 데이터 배열을 순회하여 테이블에 추가
-                    data.forEach(item => {
-
-                        // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
-                        const time = new Date(item.reservationDate).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-
-
-                        const row = document.createElement('tr'); // 새로운 행 생성
-                        row.id = 'reservationTableListParent'; // ID 추가
-                        row.innerHTML = `
-    <td>${time}</td>
-    <td>${item.department}</td>
-    <td>${item.patientNote}</td>
-`; // 각 열에 데이터 삽입
-
-                        //
-                        row.onclick = function () {
-                            selectList(item.seq);
-                        };
-
-                        tableBody.appendChild(row); // tbody에 행 추가
-                    });
-
-                })
-                .catch(error => {
-                    // 에러 처리
-                    console.error('에러 발생:', error);
-                });
-        }
 
 
     </script>

@@ -2,6 +2,7 @@ package kroryi.his.service.Impl;
 
 import kroryi.his.domain.ChartMemo;
 import kroryi.his.domain.MedicalChart;
+import kroryi.his.domain.PatientRegister;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.repository.ChartMemoRepository;
 import kroryi.his.repository.MedicalChartRepository;
@@ -11,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -38,7 +41,12 @@ public class ChartServiceImpl implements ChartService {
     }
     @Override
     public List<MedicalChart> getChart(String chartNum) {
-        return medicalChartRepository.findMedicalChartByChartNum(chartNum);
+        return medicalChartRepository.findMedicalChartByChartNumOrderByMdTimeAsc(chartNum);
+    }
+
+    @Override
+    public List<MedicalChart> PLANChart(String chartNum, String medicalDivision) {
+        return medicalChartRepository.findMedicalChartByChartNumAndMedicalDivision(chartNum, medicalDivision);
     }
 
 
@@ -117,20 +125,35 @@ public class ChartServiceImpl implements ChartService {
     }
 
     @Override
-    public MedicalChartDTO addMedicalChart(String teethNum, String plan, String chartNum, String paName) {
-
+    public MedicalChartDTO MedicalChartSave(MedicalChartDTO dto) {
         MedicalChart chartPlan = MedicalChart.builder()
-                .teethNum(teethNum)
-                .medicalDivision(plan)
-                .mdTime(LocalDate.now())
-                .medicalContent("")
-                .checkDoc("의사")
-                .paName(paName)
-                .chartNum(chartNum)
+                .teethNum(dto.getTeethNum())
+                .medicalDivision(dto.getMedicalDivision())
+                .mdTime(dto.getMdTime())
+                .medicalContent(dto.getMedicalContent())
+                .checkDoc(dto.getCheckDoc())
+                .paName(dto.getPaName())
+                .chartNum(dto.getChartNum())
                 .build();
 
         medicalChartRepository.save(chartPlan);
         return null;
+    }
+
+    @Override
+    public MedicalChart MedicalChartUpdate(MedicalChartDTO dto) {
+        Optional<MedicalChart> medicalChartOptional = medicalChartRepository.findById(dto.getCnum());
+
+        MedicalChart medicalChart = medicalChartOptional.orElseThrow();
+
+        // 기존 객체의 필드를 수정
+        medicalChart.setTeethNum(dto.getTeethNum());
+        medicalChart.setMdTime(dto.getMdTime());
+        medicalChart.setMedicalContent(dto.getMedicalContent());
+        medicalChart.setCheckDoc(dto.getCheckDoc());
+
+
+        return medicalChartRepository.save(medicalChart);
     }
 
     @Override
@@ -164,6 +187,17 @@ public class ChartServiceImpl implements ChartService {
     // 새로운 메모를 저장
     public ChartMemo saveMemo(ChartMemo newMemo) {
         return chartMemoRepository.save(newMemo);  // 메모를 데이터베이스에 저장
+    }
+
+    @Override
+    @Transactional
+    public void deleteChart(Integer cnum) {
+        try {
+            medicalChartRepository.deleteByCnum(cnum);
+        } catch (Exception e) {
+            log.error("삭제 중 오류 발생: ", e);
+            throw new RuntimeException("삭제에 실패했습니다.");
+        }
     }
 
 }

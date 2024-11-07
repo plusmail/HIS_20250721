@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <link rel="stylesheet" href="/css/medical_chart.css">
+    <title>진료차트 입력 시스템</title>
+</head>
+<body>
+<div class="container mt-2 overflow-auto border-box" style="height: 700px;">
+    <table class="table">
+        <thead class="table-dark">
+        <tr>
+            <th></th>
+            <th>진료일</th>
+            <th>진료의</th>
+            <th>치식</th>
+            <th>내역</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="plan-data">
+
+        </tbody>
+    </table>
+</div>
+
+<!--    치료계획 치아 모달-->
+<!-- Bootstrap 모달 -->
+<div class="modal fade" id="Plan-tooth-Modal" tabindex="-1" aria-labelledby="PlanToothModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="PlanToothModalLabel">치아 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="container text-center modal-tooth-container" id="modal-tooth-container">
+                    <!-- 상악 (윗니) -->
+                    <div class="tooth-row mb-2">
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="18">18</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="17">17</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="16">16</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="15">15</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="14">14</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="13">13</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="12">12</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="11">11</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="21">21</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="22">22</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="23">23</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="24">24</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="25">25</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="26">26</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="27">27</button>
+                        <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="28">28</button>
+                    </div>
+
+                    <!-- 메뉴바 (상악 하악 사이) -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <button class="btn btn-secondary control-btn modal-up-control" id="modal-upTooth"
+                                type="button">영구치 상악
+                        </button>
+                        <button class="btn btn-secondary control-btn modal-all-control" id="modal-allTooth"
+                                type="button">전체선택
+                        </button>
+                        <button class="btn btn-secondary control-btn modal-down-control" id="modal-downTooth"
+                                type="button">영구치 하악
+                        </button>
+                    </div>
+
+                    <!-- small teeth 전체 선택 버튼 (유치 상악/하악) -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <button class="btn btn-secondary control-btn modal-y-up-control" id="modal-upToothY"
+                                type="button">유치 상악
+                        </button>
+                        <button class="btn btn-secondary control-btn modal-y-all-control" id="modal-allToothY"
+                                type="button">유치 전체선택
+                        </button>
+                        <button class="btn btn-secondary control-btn modal-y-down-control" id="modal-downToothY"
+                                type="button">유치 하악
+                        </button>
+                    </div>
+
+                    <!-- small teeth (유치 상악) -->
+                    <div class="tooth-row mb-2">
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="55">55
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="54">54
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="53">53
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="52">52
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="51">51
+                        </button>
+                        <span class="upper-gap"></span>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="61">61
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="62">62
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="63">63
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="64">64
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="65">65
+                        </button>
+                    </div>
+
+                    <!-- small teeth (유치 하악) -->
+                    <div class="tooth-row mb-2">
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="85">
+                            85
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="84">
+                            84
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="83">
+                            83
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="82">
+                            82
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="81">
+                            81
+                        </button>
+                        <span class="lower-gap"></span>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="71">
+                            71
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="72">
+                            72
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="73">
+                            73
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="74">
+                            74
+                        </button>
+                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="75">
+                            75
+                        </button>
+                    </div>
+
+                    <!-- 하악 (아랫니) -->
+                    <div class="tooth-row mb-2">
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="48">48
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="47">47
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="46">46
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="45">45
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="44">44
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="43">43
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="42">42
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="41">41
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="31">31
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="32">32
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="33">33
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="34">34
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="35">35
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="36">36
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="37">37
+                        </button>
+                        <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="38">38
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="save-tooth">저장</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--    치아모달 끝-->
+
+<!--    치료계획 모달-->
+<!-- 모달 -->
+<!-- Bootstrap 모달 -->
+<!-- Modal -->
+<div class="modal fade" id="Plan-cure-modal" tabindex="-1" aria-labelledby="PlanSymptomModalLabel"
+     aria-hidden="true">
+    <!--    치료계획 모달 끝-->
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="PlanSymptomModalLabel">증상 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+
+            <!-- 체크박스 - 8개의 컬럼 적용 -->
+            <div class="container mt-4">
+                <div class="row">
+                    <!-- 첫 번째 컬럼 - 치료 계획 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">치료 계획 1</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="inlay" id="plan_inlay">
+                            <label class="form-check-label" for="plan_inlay">인레이</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="inlay_or_endocrown"
+                                   id="inlay_or_endocrown">
+                            <label class="form-check-label" for="inlay_or_endocrown">인레이 or 엔도크라운</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="resin" id="resin">
+                            <label class="form-check-label" for="resin">레진</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="cervical_resin"
+                                   id="cervical_resin">
+                            <label class="form-check-label" for="cervical_resin">서비컬 레진</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="resin_diastema"
+                                   id="resin_diastema">
+                            <label class="form-check-label" for="resin_diastema">레진 Diastema</label>
+                        </div>
+                    </div>
+
+                    <!-- 두 번째 컬럼 - 치료 계획 2 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">치료 계획 2</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="endo_post_crown"
+                                   id="endo_post_crown">
+                            <label class="form-check-label" for="endo_post_crown">엔도, 포스트 크라운</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="endo_crown" id="endo_crown">
+                            <label class="form-check-label" for="endo_crown">엔도 크라운</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="crown" id="crown">
+                            <label class="form-check-label" for="crown">크라운</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="bridge" id="bridge">
+                            <label class="form-check-label" for="bridge">브릿지</label>
+                        </div>
+                    </div>
+
+                    <!-- 세 번째 컬럼 - 치료 계획 3 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">치료 계획 3</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="implant_or_bridge"
+                                   id="implant_or_bridge">
+                            <label class="form-check-label" for="implant_or_bridge">임플란트 or 브릿지</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="implant_or_denture"
+                                   id="implant_or_denture">
+                            <label class="form-check-label" for="implant_or_denture">임플란트 or 틀니</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="implant" id="plan_implant">
+                            <label class="form-check-label" for="plan_implant">임플란트</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="implant_bone_graft"
+                                   id="implant_bone_graft">
+                            <label class="form-check-label" for="implant_bone_graft">임플란트 뼈이식</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="implant_sinus_lift"
+                                   id="implant_sinus_lift">
+                            <label class="form-check-label" for="implant_sinus_lift">임플란트 상악동</label>
+                        </div>
+                    </div>
+
+                    <!-- 네 번째 컬럼 - 소아 치료 계획 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">소아 치료 계획</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="ss_crown" id="ss_crown">
+                            <label class="form-check-label" for="ss_crown">SS 크라운</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="space_maintainer"
+                                   id="space_maintainer">
+                            <label class="form-check-label" for="space_maintainer">공간 유지 장치</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="fissure_sealant"
+                                   id="fissure_sealant">
+                            <label class="form-check-label" for="fissure_sealant">치아 홈 메우기</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="fluoride_application"
+                                   id="fluoride_application">
+                            <label class="form-check-label" for="fluoride_application">불소 도포</label>
+                        </div>
+                    </div>
+
+                    <!-- 다섯 번째 컬럼 - 교정 치료 계획 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">교정 치료 계획</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="extraction_orthodontics_A"
+                                   id="extraction_orthodontics_A">
+                            <label class="form-check-label" for="extraction_orthodontics_A">발치 교정 A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="extraction_orthodontics_B"
+                                   id="extraction_orthodontics_B">
+                            <label class="form-check-label" for="extraction_orthodontics_B">발치 교정 B</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="extraction_orthodontics_C"
+                                   id="extraction_orthodontics_C">
+                            <label class="form-check-label" for="extraction_orthodontics_C">발치 교정 C</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="non_extraction_orthodontics_A"
+                                   id="non_extraction_orthodontics_A">
+                            <label class="form-check-label" for="non_extraction_orthodontics_A">비발치 교정 A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="non_extraction_orthodontics_B"
+                                   id="non_extraction_orthodontics_B">
+                            <label class="form-check-label" for="non_extraction_orthodontics_B">비발치 교정 B</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="partial_orthodontics"
+                                   id="partial_orthodontics">
+                            <label class="form-check-label" for="partial_orthodontics">부분 교정</label>
+                        </div>
+                    </div>
+
+                    <!-- 여섯 번째 컬럼 - 성장 조절 치료 계획 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">성장 조절 치료 계획</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="growth_control_A"
+                                   id="growth_control_A">
+                            <label class="form-check-label" for="growth_control_A">성장 조절 장치 A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="growth_control_B"
+                                   id="growth_control_B">
+                            <label class="form-check-label" for="growth_control_B">성장 조절 장치 B</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="growth_control_C"
+                                   id="growth_control_C">
+                            <label class="form-check-label" for="growth_control_C">성장 조절 장치 C</label>
+                        </div>
+                    </div>
+
+                    <!-- 일곱 번째 컬럼 - 가철식 장치 교정 계획 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">가철식 장치 교정 계획</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="removable_appliance_A"
+                                   id="removable_appliance_A">
+                            <label class="form-check-label" for="removable_appliance_A">가철식 장치 교정 A</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="removable_appliance_B"
+                                   id="removable_appliance_B">
+                            <label class="form-check-label" for="removable_appliance_B">가철식 장치 교정 B</label>
+                        </div>
+                    </div>
+
+                    <!-- 여덟 번째 컬럼 - 미용 치료 계획 -->
+                    <div class="col-lg-3 col-md-6 col-sm-12" style="max-height: 250px; overflow-y: auto;">
+                        <h6 class="category-title">미용 치료 계획</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="laminate" id="laminate">
+                            <label class="form-check-label" for="laminate">라미네이트</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="tooth_whitening"
+                                   id="tooth_whitening">
+                            <label class="form-check-label" for="tooth_whitening">치아 미백</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="botox" id="botox">
+                            <label class="form-check-label" for="botox">보톡스</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="filler" id="filler">
+                            <label class="form-check-label" for="filler">필러</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="saveBtn">저장</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<script src="/js/medical_chart_plan.js"></script>
+</body>
+</html>

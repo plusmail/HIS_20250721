@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import kroryi.his.domain.Member;
 import kroryi.his.domain.MemberRoleSet;
 import kroryi.his.dto.*;
+import kroryi.his.exception.UserNotFoundException;
 import kroryi.his.repository.MemberRepository;
 import kroryi.his.repository.MemberRoleSetRepository;
 import kroryi.his.service.MemberRoleSetService;
@@ -12,6 +13,7 @@ import kroryi.his.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -200,11 +202,10 @@ public class UserController {
     @GetMapping("/editform/{id}")
     @ResponseBody
     public Optional<Member> getEditUserForm(@PathVariable("id") String id) {
-        Optional<Member> member = memberService.getUserById(id);
-        log.info("getEditUserForm -> {}", member);
+        Optional<Member> member = Optional.ofNullable(memberService.getUserById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id)));
         return member;
     }
-
 
     @PostMapping("/searchUsers")
     @ResponseBody
@@ -227,3 +228,4 @@ public class UserController {
     }
 
 }
+
