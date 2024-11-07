@@ -48,10 +48,10 @@
                                             <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
                                             <tr>
                                                 <th scope="col" class="col-md-2">진료일</th>
-                                                <th scope="col" class="col-md-4">선택치아</th>
+                                                <th scope="col" class="col-md-3">선택치아</th>
                                                 <th scope="col" class="col-md-1">구분</th> <!-- 구분 열을 좁게 설정 -->
-                                                <th scope="col" class="col-md-4">내역</th>
-                                                <th scope="col" class="col-md-1">진료의</th>
+                                                <th scope="col" class="col-md-3">내역</th>
+                                                <th scope="col" class="col-md-2">진료의</th>
                                             </tr>
                                             </thead>
                                             <tbody id="paChart-list">
@@ -498,6 +498,39 @@
                     }
                 }
             });
+        }
+
+        // 차트 내역 더블클릭시 탭이동 이벤트
+        $(document).on('dblclick', '#paChart-list tr', function() {
+            const medicalDivision = $(this).find('td:eq(2)').text().trim();
+            const mdTime = $(this).find('td:eq(0)').text(); // 날짜 데이터
+            const medicalContent = $(this).find('td:eq(3)').text(); // 진료 내역
+            const checkDoc = $(this).find('.medical-content-cell').text(); // 진료의
+            const teethNum = $(this).find('td:eq(1)').text(); // 선택 치아
+
+            let targetTab, targetTabSelector;
+            if (medicalDivision === 'CC') {
+                targetTab = '/medical_chart_cc';
+                targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_cc"]';
+            } else if (medicalDivision === 'PI') {
+                targetTab = '/medical_chart_pi';
+                targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_pi"]';
+            } else if (medicalDivision === 'PLAN') {
+                targetTab = '/medical_chart_plan';
+                targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_plan"]';
+            }
+            activateTab(targetTabSelector);
+
+            loadContent(targetTab);
+        });
+
+        // 탭 활성화 함수
+        function activateTab(selector) {
+            // 모든 탭에서 active 클래스와 aria-selected="true" 제거
+            $('.nav-link').removeClass('active').attr('aria-selected', 'false');
+
+            // 선택된 탭에만 active 클래스와 aria-selected="true" 추가
+            $(selector).addClass('active').attr('aria-selected', 'true');
         }
     </script>
 </div>

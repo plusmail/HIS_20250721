@@ -85,3 +85,8 @@
 .upper-left, .lower-left {
     border-right: 2px solid red; /* 왼쪽 사분면 오른쪽에 빨간색 경계 */
 }
+
+.text-center {
+    text-align: center;
+    vertical-align: middle;
+}

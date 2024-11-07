@@ -287,13 +287,53 @@ function readPaChart() {
                     // 행 생성
                     let row = $(`
                         <tr>
-                            <td>${mdTimeCell}</td>
+                            <td class="text-center">${mdTimeCell}</td>
                             ${teethNumCell}
-                            <td>${chart.medicalDivision}</td>
-                            <td>${chart.medicalContent}</td>
-                            <td class="medical-content-cell">${chart.checkDoc}</td>
+                            <td class="text-center">${chart.medicalDivision}</td>
+                            <td class="text-center">${chart.medicalContent}</td>
+                            <td class="text-center medical-content-cell">${chart.checkDoc}</td>
                         </tr>
                     `);
+
+                    // 각 데이터 클릭 이벤트 추가
+                    row.on('click', function () {
+                        $('.medical-content-cell .delete-icon').remove();
+                        let medicalContentCell = row.find('.medical-content-cell');
+                        if (!medicalContentCell.find('.delete-icon').length) {
+                            medicalContentCell.append('<span class="delete-icon">X</span>');
+                        }
+                        medicalContentCell.on('click', '.delete-icon', function (event) {
+                            event.stopPropagation();
+                            let cnum = chart.cnum;
+                            $.ajax({
+                                url: '/medical_chart/deleteChart',
+                                type: 'DELETE',
+                                data: {cnum: cnum},
+                                success: function (response) {
+                                    $.ajax({
+                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        success: function (data) {
+                                            let tableBody = $("#plan-data");
+                                            tableBody.empty();
+                                            data.forEach(chart => {
+                                                createTableRowWithData(chart, doctorNames, tableBody);
+                                            });
+                                            createNewTableRow(doctorNames, tableBody);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);
+                                        }
+                                    });
+                                    readPaChart();
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Error:', error);
+                                }
+                            });
+                        });
+                    });
 
                     tableBody.append(row);
                     previousMdTime = chart.mdTime;
