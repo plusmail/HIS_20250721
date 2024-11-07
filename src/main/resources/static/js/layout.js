@@ -129,6 +129,14 @@ if (patientInfo) {
     }
 }
 
+// 엔터 키 입력 시 버튼 기능 실행
+document.getElementById('patient_name_keyword').addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') { // Enter 키 확인
+        event.preventDefault(); // 기본 엔터 동작 방지 (필요 시)
+        document.getElementById('addReplyBtn').click(); // 버튼 클릭 실행
+    }
+});
+
 document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
     const keyword = {
         "keyword": patient_name_keyword.value

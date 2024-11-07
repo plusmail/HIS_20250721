@@ -19,20 +19,24 @@
                                 <div class="col-md-6">
                                     <!-- 검색 섹션 -->
                                     <div class="mb-3">
-                                        <div class="row g-2 align-items-end flex-nowrap">
-                                            <div class="col">
-                                                <label for="keyword" class="form-label">내역키워드</label>
-                                                <input type="text" class="form-control" id="keyword"
-                                                       placeholder="내역키워드">
+                                        <!-- 검색 필터 버튼 (맨 끝에 배치) -->
+                                        <div class="col d-flex justify-content-end">
+                                            <button style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Search-Modal" class="select-pTag btn btn-warning">
+                                                <i class="bi bi-filter"></i> 검색 필터
+                                            </button>
+                                        </div>
+                                        <div class="row align-items-end">
+                                            <!-- 내역 키워드 입력 필드 -->
+                                            <div class="input-group col">
+                                                <span class="input-group-text">내역</span>
+                                                <input type="text" class="form-control" id="History_keyword" placeholder="검색어를 입력하세요.">
                                             </div>
-                                            <div class="col">
-                                                <!-- 부트스트랩 아이콘 클래스 추가 -->
-                                                <button style="cursor: pointer;" data-bs-toggle="modal"
-                                                        data-bs-target="#Search-Modal"
-                                                        class="select-pTag btn btn-primary">
-                                                    <i class="bi bi-filter"></i> 검색 필터
-                                                </button>
 
+                                            <!-- 검색 버튼 -->
+                                            <div class="col">
+                                                <button type="button" class="btn btn-primary" id="searchButton">
+                                                    <i class="bi bi-search" style="padding: 0.5rem;"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -89,22 +93,310 @@
                             </div>
                         </div>
 
-                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                        <script type="text/javascript">
-                            // JavaScript로 <select> 요소에서 모든 <option> 값을 가져오기
-                            const selectElement = document.getElementById("checkDoc");
-                            const doctorNames = Array.from(selectElement.options)
-                                .map(option => option.value)
-                                .filter(value => value);
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Search-Modal" tabindex="-1" aria-labelledby="SearchModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl" id="Search_filter">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="SearchModalLabel">검색 필터</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <div class="row align-items-end flex-nowrap"
+                         style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                        <div class="col">
+                            <label for="appointmentDateStart" class="form-label">진료일자</label>
+                            <input type="date" class="form-control" id="appointmentDateStart" placeholder="시작일자">
+                        </div>
+                        <div class="col-auto d-flex justify-content-center align-items-center">
+                            <span>~</span>
+                        </div>
+                        <div class="col">
+                            <input type="date" class="form-control" id="appointmentDateEnd" placeholder="종료일자">
+                        </div>
+                    </div>
+
+                    <div class="row"
+                         style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                        <div class="col">
+                            <label for="checkDoc" class="form-label">진료의</label>
+                            <select class="form-select" name="checkDoc" id="checkDoc" required>
+                                <option value="" selected>진료의</option>
+                                <th:block th:each="doctor : ${doctorNames}">
+                                    <option th:value="${doctor}" th:text="${doctor}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="medicalDivision" class="form-label">구분</label>
+                            <select class="form-select" name="medicalDivision" id="medicalDivision" required>
+                                <option value="" selected>구분</option>
+                                <option value="CC">CC</option>
+                                <option value="PI">PI</option>
+                                <option value="PLAN">치료 계획</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                        <div class="col">
+                            <label for="Search-container" class="form-label">치아 선택</label>
+                            <div class="container text-center modal-tooth-container" id="Search-container">
+                                <!-- 상악 (윗니) -->
+                                <div class="tooth-row mb-2">
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="18">
+                                        18
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="17">
+                                        17
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="16">
+                                        16
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="15">
+                                        15
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="14">
+                                        14
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="13">
+                                        13
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="12">
+                                        12
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="11">
+                                        11
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="21">
+                                        21
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="22">
+                                        22
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="23">
+                                        23
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="24">
+                                        24
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="25">
+                                        25
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="26">
+                                        26
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="27">
+                                        27
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="28">
+                                        28
+                                    </button>
+                                </div>
+
+                                <!-- 메뉴바 (상악 하악 사이) -->
+                                <div class="d-flex justify-content-between mb-2">
+                                    <button class="btn btn-secondary control-btn modal-up-control"
+                                            id="search-modal-upTooth"
+                                            type="button">영구치 상악
+                                    </button>
+                                    <button class="btn btn-secondary control-btn modal-all-control"
+                                            id="search-modal-allTooth"
+                                            type="button">전체선택
+                                    </button>
+                                    <button class="btn btn-secondary control-btn modal-down-control"
+                                            id="search-modal-downTooth"
+                                            type="button">영구치 하악
+                                    </button>
+                                </div>
+
+                                <!-- small teeth 전체 선택 버튼 (유치 상악/하악) -->
+                                <div class="d-flex justify-content-between mb-2">
+                                    <button class="btn btn-secondary control-btn modal-y-up-control"
+                                            id="search-modal-upToothY"
+                                            type="button">유치 상악
+                                    </button>
+                                    <button class="btn btn-secondary control-btn modal-y-all-control"
+                                            id="search-modal-allToothY"
+                                            type="button">유치 전체선택
+                                    </button>
+                                    <button class="btn btn-secondary control-btn modal-y-down-control"
+                                            id="search-modal-downToothY"
+                                            type="button">유치 하악
+                                    </button>
+                                </div>
+
+                                <!-- small teeth (유치 상악) -->
+                                <div class="tooth-row mb-2">
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="55">55
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="54">54
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="53">53
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="52">52
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="51">51
+                                    </button>
+                                    <span class="upper-gap"></span>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="61">61
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="62">62
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="63">63
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="64">64
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button"
+                                            value="65">65
+                                    </button>
+                                </div>
+
+                                <!-- small teeth (유치 하악) -->
+                                <div class="tooth-row mb-2">
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="85">
+                                        85
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="84">
+                                        84
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="83">
+                                        83
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="82">
+                                        82
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="81">
+                                        81
+                                    </button>
+                                    <span class="lower-gap"></span>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="71">
+                                        71
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="72">
+                                        72
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="73">
+                                        73
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="74">
+                                        74
+                                    </button>
+                                    <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button"
+                                            value="75">
+                                        75
+                                    </button>
+                                </div>
+
+                                <!-- 하악 (아랫니) -->
+                                <div class="tooth-row mb-2">
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="48">
+                                        48
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="47">
+                                        47
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="46">
+                                        46
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="45">
+                                        45
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="44">
+                                        44
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="43">
+                                        43
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="42">
+                                        42
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="41">
+                                        41
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="31">
+                                        31
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="32">
+                                        32
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="33">
+                                        33
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="34">
+                                        34
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="35">
+                                        35
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="36">
+                                        36
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="37">
+                                        37
+                                    </button>
+                                    <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="38">
+                                        38
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
-                            // 데이터를 기반으로 행을 생성하고 추가하는 함수
-                            function createTableRowWithData(chart, doctorNames, tableBody) {
-                                const option = doctorNames.map(doctor =>
-                                    `<option value="${doctor}" ${doctor === chart.checkDoc ? 'selected' : ''}>${doctor}</option>`
-                                ).join('');
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="search-save-tooth">저장</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        // JavaScript로 <select> 요소에서 모든 <option> 값을 가져오기
+        const selectElement = document.getElementById("checkDoc");
+        const doctorNames = Array.from(selectElement.options)
+            .map(option => option.value)
+            .filter(value => value);
 
-                                let row = `
+
+        // 데이터를 기반으로 행을 생성하고 추가하는 함수
+        function createTableRowWithData(chart, doctorNames, tableBody) {
+            const option = doctorNames.map(doctor =>
+                `<option value="${doctor}" ${doctor === chart.checkDoc ? 'selected' : ''}>${doctor}</option>`
+            ).join('');
+
+            let row = `
         <tr>
             <td><input type="hidden" name="cnum" id="${chart.cnum}" value="${chart.cnum}"></td>
             <td><input type="date" name="mdTime" id="mdTime${chart.cnum}" class="form-control" required value="${chart.mdTime}"></td>
@@ -121,16 +413,16 @@
             <td><button class="btn btn-success update-db-btn" type="button">수정</button></td>
         </tr>`;
 
-                                tableBody.append(row);  // 새로운 행을 테이블에 추가
-                            }
+            tableBody.append(row);  // 새로운 행을 테이블에 추가
+        }
 
-                            // 새로운 빈 행을 추가하는 함수
-                            function createNewTableRow(doctorNames, tableBody) {
-                                const options = doctorNames.map(doctor =>
-                                    `<option value="${doctor}">${doctor}</option>`
-                                ).join('');
+        // 새로운 빈 행을 추가하는 함수
+        function createNewTableRow(doctorNames, tableBody) {
+            const options = doctorNames.map(doctor =>
+                `<option value="${doctor}">${doctor}</option>`
+            ).join('');
 
-                                const newRow = `
+            const newRow = `
         <tr>
             <td><input type="hidden" name="cnum" id=""></td>
             <td><input type="date" name="mdTime" id="mdTime" class="form-control" required></td>
@@ -145,279 +437,69 @@
             <td><button class="btn btn-primary save-db-btn" type="button">저장</button></td>
         </tr>`;
 
-                                tableBody.append(newRow);  // 새로운 빈 행을 테이블에 추가
+            tableBody.append(newRow);  // 새로운 빈 행을 테이블에 추가
+        }
+
+        // 페이지가 로드되면 기본 콘텐츠 로드
+        $(document).ready(function () {
+            loadContent('/medical_chart_cc');
+        });
+
+        // 이미 로드된 스크립트 경로를 저장하는 배열
+        const loadedScripts = [];
+
+        function loadContent(page) {
+            $("#tabContent").load(page, function (response, status, xhr) {
+                if (status === "error") {
+                    $("#tabContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
+                } else {
+                    // // 이전 스크립트가 로드되어 있다면 제거
+                    // $('script[src="/js/medical_chart_pi.js"]').remove();
+                    // $('script[src="/js/medical_chart_plan.js"]').remove();
+
+                    // 필요한 스크립트를 동적으로 로드
+                    if (page === '/medical_chart_pi') {
+                        $.getScript("/js/medical_chart_pi.js", function () {
+                            if (typeof MedicalChartPIModule !== "undefined") {
+                                MedicalChartPIModule.init();
                             }
+                        });
+                    } else if (page === '/medical_chart_cc') {
+                        $.getScript("/js/medical_chart_cc.js", function () {
+                            if (typeof MedicalChartCCModule !== "undefined") {
+                                MedicalChartCCModule.init();
+                            }
+                        });
+                    } else if (page === '/medical_chart_plan') {
+                        $.getScript("/js/medical_chart_plan.js", function () {
+                            if (typeof MedicalPlanModule !== "undefined") {
+                                MedicalPlanModule.init();
+                                if (patientInfos) {
+                                    $.ajax({
+                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
+                                        type: 'GET',  // GET 요청
+                                        dataType: 'json',  // 서버에서 JSON 응답을 기대
+                                        success: function (data) {
+                                            let tableBody = $("#plan-data");
+                                            tableBody.empty();  // 기존 내용을 비움
 
-                            // 페이지가 로드되면 기본 콘텐츠 로드
-                            $(document).ready(function () {
-                                loadContent('/medical_chart_cc');
-                            });
-
-                            // 이미 로드된 스크립트 경로를 저장하는 배열
-                            const loadedScripts = [];
-
-                            function loadContent(page) {
-                                $("#tabContent").load(page, function (response, status, xhr) {
-                                    if (status === "error") {
-                                        $("#tabContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
-                                    } else {
-                                        // // 이전 스크립트가 로드되어 있다면 제거
-                                        // $('script[src="/js/medical_chart_pi.js"]').remove();
-                                        // $('script[src="/js/medical_chart_plan.js"]').remove();
-
-                                        // 필요한 스크립트를 동적으로 로드
-                                        if (page === '/medical_chart_pi') {
-                                            $.getScript("/js/medical_chart_pi.js", function () {
-                                                if (typeof MedicalChartPIModule !== "undefined") {
-                                                    MedicalChartPIModule.init();
-                                                }
-                                            });
-                                        } else if (page === '/medical_chart_cc') {
-                                            $.getScript("/js/medical_chart_cc.js", function () {
-                                                if (typeof MedicalChartCCModule !== "undefined") {
-                                                    MedicalChartCCModule.init();
-                                                }
-                                            });
-                                        } else if (page === '/medical_chart_plan') {
-                                            $.getScript("/js/medical_chart_plan.js", function () {
-                                                if (typeof MedicalPlanModule !== "undefined") {
-                                                    MedicalPlanModule.init();
-                                                    if (patientInfos) {
-                                                        $.ajax({
-                                                            url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
-                                                            type: 'GET',  // GET 요청
-                                                            dataType: 'json',  // 서버에서 JSON 응답을 기대
-                                                            success: function (data) {
-                                                                let tableBody = $("#plan-data");
-                                                                tableBody.empty();  // 기존 내용을 비움
-
-                                                                data.forEach(chart => {
-                                                                    createTableRowWithData(chart, doctorNames, tableBody);
-                                                                })
-                                                                createNewTableRow(doctorNames, tableBody);
-                                                            },
-                                                            error: function (xhr, status, error) {
-                                                                console.error('Error:', error);  // 에러 처리
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            });
+                                            data.forEach(chart => {
+                                                createTableRowWithData(chart, doctorNames, tableBody);
+                                            })
+                                            createNewTableRow(doctorNames, tableBody);
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error:', error);  // 에러 처리
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="Search-Modal" tabindex="-1" aria-labelledby="SearchModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="SearchModalLabel">검색 필터</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <div class="row g-2 align-items-end flex-nowrap">
-                        <div class="col">
-                            <label for="appointmentDateStart" class="form-label">진료일자</label>
-                            <input type="date" class="form-control" id="appointmentDateStart" placeholder="시작일자">
-                        </div>
-
-                        <!-- ~ 표시를 위한 작은 col-auto -->
-                        <div class="col-auto d-flex justify-content-center align-items-center">
-                            <span>~</span>
-                        </div>
-
-                        <div class="col">
-                            <input type="date" class="form-control" id="appointmentDateEnd" placeholder="종료일자">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label for="checkDoc" class="form-label">진료의</label>
-                            <select class="form-select" name="checkDoc" id="checkDoc" required>
-                                <option value="" selected>진료의</option>
-                                <th:block th:each="doctor : ${doctorNames}">
-                                    <option th:value="${doctor}" th:text="${doctor}"></option>
-                                </th:block>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="checkDoc" class="form-label">구분</label>
-                            <select class="form-select" name="medicalDivision" id="medicalDivision" required>
-                                <option value="" selected>구분</option>
-                                <option value="CC">CC</option>
-                                <option value="PI">PI</option>
-                                <option value="PLAN">치료 계획</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="container text-center modal-tooth-container" id="Search-container">
-                        <!-- 상악 (윗니) -->
-                        <div class="tooth-row mb-2">
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="18">18</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="17">17</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="16">16</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="15">15</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="14">14</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="13">13</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="12">12</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="11">11</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="21">21</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="22">22</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="23">23</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="24">24</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="25">25</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="26">26</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="27">27</button>
-                            <button class="btn btn-danger tooth-btn modal-up-tooth" type="button" value="28">28</button>
-                        </div>
-
-                        <!-- 메뉴바 (상악 하악 사이) -->
-                        <div class="d-flex justify-content-between mb-2">
-                            <button class="btn btn-secondary control-btn modal-up-control" id="search-modal-upTooth"
-                                    type="button">영구치 상악
-                            </button>
-                            <button class="btn btn-secondary control-btn modal-all-control" id="search-modal-allTooth"
-                                    type="button">전체선택
-                            </button>
-                            <button class="btn btn-secondary control-btn modal-down-control" id="search-modal-downTooth"
-                                    type="button">영구치 하악
-                            </button>
-                        </div>
-
-                        <!-- small teeth 전체 선택 버튼 (유치 상악/하악) -->
-                        <div class="d-flex justify-content-between mb-2">
-                            <button class="btn btn-secondary control-btn modal-y-up-control" id="search-modal-upToothY"
-                                    type="button">유치 상악
-                            </button>
-                            <button class="btn btn-secondary control-btn modal-y-all-control"
-                                    id="search-modal-allToothY"
-                                    type="button">유치 전체선택
-                            </button>
-                            <button class="btn btn-secondary control-btn modal-y-down-control"
-                                    id="search-modal-downToothY"
-                                    type="button">유치 하악
-                            </button>
-                        </div>
-
-                        <!-- small teeth (유치 상악) -->
-                        <div class="tooth-row mb-2">
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="55">55
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="54">54
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="53">53
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="52">52
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="51">51
-                            </button>
-                            <span class="upper-gap"></span>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="61">61
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="62">62
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="63">63
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="64">64
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="65">65
-                            </button>
-                        </div>
-
-                        <!-- small teeth (유치 하악) -->
-                        <div class="tooth-row mb-2">
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="85">
-                                85
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="84">
-                                84
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="83">
-                                83
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="82">
-                                82
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="81">
-                                81
-                            </button>
-                            <span class="lower-gap"></span>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="71">
-                                71
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="72">
-                                72
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="73">
-                                73
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="74">
-                                74
-                            </button>
-                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="75">
-                                75
-                            </button>
-                        </div>
-
-                        <!-- 하악 (아랫니) -->
-                        <div class="tooth-row mb-2">
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="48">48
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="47">47
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="46">46
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="45">45
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="44">44
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="43">43
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="42">42
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="41">41
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="31">31
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="32">32
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="33">33
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="34">34
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="35">35
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="36">36
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="37">37
-                            </button>
-                            <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="38">38
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="search-save-tooth">저장</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+                        });
+                    }
+                }
+            });
+        }
+    </script>
 </div>
 <script layout:fragment="chartscript" src="/js/medical_chart.js"></script>
 </html>
