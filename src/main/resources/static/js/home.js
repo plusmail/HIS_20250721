@@ -133,12 +133,17 @@ function updatePatientCounts(counts) {
 
 // 진료 접수 페이지로 이동
 function goToReception() {
-    window.location.href = "http://localhost:8080/reception";
+    window.location.href = "/reception";
 }
 
 // 진료 예약 페이지로 이동
 function goToReservation() {
-    window.location.href = "http://localhost:8080/reservation";
+    window.location.href = "/reservation";
 }
 
+
+// 공지사항 페이지로 이동하는 함수
+function goToBoardList() {
+    window.location.href = "/board/list";
+}
 

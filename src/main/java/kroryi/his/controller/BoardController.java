@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -57,7 +58,7 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
-    @GetMapping("/read")
+    @GetMapping({"/read"})
     public String read(Long bno, PageRequestDTO pageRequestDTO, Model model) {
         BoardDTO boardDTO = boardService.readOne(bno);
 
@@ -68,5 +69,54 @@ public class BoardController {
         return "board/read";
     }
 
+    @GetMapping("/modify")
+    public String modify(Long bno, PageRequestDTO pageRequestDTO, Model model) {
+        log.info("-------modify -------");
+        BoardDTO boardDTO = boardService.readOne(bno);
+        log.info("/board/modify ---> {}", boardDTO);
+        model.addAttribute("dto", boardDTO);
+
+        return "board/modify";
+    }
+
+    @PostMapping("/modify")
+    public String modify(@Valid BoardDTO boardDTO,
+                         PageRequestDTO pageRequestDTO,
+                         BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes) {
+        log.info("-------modify post -------");
+
+        if (bindingResult.hasErrors()) {
+            log.info("/modify post 에러 발생 : {}", bindingResult.getAllErrors());
+            String link = pageRequestDTO.getLink();
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
+            redirectAttributes.addAttribute("bno", boardDTO.getBno());
+            return "redirect:/board/modify?" + link;
+        }
+
+        boardService.modify(boardDTO);
+        redirectAttributes.addFlashAttribute("result", "수정됨");
+        redirectAttributes.addAttribute("bno", boardDTO.getBno());
+
+
+        return "redirect:/board/read";
+    }
+
+    @PostMapping("/remove")
+    public String remove(Long bno, RedirectAttributes redirectAttributes) {
+        boardService.remove(bno);
+        redirectAttributes.addFlashAttribute("result", "삭제되었습니다.");
+        return "redirect:/board/list";
+    }
+
+//    @GetMapping("/board/view/{bno}")
+//    public String view(@PathVariable Long bno, Model model) {
+//        // 게시글을 조회하는 서비스 호출
+//        BoardDTO dto = boardService.getPost(bno);
+//
+//        model.addAttribute("dto", dto);
+//
+//        return "board/view";
+//    }
 
 }
