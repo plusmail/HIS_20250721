@@ -12,6 +12,66 @@ window.addEventListener('sessionStorageChanged', (event) => {
 });
 
 
+
+function dateReservationList(selectedDate) {
+    console.log(selectedDate);
+    fetch('reservation/selectedDatePatientList', {
+
+        method: 'POST', // POST 요청
+        headers: {
+            'Content-Type': 'application/json' // JSON 형식으로 데이터 전송
+        },
+        body: JSON.stringify({
+            reservationDate: selectedDate
+        }) // JSON 객체로 전송
+    })
+        .then(response => {
+            // 응답 상태가 성공적인 경우 JSON으로 변환
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 실패했습니다.');
+            }
+            return response.json(); // JSON 데이터로 변환
+        })
+        .then(data => {
+            // 환자 데이터가 들어갈 ID값 보관
+            const tableBody = document.querySelector('#reservationTableList');
+
+            // 테이블의 기존 데이터를 지우고 새 데이터를 추가
+            // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
+            tableBody.innerHTML = ''; // 기존 내용 제거
+
+            // 데이터 배열을 순회하여 테이블에 추가
+            data.forEach(item => {
+
+                // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
+                const time = new Date(item.reservationDate).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+
+                const row = document.createElement('tr'); // 새로운 행 생성
+                row.id = 'reservationTableListParent'; // ID 추가
+                row.innerHTML =
+                    `<td>${time}</td>
+                <td>${item.department}</td>
+                <td>${item.patientNote}</td>
+                `; // 각 열에 데이터 삽입
+
+                row.onclick = function () {
+                    selectList(item.seq);
+                };
+
+                tableBody.appendChild(row); // tbody에 행 추가
+            });
+
+        })
+        .catch(error => {
+            // 에러 처리
+            console.error('에러 발생:', error);
+        });
+}
+
 // 드롭다운 메뉴 초기화
 reservationTimes.forEach((time, index) => {
     const test_time = document.getElementById('test_time');
@@ -30,7 +90,7 @@ reservationTimes.forEach((time, index) => {
 
 // 예약 목록에서 환자 정보를 눌렀을때 데이터 받아온 뒤 수정 가능한 화면 만들기
 function selectList(indexNumber) {
-
+    console.log("!!!!!!11")
     // 보낼 데이터 객체로 변환
     const data = {
         seq: indexNumber
@@ -53,6 +113,7 @@ function selectList(indexNumber) {
             console.error('에러 발생:', error); // 에러 처리
         });
 }
+
 
 function rReset(reset) {
 
@@ -115,13 +176,12 @@ function sessionCallData(responseData) {
     const chartNumberElement = document.getElementById('chart-numberInput');
 
     // 받아온 데이터로 데이터 새로 등록
-        // 환자 이름
-        departmentElement.value = responseData.name;
-        // 차트 번호
-        chartNumberElement.value = responseData.chartNum;
+    // 환자 이름
+    departmentElement.value = responseData.name;
+    // 차트 번호
+    chartNumberElement.value = responseData.chartNum;
 
 }
-
 
 
 function rReset2(responseData) {
@@ -140,7 +200,6 @@ function rReset2(responseData) {
     const taggedWordsDiv = document.getElementById('taggedWords');
 
 
-    console.log(("9999999999999999"))
     // 받아온 데이터로 데이터 새로 등록
 
     if (responseData.length > 0) {
@@ -386,7 +445,6 @@ function addRow() {
 
     termList.appendChild(newRow);
 }
-
 
 
 function saveTerm(button) {
