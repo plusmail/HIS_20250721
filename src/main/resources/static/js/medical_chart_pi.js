@@ -63,6 +63,27 @@ window.addEventListener('sessionStorageChanged', (event) => {
 });
 
 
+document.addEventListener('DOMContentLoaded', function() {
+    // 모든 버튼에 대해 이벤트 리스너 등록
+    const buttons = document.querySelectorAll('.tooth-btn');
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            changeImageColor(button);
+        });
+    });
+});
+
+
+function changeImageColor(button) {
+    const img = button.querySelector('.tooth-img');
+
+    // 이미지에 붉은색 필터가 적용되어 있으면 제거하고, 없으면 추가
+    if (img.style.filter) {
+        img.style.filter = '';  // 필터를 제거하여 원래 이미지로 돌아가게 함
+    } else {
+        img.style.filter = 'sepia(1) saturate(1000%) hue-rotate(-45deg)';  // 붉은색 필터 적용
+    }
+}
 //세션 시작
 // 세션 데이터 가져오기
 function saveChartNum() {

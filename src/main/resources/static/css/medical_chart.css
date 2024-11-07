@@ -38,3 +38,30 @@
 .selected-row {
     background-color: #d1ecf1; /* 선택된 행의 배경색 */
 }
+
+.tooth-btn {
+    background: transparent;
+    border: none;
+    position: relative;
+    display: inline-block;
+    padding: 0; /* 버튼의 기본 여백 제거 */
+}
+
+.tooth-img {
+    display: block;
+    transition: filter 0.3s; /* 부드러운 색상 전환 */
+}
+
+.tooth-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black; /* 숫자 색상 */
+    font-size: x-small; /* 숫자 크기 */
+    font-weight: bold; /* 숫자 굵기 */
+}
+
+.tooth-btn:active .tooth-img {
+    filter: brightness(0) sepia(1) saturate(1000%) hue-rotate(-45deg); /* 붉은색 필터 */
+}
