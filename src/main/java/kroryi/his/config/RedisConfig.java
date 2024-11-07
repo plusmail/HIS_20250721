@@ -30,12 +30,14 @@ public class RedisConfig {
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory redisConnectionFactory,
             MessageListenerAdapter listenerAdapter,
-            MessageListenerAdapter chatListenerAdapter
+            MessageListenerAdapter chatListenerAdapter,
+            MessageListenerAdapter reservationListenerAdapter
     ) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
         redisMessageListenerContainer.addMessageListener(listenerAdapter,   new ChannelTopic("patientStatusUpdate"));
         redisMessageListenerContainer.addMessageListener(chatListenerAdapter,   new ChannelTopic("chatChannel"));
+        redisMessageListenerContainer.addMessageListener(reservationListenerAdapter,   new ChannelTopic("reservationChannel"));
 
         return redisMessageListenerContainer;
     }
@@ -67,6 +69,14 @@ public class RedisConfig {
         // receiveMessage 메서드를 Redis 메시지 수신 메서드로 설정
         return new MessageListenerAdapter(redisMessageListener, "receiveChatMessage");
     }
+
+
+    @Bean
+    public MessageListenerAdapter reservationListenerAdapter(RedisMessageListener redisMessageListener) {
+        // receiveMessage 메서드를 Redis 메시지 수신 메서드로 설정
+        return new MessageListenerAdapter(redisMessageListener, "receiveReservationMessage");
+    }
+
 
 
 
