@@ -1,40 +1,23 @@
-/* 고정된 영역을 유지하기 위한 스타일 */
-.fixed-box {
-    height: 600px; /* 고정된 높이 */
-    border: 0px solid #ccc;
+
+.container2 {
+    border: 1px solid #f1f1f1;
     overflow-y: auto;
-    box-sizing: border-box; /* 스크롤바 너비 포함하여 계산 */
-    margin: 0;
-    padding: 0;
-
-}
-
-.fixed-box table {
-    top: 0;
+    height: 500px;
     width: 100%;
+    padding: 0;
     margin: 0;
-    padding: 10px;
-    border-collapse: collapse;
 }
 
-.fixed-box table thead{
-    position: sticky;
-    top: 0;
-    background-color: #f1f1f1; /* 헤더 배경색 설정 */
-    z-index: 1; /* 헤더가 내용 위에 오도록 설정 */
-}
-
-
-.fixed-box table td,th {
+.container2 table td,th {
     background-color: #f1f3f5;
     padding: 8px;
-    border: 1px solid #ddd;
+    border-left: 1px solid white;
 }
 
-table thead th {
-    padding: 0;
-    margin: 0;
-}
+/*table thead th {*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*}*/
 
 /* 테이블 헤더 중앙 정렬 및 고정 */
 table thead tr {

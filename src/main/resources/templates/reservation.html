@@ -177,9 +177,8 @@
                         if (date === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
                             cell.classList.add('selected');
                             // Call for today's date
-                            const todayDate = `${year}-${month + 1}-${date}`;
+                            const todayDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
                             dateReservationList(todayDate);
-                            console.log("!!!!"+todayDate)
                             selectedCell = cell; // Keep track of today's cell
                         }
 
