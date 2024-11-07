@@ -48,24 +48,26 @@
 }
 
 .room-title-container {
-    display: flex;
-    justify-content: space-between;
     width: 100%;
 }
 
 .room-title {
-    flex-shrink: 0;
     font-weight: bold;
-    margin-right: auto;
+    margin-bottom: 5px;
+    margin-left: 0; /* 왼쪽 마진 제거 */
+    padding-left: 10px/* padding이 있을 경우 제거 */
 }
 
 .recent-message {
-    color: #888;
-    margin-left: auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 50%; /* 최근 메시지 최대 너비 설정 */
+    font-size: 0.9em;
+    color: gray;
+    margin-left: 0; /* 왼쪽 마진 제거 */
+    padding-left: 10px; /* padding이 있을 경우 제거 */
+}
+
+/* 모달 창의 너비를 줄이기 위한 CSS */
+.custom-modal-width {
+    max-width: 400px; /* 원하는 너비 설정 */
 }
 
 /* 사용자를 선택하면 파란색으로 강조 표시 */

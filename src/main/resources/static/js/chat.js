@@ -25,13 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.stompClient.connect({}, function (frame) {
         console.log('Connected to server:', frame);
 
-        // // 현재 열려 있는 채팅방의 메시지를 수신하고 목록을 업데이트
-        // window.stompClient.subscribe(`/topic/rooms/{roomId}`, function (message) {
-        //     const newMessage = JSON.parse(message.body);
-        //     addMessageToChat(newMessage); // 새로운 메시지를 채팅 UI에 추가
-        //     loadChatRooms(); // 채팅방 목록을 업데이트하여 최신 메시지 표시
-        // });
-
         // 사용자 정보 가져오기 및 채팅방 목록 초기화
         fetchCurrentUser();
         loadChatRooms();
@@ -50,13 +43,15 @@ function fetchCurrentUser() {
             globalUserData = response.data; // 응답 데이터를 globalUserData에 할당
             loggedInUserId = globalUserData.username || globalUserData.mid; // mid 또는 username 사용
             console.log('로그인된 사용자 ID:', loggedInUserId);
+
+            // 사용자 목록 로드
+            loadUsers();
         })
         .catch(error => {
             console.error('Error fetching user session:', error);
             alert("사용자 세션 정보를 불러오지 못했습니다. 다시 로그인해 주세요.");
         });
 }
-
 
 // 페이지 로드 시 사용자 정보 가져오기
 document.addEventListener('DOMContentLoaded', fetchCurrentUser);
@@ -91,15 +86,15 @@ function renderChatRooms() {
         const titleContainer = document.createElement('div');
         titleContainer.classList.add('room-title-container');
 
-        const title = document.createElement('span');
+        const title = document.createElement('div');
         title.classList.add('room-title');
         title.textContent = room.roomName;
 
-        const recentMessage = document.createElement('span');
+        const recentMessage = document.createElement('div');
         recentMessage.classList.add('recent-message');
         recentMessage.textContent = room.lastMessage ? room.lastMessage.content : '메시지가 없습니다.';
 
-        // 제목과 최근 메시지를 컨테이너에 추가
+        // 제목을 위에, 최근 메시지를 아래에 배치
         titleContainer.appendChild(title);
         titleContainer.appendChild(recentMessage);
         li.appendChild(titleContainer);
@@ -116,7 +111,6 @@ function renderChatRooms() {
         roomList.appendChild(li);
     });
 }
-
 
 // 사용자 불러오기
 function loadUsers() {
@@ -142,9 +136,13 @@ function renderUserList(users) {
     userList.innerHTML = ''; // 기존 목록 초기화
 
     users.forEach(user => {
+        if (user.mid === loggedInUserId) return; // 로그인한 사용자는 제외
+
         const li = document.createElement('li');
         li.classList.add('list-group-item');
-        li.textContent = user.name;
+
+        // 이름과 ID 표시
+        li.textContent = `${user.name} (${user.mid})`;
         li.dataset.userId = user.mid; // 각 사용자에 고유 ID 저장
 
         // 항목에 마우스를 올리면 파란색으로 강조 표시
@@ -253,6 +251,12 @@ startChatBtn.addEventListener('click', () => {
         });
 });
 
+// 스크롤을 맨 아래로 이동시키는 함수
+function scrollToBottom() {
+    setTimeout(() => {
+        messageList.scrollTop = messageList.scrollHeight;
+    }, 300); // 지연 시간 300ms로 설정
+}
 
 // 채팅방 열기
 function openChatRoom(roomId) {
@@ -276,14 +280,23 @@ function openChatRoom(roomId) {
         const newMessage = JSON.parse(message.body);
         console.log("실시간 메시지 수신:", newMessage);
 
-        // 필터링 조건 없이 모든 메시지 추가
+        // 새 메시지를 화면에 추가
         addMessageToChat(newMessage);
+
+        // 스크롤을 맨 아래로 이동
+        scrollToBottom();
+
+        // 채팅방 목록의 최근 메시지를 갱신
+        loadChatRooms();
     });
 
     // 채팅 메시지 가져오기 - 해당 채팅방의 이전 메시지 로드
     axios.get(`/api/chat/rooms/${roomId}/messages`)
         .then(response => {
             renderMessages(response.data);
+            // 모든 이전 메시지가 렌더링된 후 스크롤을 맨 아래로 이동
+            setTimeout(scrollToBottom, 100);
+
             // 모달 창 열기
             const chatModalTrigger = document.createElement('button');
             chatModalTrigger.setAttribute('data-bs-toggle', 'modal');
@@ -337,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = messageInput.value.trim();
 
         if (!message || !currentRoomId) {
-            alert('메시지를 보내기 전에 채팅방을 선택하세요.');
             return;
         }
 
@@ -357,25 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 입력란 초기화
         messageInput.value = '';
     });
-
-// 메시지 수신 후 UI에 추가하는 함수
-    function addMessageToChat(message) {
-        const li = document.createElement('li');
-
-        // 보낸 사람과 로그인한 사용자를 비교하여 위치와 스타일 설정
-        if (message.senderId === loggedInUserId) {
-            li.classList.add('message-item', 'right-message');
-        } else {
-            li.classList.add('message-item', 'left-message');
-        }
-
-        // 메시지 내용 설정
-        li.textContent = message.content;
-
-        // 메시지 목록에 추가
-        messageList.appendChild(li);
-        messageList.scrollTop = messageList.scrollHeight; // 스크롤을 맨 아래로
-    }
 
     // Enter 키로 메시지 전송 기능 추가
     messageInput.addEventListener('keydown', function(event) {
