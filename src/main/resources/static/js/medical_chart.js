@@ -306,8 +306,6 @@ function readPaChart() {
     }
 }
 
-
-
 // HTML에 데이터 렌더링
 function renderItems(itemsArray) {
     // readPaChart()
@@ -334,5 +332,27 @@ function renderItems(itemsArray) {
             '<button type="button" class="btn btn-sm">삭제</button></th>');
 
         row.append(buttonCell);
+    }
+}
+
+// 엔터 키 입력 시 버튼 기능 실행
+document.getElementById('History_keyword').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') { // Enter 키 확인
+        event.preventDefault(); // 기본 엔터 동작 방지 (필요 시)
+        document.getElementById('searchButton').click(); // 버튼 클릭 실행
+    }
+});
+
+// 버튼 클릭 시 검색 함수 호출
+document.getElementById('searchButton').addEventListener('click', performSearch);
+
+// 검색 기능 함수
+function performSearch() {
+    const keyword = document.getElementById('History_keyword').value;
+    if (keyword.trim() !== "") { // 키워드가 비어있지 않을 경우에만 실행
+        console.log("Searching for:", keyword);
+        // 여기서 원하는 검색 기능 또는 AJAX 요청을 추가할 수 있습니다.
+    } else {
+        console.log("Please enter a keyword to search.");
     }
 }
