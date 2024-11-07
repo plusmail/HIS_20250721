@@ -55,7 +55,7 @@ public class chartTest {
 
     @Test
     public void researchChartTest() {
-        List<MedicalChart> memos = medicalRepo.findMedicalChartByChartNum("2024111122");
+        List<MedicalChart> memos = medicalRepo.findMedicalChartByChartNumOrderByMdTimeAsc("2024111122");
         for (MedicalChart memo : memos) {
             log.info(memo.getChartNum());
             log.info(memo.getCheckDoc());

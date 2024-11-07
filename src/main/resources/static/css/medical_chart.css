@@ -1,5 +1,5 @@
 /* 모달 크기 조절 */
-.modal-dialog {
+#Search_filter {
     max-width: 600px; /* 모달의 최대 너비 */
     height: 200px;
     max-height: 600px;
@@ -39,29 +39,54 @@
     background-color: #d1ecf1; /* 선택된 행의 배경색 */
 }
 
-.tooth-btn {
-    background: transparent;
-    border: none;
-    position: relative;
-    display: inline-block;
-    padding: 0; /* 버튼의 기본 여백 제거 */
+.no-hover {
+    background-color: transparent !important;
+    color: inherit !important;
+    border-color: inherit !important;
+    cursor: default;
 }
 
-.tooth-img {
-    display: block;
-    transition: filter 0.3s; /* 부드러운 색상 전환 */
-}
-
-.tooth-number {
+.delete-icon {
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    float: right;
+    margin-left: 5px;
     position: absolute;
+    right: 20px;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: black; /* 숫자 색상 */
-    font-size: x-small; /* 숫자 크기 */
-    font-weight: bold; /* 숫자 굵기 */
+    font-size: 1.2rem;
+    transform: translateY(-50%);
 }
 
-.tooth-btn:active .tooth-img {
-    filter: brightness(0) sepia(1) saturate(1000%) hue-rotate(-45deg); /* 붉은색 필터 */
+.medical-content-cell {
+    position: relative;
+}
+
+/* 사분면 경계를 위한 스타일 */
+.quadrant-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-align: center;
+}
+
+.quadrant {
+    padding: 5px;
+}
+
+.upper-left, .upper-right {
+    border-bottom: 2px solid red; /* 상단 사분면 하단에 빨간색 경계 */
+}
+
+.upper-left, .lower-left {
+    border-right: 2px solid red; /* 왼쪽 사분면 오른쪽에 빨간색 경계 */
+}
+
+.text-center {
+    text-align: center;
+    vertical-align: middle;
 }

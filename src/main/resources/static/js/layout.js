@@ -15,6 +15,23 @@ let globalUserData;
 
 window.globalUserData = {};
 
+function setSessionStorageItem(key, value) {
+    sessionStorage.setItem(key, value);
+    const event = new CustomEvent('sessionStorageChanged', {
+        detail: { key, value }
+    });
+    window.dispatchEvent(event);
+}
+
+
+// 이벤트 리스너 등록
+window.addEventListener('sessionStorageChanged', (event) => {
+    console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
+    patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+});
+
+
+
 function fetchUserSession() {
     fetch('/api/user/session')
         .then(response => {
@@ -112,6 +129,14 @@ if (patientInfo) {
     }
 }
 
+// 엔터 키 입력 시 버튼 기능 실행
+document.getElementById('patient_name_keyword').addEventListener('keypress', function (event) {
+    if (event.key === 'Enter') { // Enter 키 확인
+        event.preventDefault(); // 기본 엔터 동작 방지 (필요 시)
+        document.getElementById('addReplyBtn').click(); // 버튼 클릭 실행
+    }
+});
+
 document.querySelector("#addReplyBtn").addEventListener("click", (e) => {
     const keyword = {
         "keyword": patient_name_keyword.value
@@ -186,7 +211,7 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             patientLastVisit(parseInt(menu_chartNum)).then(data => {
                 console.log(data.completionTime)
                 if (data.completionTime) {
-                    const completionTime = new Date(data.completionTime[0],data.completionTime[1],data.completionTime[2]);
+                    const completionTime = new Date(data.completionTime[0], data.completionTime[1], data.completionTime[2]);
                     lastVisit.value = completionTime.toISOString().split('T')[0]; // "yyyy-MM-dd" 형식으로 변환
                 } else {
                     lastVisit.value = ''; // completionTime이 null일 경우 빈 문자열
@@ -216,21 +241,36 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             }
         }
 
-
-        // 세션 저장
-        sessionStorage.setItem('selectedPatient', JSON.stringify({
+        setSessionStorageItem('selectedPatient', JSON.stringify({
             name: menu_name,
             age: menu_age,
             gender: menu_gender,
             chartNum: menu_chartNum,
             birthDate: menu_birthDate
-        }));
-
-
+        }))
         // 모달 창 닫기
         searchModal.hide();
-    } else {
-        console.log("선택된 행이 없습니다.");
+        if (window.location.href.includes("/medical_chart")) {
+            $.ajax({
+                url: '/medical_chart/PLANChartData?chartNum=' + menu_chartNum,  // 서버에서 데이터를 가져올 API 경로
+                type: 'GET',  // GET 요청
+                dataType: 'json',  // 서버에서 JSON 응답을 기대
+                success: function (data) {
+                    let tableBody = $("#plan-data");
+                    tableBody.empty();  // 기존 내용을 비움
+
+                    data.forEach(chart => {
+                        createTableRowWithData(chart, doctorNames, tableBody);
+                    })
+                    createNewTableRow(doctorNames, tableBody);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);  // 에러 처리
+                }
+            });
+        } else {
+            console.log("선택된 행이 없습니다.");
+        }
     }
 }, false);
 

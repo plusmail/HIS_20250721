@@ -69,28 +69,34 @@ public class CustomerSecurityConfig {
                                 .requestMatchers("/topic/**").permitAll() // WebSocket 경로에 대한 권한 설정
                                 .requestMatchers("/queue/**").permitAll() // WebSocket 경로에 대한 권한 설정
                                 .requestMatchers("/error/**").permitAll() // WebSocket 경로에 대한 권한 설정
+                                .requestMatchers("/api/chat/auth/currentUser").permitAll() // WebSocket 경로에 대한 권한 설정
 
 //                        .requestMatchers("/home").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/member/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .loginProcessingUrl("/member/login-proc")
-                        .defaultSuccessUrl("/home", true)
+                        .loginPage("/member/login")   // 로그인 페이지 경로
+                        .usernameParameter("username") // 폼에서 사용자 이름 필드 매핑
+                        .passwordParameter("password") // 폼에서 비밀번호 필드 매핑
+                        .loginProcessingUrl("/member/login-proc") // 로그인 처리 URL
+                        .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트할 URL
                         .permitAll()
                 )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedHandler(accessDeniedHandler())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler())
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 세션 생성 정책
-                        .maximumSessions(1) // 최대 세션 수
-                        .expiredUrl("/login?expired") // 세션 만료 시 리다이렉트 URL
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1)
+                        .expiredUrl("/login?expired")
                 )
                 .userDetailsService(userDetailsService)
-                .logout(LogoutConfigurer::permitAll);
+                .logout(logout -> logout
+                        .permitAll()
+                        .logoutSuccessUrl("/member/login?logout") // 로그아웃 성공 시 리다이렉트 URL
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                );
 
         return http.build();
     }
@@ -106,7 +112,6 @@ public class CustomerSecurityConfig {
             return config;
         };
     }
-
 
     @Bean
     public PersistentTokenRepository persistentTokenRepository() {
