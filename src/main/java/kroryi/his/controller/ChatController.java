@@ -67,16 +67,21 @@ public class ChatController {
         String currentUserId = userDetails.getUsername();
         List<String> memberMidsList = new ArrayList<>(chatRoomDTO.getMemberMids());
 
+        log.info("채팅방 생성 요청: 방 이름 = {}, 멤버 = {}", chatRoomDTO.getRoomName(), memberMidsList);
+
         // 채팅방에 현재 사용자가 포함되지 않았다면 추가
         if (!memberMidsList.contains(currentUserId)) {
             memberMidsList.add(currentUserId);
+            log.info("현재 사용자({})가 멤버 목록에 추가됨", currentUserId);
         }
 
         // 다인 채팅을 위해 recipientIds를 전체 멤버로 설정
         List<String> recipientIds = memberMidsList.size() > 1 ? memberMidsList : null;
+        log.info("최종 멤버 목록: {}, 수신자 목록: {}", memberMidsList, recipientIds);
 
         // 채팅방 생성
         ChatRoomDTO createdRoom = chatRoomService.createChatRoom(chatRoomDTO.getRoomName(), memberMidsList, recipientIds);
+        log.info("채팅방 생성 완료: 채팅방 ID = {}, 방 이름 = {}, 멤버 = {}", createdRoom.getId(), createdRoom.getRoomName(), createdRoom.getMemberMids());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
     }

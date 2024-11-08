@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import kroryi.his.dto.ChatMessageDTO;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,10 @@ public class ChatRoom {
     private Long id;
 
     private String roomName;
+
+    private String lastMessage;
+
+    private LocalDateTime lastMessageTimestamp;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

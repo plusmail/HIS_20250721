@@ -19,16 +19,17 @@ let loggedInUserId = null;
 let recipientIds = [];
 
 
-// WebSocket 설정 및 연결
+// WebSocket 설정 및 구독
 document.addEventListener('DOMContentLoaded', () => {
-    // 중복 방지를 위해 한 번만 초기화
-
     window.stompClient.connect({}, function (frame) {
         console.log('Connected to server:', frame);
 
-        // 사용자 정보 가져오기 및 채팅방 목록 초기화
-        fetchCurrentUser();
-        loadChatRooms();
+        // 모든 채팅방의 새로운 메시지 수신
+        window.stompClient.subscribe(`/topic/rooms/`, function (message) {
+            const newMessage = JSON.parse(message.body);
+            console.log("New message received:", newMessage);
+            updateChatRoomList(newMessage); // 새로운 메시지로 채팅방 목록 업데이트
+        });
     });
 });
 
@@ -53,9 +54,6 @@ function fetchCurrentUser() {
             alert("사용자 세션 정보를 불러오지 못했습니다. 다시 로그인해 주세요.");
         });
 }
-
-// 페이지 로드 시 사용자 정보 가져오기
-document.addEventListener('DOMContentLoaded', fetchCurrentUser);
 
 // DOMContentLoaded 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
@@ -91,9 +89,12 @@ function renderChatRooms() {
         title.classList.add('room-title');
         title.textContent = room.roomName;
 
+        // 최근 메시지 표시
         const recentMessage = document.createElement('div');
         recentMessage.classList.add('recent-message');
-        recentMessage.textContent = room.lastMessage ? room.lastMessage.content : '메시지가 없습니다.';
+
+        // lastMessage가 문자열인지 확인하고, 문자열이 아니면 content 속성을 사용
+        recentMessage.textContent = typeof room.lastMessage === 'string' ? room.lastMessage : (room.lastMessage?.content || '메시지가 없습니다.');
 
         // 제목을 위에, 최근 메시지를 아래에 배치
         titleContainer.appendChild(title);
@@ -324,17 +325,20 @@ function openChatRoom(roomId) {
         });
 }
 
-// 새로운 메시지 수신 시 채팅방 목록 업데이트 함수
 function updateChatRoomList(message) {
     const roomIndex = chatRooms.findIndex(room => room.id === message.roomId);
+
     if (roomIndex !== -1) {
-        chatRooms[roomIndex].lastMessage = message; // 마지막 메시지를 업데이트
+        // 받은 메시지로 lastMessage와 lastMessageTimestamp 업데이트
+        chatRooms[roomIndex].lastMessage = message.content;
+        chatRooms[roomIndex].lastMessageTimestamp = message.timestamp;
+
+        console.log('Updated chat room list with new message:', message.content); // 확인용 로그
         renderChatRooms(); // 업데이트된 채팅방 목록을 다시 렌더링
     } else {
         loadChatRooms(); // 방 목록이 없는 경우 전체 목록을 다시 로드
     }
 }
-
 
 // 메시지를 렌더링하는 함수
 function renderMessages(messages) {

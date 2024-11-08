@@ -13,6 +13,7 @@ import kroryi.his.repository.MemberRepository;
 import kroryi.his.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final MemberRepository memberRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public ChatRoomDTO createChatRoom(String roomName, List<String> memberMids, List<String> recipientIds) {
@@ -141,6 +143,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Member sender = memberRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("Sender not found"));
 
+        log.info("Chat-----> {}", sender);
+
         ChatMessage message = ChatMessage.builder()
                 .content(content)
                 .timestamp(timestamp != null ? timestamp : LocalDateTime.now())
@@ -151,8 +155,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         // 메시지를 DB에 저장하여 자동 생성된 messageId를 얻음
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
-        // messageId를 포함하여 ChatMessageDTO 반환
-        return ChatMessageDTO.builder()
+        // 채팅방의 최근 메시지 업데이트
+        chatRoom.setLastMessage(savedMessage.getContent());
+        chatRoom.setLastMessageTimestamp(savedMessage.getTimestamp());
+        chatRoomRepository.save(chatRoom);
+
+        ChatMessageDTO messageDTO = ChatMessageDTO.builder()
                 .messageId(savedMessage.getMessageId()) // 자동 생성된 messageId
                 .roomId(chatRoom.getId())
                 .content(savedMessage.getContent())
@@ -161,7 +169,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .recipientIds(recipientIds != null ? recipientIds : Collections.emptyList())
                 .timestamp(savedMessage.getTimestamp())
                 .build();
+
+        // 메시지 저장 후 WebSocket을 통해 전송
+        messagingTemplate.convertAndSend("/topic/rooms", messageDTO);
+
+        // messageId를 포함하여 ChatMessageDTO 반환
+        return messageDTO;
     }
+
 }
 
 
