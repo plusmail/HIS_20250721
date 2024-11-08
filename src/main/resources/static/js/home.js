@@ -118,6 +118,7 @@ function requestPatientCounts() {
         });
 }
 
+// 진료 접수 페이지로 이동
 // 환자 수 업데이트를 위한 함수
 function updatePatientCounts(counts) {
     console.log("updatePa----->", counts)
@@ -136,7 +137,7 @@ function goToReception() {
     window.location.href = "/reception";
 }
 
-// 진료 예약 페이지로 이동
+// 예약 페이지로 이동
 function goToReservation() {
     window.location.href = "/reservation";
 }

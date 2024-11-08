@@ -25,7 +25,8 @@
                                             <!-- 내역 키워드 입력 필드 -->
                                             <div class="input-group col" style="padding-right: 0.25rem">
                                                 <span class="input-group-text">내역</span>
-                                                <input type="text" class="form-control flex-grow-1" id="History_keyword" placeholder="검색어를 입력하세요.">
+                                                <input type="text" class="form-control flex-grow-1" id="History_keyword"
+                                                       placeholder="검색어를 입력하세요.">
                                                 <button type="button" class="btn btn-primary" id="searchButton">
                                                     <i class="bi bi-search" style="padding: 0.5rem;"></i>
                                                 </button>
@@ -33,10 +34,12 @@
 
                                             <!-- 검색 버튼 -->
                                             <div class="col" style="padding-left: 0.2rem">
-                                                <button style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Search-Modal" class="select-pTag btn btn-info">
+                                                <button style="cursor: pointer;" data-bs-toggle="modal"
+                                                        data-bs-target="#Search-Modal" class="select-pTag btn btn-info">
                                                     <i class="bi bi-filter"></i> 검색 필터
                                                 </button>
-                                                <button type="button" class="btn btn-light" id="resetButton" style="cursor: pointer;">
+                                                <button type="button" class="btn btn-light" id="resetButton"
+                                                        style="cursor: pointer;">
                                                     <i class="fa-solid fa-rotate-left"></i>
                                                 </button>
                                             </div>
@@ -69,22 +72,22 @@
                                         <li class="nav-item" role="presentation">
                                             <a class="nav-link active" data-bs-toggle="tab" href="#tabContent"
                                                aria-selected="true"
-                                               role="tab" onclick="loadContent('/medical_chart_cc')">CC 입력</a>
+                                               role="tab" onclick="loadContent('/medical_chart_cc', null)">CC 입력</a>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <a class="nav-link" data-bs-toggle="tab" href="#tabContent"
                                                aria-selected="false"
-                                               role="tab" onclick="loadContent('/medical_chart_pi')">PI 입력</a>
+                                               role="tab" onclick="loadContent('/medical_chart_pi', null)">PI 입력</a>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <a class="nav-link" data-bs-toggle="tab" href="#tabContent"
                                                aria-selected="false"
-                                               role="tab" onclick="loadContent('/medical_chart_plan')">치료계획 입력</a>
+                                               role="tab" onclick="loadContent('/medical_chart_plan', null)">치료계획 입력</a>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <a class="nav-link" data-bs-toggle="tab" href="#tabContent"
                                                aria-selected="false"
-                                               role="tab" onclick="loadContent('/medical_chart_input')">진료입력</a>
+                                               role="tab" onclick="loadContent('/medical_chart_input', null)">진료입력</a>
                                         </li>
                                     </ul>
 
@@ -392,7 +395,6 @@
             .map(option => option.value)
             .filter(value => value);
 
-
         // 데이터를 기반으로 행을 생성하고 추가하는 함수
         function createTableRowWithData(chart, doctorNames, tableBody) {
             const option = doctorNames.map(doctor =>
@@ -451,65 +453,67 @@
         // 이미 로드된 스크립트 경로를 저장하는 배열
         const loadedScripts = [];
 
-        function loadContent(page) {
-            $("#tabContent").load(page, function (response, status, xhr) {
-                if (status === "error") {
-                    $("#tabContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
-                } else {
-                    // // 이전 스크립트가 로드되어 있다면 제거
-                    // $('script[src="/js/medical_chart_pi.js"]').remove();
-                    // $('script[src="/js/medical_chart_plan.js"]').remove();
+        function loadContent(page, cnum) {
 
-                    // 필요한 스크립트를 동적으로 로드
-                    if (page === '/medical_chart_pi') {
-                        $.getScript("/js/medical_chart_pi.js", function () {
-                            if (typeof MedicalChartPIModule !== "undefined") {
-                                MedicalChartPIModule.init();
-                            }
-                        });
-                    } else if (page === '/medical_chart_cc') {
-                        $.getScript("/js/medical_chart_cc.js", function () {
-                            if (typeof MedicalChartCCModule !== "undefined") {
-                                MedicalChartCCModule.init();
-                            }
-                        });
-                    } else if (page === '/medical_chart_plan') {
-                        $.getScript("/js/medical_chart_plan.js", function () {
-                            if (typeof MedicalPlanModule !== "undefined") {
-                                MedicalPlanModule.init();
-                                if (patientInfos) {
-                                    $.ajax({
-                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
-                                        type: 'GET',  // GET 요청
-                                        dataType: 'json',  // 서버에서 JSON 응답을 기대
-                                        success: function (data) {
-                                            let tableBody = $("#plan-data");
-                                            tableBody.empty();  // 기존 내용을 비움
+                $("#tabContent").load(page, function (response, status, xhr) {
+                    if (status === "error") {
+                        $("#tabContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
+                    } else {
+                        // 필요한 스크립트를 동적으로 로드
+                        if (page === '/medical_chart_pi') {
+                            $.getScript("/js/medical_chart_pi.js", function () {
+                                if (typeof MedicalChartPIModule !== "undefined") {
+                                    MedicalChartPIModule.init();
 
-                                            data.forEach(chart => {
-                                                createTableRowWithData(chart, doctorNames, tableBody);
-                                            })
-                                            createNewTableRow(doctorNames, tableBody);
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error:', error);  // 에러 처리
-                                        }
-                                    });
+                                    if (cnum) {
+                                        loadDataIntoFields(cnum);
+                                    }
+
                                 }
-                            }
-                        });
+                            });
+                        } else if (page === '/medical_chart_cc') {
+                            $.getScript("/js/medical_chart_cc.js", function () {
+                                if (typeof MedicalChartCCModule !== "undefined") {
+                                    MedicalChartCCModule.init();
+                                    if (cnum) {
+                                        loadDataIntoFields(cnum);
+                                    }
+                                }
+                            });
+                        } else if (page === '/medical_chart_plan') {
+                            $.getScript("/js/medical_chart_plan.js", function () {
+                                if (typeof MedicalPlanModule !== "undefined") {
+                                    MedicalPlanModule.init();
+                                    if (patientInfos) {
+                                        $.ajax({
+                                            url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
+                                            type: 'GET',  // GET 요청
+                                            dataType: 'json',  // 서버에서 JSON 응답을 기대
+                                            success: function (data) {
+                                                let tableBody = $("#plan-data");
+                                                tableBody.empty();  // 기존 내용을 비움
+
+                                                data.forEach(chart => {
+                                                    createTableRowWithData(chart, doctorNames, tableBody);
+                                                })
+                                                createNewTableRow(doctorNames, tableBody);
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error('Error:', error);  // 에러 처리
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
                     }
-                }
-            });
+                });
+
         }
 
         // 차트 내역 더블클릭시 탭이동 이벤트
-        $(document).on('dblclick', '#paChart-list tr', function() {
+        $(document).on('dblclick', '#paChart-list tr', function () {
             const medicalDivision = $(this).find('td:eq(2)').text().trim();
-            const mdTime = $(this).find('td:eq(0)').text(); // 날짜 데이터
-            const medicalContent = $(this).find('td:eq(3)').text(); // 진료 내역
-            const checkDoc = $(this).find('.medical-content-cell').text(); // 진료의
-            const teethNum = $(this).find('td:eq(1)').text(); // 선택 치아
 
             let targetTab, targetTabSelector;
             if (medicalDivision === 'CC') {
@@ -523,8 +527,8 @@
                 targetTabSelector = 'a[href="#tabContent"][onclick*="medical_chart_plan"]';
             }
             activateTab(targetTabSelector);
+            loadContent(targetTab, cnumGlogal);
 
-            loadContent(targetTab);
         });
 
         // 탭 활성화 함수
@@ -535,6 +539,50 @@
             // 선택된 탭에만 active 클래스와 aria-selected="true" 추가
             $(selector).addClass('active').attr('aria-selected', 'true');
         }
+
+
+        function loadDataIntoFields(cnum) {
+            console.log("Fetching data for cnum:", cnum);
+            $.ajax({
+                url: `/medical_chart/getDataByCnum?cnum=${cnum}`,  // 템플릿 리터럴 사용
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response) {
+                        $('#mdTime').val(response.mdTime || '');
+                        $('#ccCheckDoc').val(response.checkDoc || '');
+                        $('#cc-textarea').val(response.medicalContent || '');
+                        $('#piCheckDoc').val(response.checkDoc || '');
+                        $('#pi-textarea').val(response.medicalContent || '');
+
+                        if (response.teethNum) {
+                            const teethArray = response.teethNum.split(',').map(tooth => tooth.trim());
+                            window.toothList = teethArray;
+
+                            updateToothButtonStyles(teethArray);
+                        }
+                    } else {
+                        console.warn("No data found for cnum:", cnum);
+                        alert('해당 데이터가 없습니다.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to fetch data for cnum:', cnum, error);
+                    alert('데이터를 가져오는데 실패했습니다. 다시 시도해주세요.');
+                }
+            });
+        }
+
+
+        //저장된 치아 클릭 함수
+        function updateToothButtonStyles(teethArray) {
+            $('.tooth-btn, .small-tooth-btn').removeClass("opacity-50");
+
+            teethArray.forEach(toothValue => {
+                $(`.tooth-btn[value="${toothValue}"], .small-tooth-btn[value="${toothValue}"]`).addClass("opacity-50");
+            });
+        }
+
     </script>
 </div>
 <script layout:fragment="chartscript" src="/js/medical_chart.js"></script>

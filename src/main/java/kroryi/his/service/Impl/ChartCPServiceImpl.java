@@ -1,11 +1,13 @@
 package kroryi.his.service.Impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import kroryi.his.domain.MedicalChart;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.repository.MedicalChartRepository;
 import kroryi.his.service.ChartCPService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.List;
 public class ChartCPServiceImpl implements ChartCPService {
 
     private final MedicalChartRepository medicalChartRepository;
+
+    private final ModelMapper modelMapper;
 
     private List<List<String>> toothList = new ArrayList<>();
     private List<List<String>> symptomList = new ArrayList<>();
@@ -54,4 +58,15 @@ public class ChartCPServiceImpl implements ChartCPService {
 
         medicalChartRepository.save(medicalChart);
     }
+
+
+    @Override
+    public MedicalChartDTO getMedicalChartByCnum(Integer cnum) {
+        MedicalChart medicalChart = medicalChartRepository.findByCnum(cnum);
+        if (medicalChart != null) {
+            return modelMapper.map(medicalChart, MedicalChartDTO.class); // 자동으로 매핑
+        }
+        return null;
+    }
+
 }

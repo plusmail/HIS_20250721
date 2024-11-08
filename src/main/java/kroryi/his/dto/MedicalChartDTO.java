@@ -27,4 +27,5 @@ public class MedicalChartDTO implements Serializable {
 
     private List<List<String>> chartData;
 
+  
 }
