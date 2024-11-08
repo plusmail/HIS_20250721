@@ -137,7 +137,7 @@ function goToReception() {
     window.location.href = "/reception";
 }
 
- 예약 페이지로 이동
+// 예약 페이지로 이동
 function goToReservation() {
     window.location.href = "/reservation";
 }
