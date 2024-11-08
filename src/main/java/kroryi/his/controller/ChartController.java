@@ -4,7 +4,9 @@ import kroryi.his.domain.ChartMemo;
 import kroryi.his.domain.MedicalChart;
 import kroryi.his.dto.ChartPaData;
 import kroryi.his.dto.MedicalChartDTO;
+import kroryi.his.dto.MedicalChartSearchDTO;
 import kroryi.his.repository.ChartMemoRepository;
+import kroryi.his.repository.MedicalChartRepository;
 import kroryi.his.service.ChartService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +31,13 @@ public class ChartController {
     private final ChartService chartService;
     @Autowired
     private final ChartMemoRepository chartMemoRepository;
+    @Autowired
+    private final MedicalChartRepository medicalChartRepository;
+
 
     String paName;
     String chartNum;
+
     @PostMapping("/savePaList")
     private ResponseEntity<?> savePaList(@RequestBody ChartPaData paData) {
         paName = paData.getPaName();
@@ -52,6 +58,7 @@ public class ChartController {
         // JSON 형태로 반환
         return chartService.getAllMedicalChartsMemo();
     }
+
     @PostMapping("/saveData")
     public String addData(@RequestBody MedicalChartDTO medicalChartDTO) {
         chartService.addMedicalChart(medicalChartDTO);
@@ -66,7 +73,7 @@ public class ChartController {
 
     @GetMapping("/PLANChartData")
     public List<MedicalChart> searchByChartNumMedicalDivision(@RequestParam String chartNum) {
-        return chartService.PLANChart(chartNum,"PLAN");
+        return chartService.PLANChart(chartNum, "PLAN");
     }
 
     @Transactional
@@ -76,5 +83,11 @@ public class ChartController {
         return ResponseEntity.ok("차트내역이 성공적으로 삭제되었습니다!");
     }
 
-}
-
+    @PostMapping("/search")
+    public ResponseEntity<List<MedicalChart>> searchMedicalCharts(@RequestBody MedicalChartSearchDTO medicalChartSearchDTO) {
+        log.info("Received search criteria: {}", medicalChartSearchDTO);
+        List<MedicalChart> results = chartService.searchMedicalCharts(medicalChartSearchDTO);
+        log.info("Search results: {}", results);
+        return ResponseEntity.ok(results);
+    }
+    }
