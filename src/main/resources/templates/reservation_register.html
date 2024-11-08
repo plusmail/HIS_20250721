@@ -45,9 +45,9 @@
             <div class="form-group">
                 <label for="doctor">진료의사</label>
                 <select id="doctor" name="doctor" class="form-control">
-                    <option value="-----">-----</option>
+                    <option value="" selected disabled>선택해주세요</option> <!-- 비어있는 첫 번째 옵션으로 '선택해주세요' 텍스트를 넣음 -->
                     <th:block th:each="doctor : ${doctorNames}">
-                        <option th:value="${doctor}" th:text="${doctor}"></option>
+                        <option th:value="${doctor}" th:text="${doctor}" th:selected="${doctor eq doctorNames[0]}"></option>
                     </th:block>
                 </select>
             </div>
@@ -127,5 +127,6 @@
     </div>
 </div>
 <script src="/js/reservation_register.js"></script>
+
 </body>
 </html>

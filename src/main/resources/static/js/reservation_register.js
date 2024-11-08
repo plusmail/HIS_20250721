@@ -1,7 +1,3 @@
-patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
-console.log(patientInfos);
-sessionCallData(patientInfos);
-
 // 이벤트 리스너 등록
 window.addEventListener('sessionStorageChanged', (event) => {
     console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
@@ -9,6 +5,25 @@ window.addEventListener('sessionStorageChanged', (event) => {
 
     sessionCallData(patientInfos);
     console.log(patientInfos);
+});
+
+patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+console.log(patientInfos);
+sessionCallData(patientInfos);
+
+// 드롭다운 메뉴 초기화
+reservationTimes.forEach((time, index) => {
+    const test_time = document.getElementById('test_time');
+    const option = document.createElement('option');
+    option.value = time;
+    option.textContent = time;
+
+    // 첫 번째 옵션을 기본값으로 설정
+    if (index === 0) {
+        option.selected = true;
+    }
+
+    test_time.appendChild(option);
 });
 
 
@@ -23,6 +38,7 @@ function dateReservationList(selectedDate) {
         },
         body: JSON.stringify({
             reservationDate: selectedDate
+
         }) // JSON 객체로 전송
     })
         .then(response => {
@@ -72,25 +88,8 @@ function dateReservationList(selectedDate) {
         });
 }
 
-// 드롭다운 메뉴 초기화
-reservationTimes.forEach((time, index) => {
-    const test_time = document.getElementById('test_time');
-    const option = document.createElement('option');
-    option.value = time;
-    option.textContent = time;
-
-    // 첫 번째 옵션을 기본값으로 설정
-    if (index === 0) {
-        option.selected = true;
-    }
-
-    test_time.appendChild(option);
-});
-
-
 // 예약 목록에서 환자 정보를 눌렀을때 데이터 받아온 뒤 수정 가능한 화면 만들기
 function selectList(indexNumber) {
-    console.log("!!!!!!11")
     // 보낼 데이터 객체로 변환
     const data = {
         seq: indexNumber
@@ -107,7 +106,7 @@ function selectList(indexNumber) {
         .then(response => response.json()) // 응답을 JSON으로 변환
         .then(responseData => {
             rReset();
-            rReset2(responseData);
+            SelectData(responseData);
         })
         .catch(error => {
             console.error('에러 발생:', error); // 에러 처리
@@ -174,6 +173,8 @@ function rReset(reset) {
 function sessionCallData(responseData) {
     const departmentElement = document.getElementById('departmentInput');
     const chartNumberElement = document.getElementById('chart-numberInput');
+    // 'reservation-date' input의 value를 오늘 날짜로 설정
+    document.getElementById('reservation-date').value = new Date().toISOString().split('T')[0];
 
     // 받아온 데이터로 데이터 새로 등록
     // 환자 이름
@@ -184,7 +185,7 @@ function sessionCallData(responseData) {
 }
 
 
-function rReset2(responseData) {
+function SelectData(responseData) {
     const reservationDateElement = document.getElementById('reservation-date');
     const reservationTimeElement = document.getElementById('test_time'); // 예약시간 요소 추가
     const departmentElement = document.getElementById('departmentInput');
@@ -277,6 +278,11 @@ function saveUpdate() {
     // 치료 유형
     const treatmentType = document.getElementById('treatment-type').value;
 
+    if (!department || !chartNumber || !doctor || !treatmentType) {
+        alert("부서, 차트 번호, 의사, 치료 유형을 모두 입력해 주세요.");
+        return; // 빈값이 있으면 중지
+    }
+
     // 환자 노트
     const patientNote = document.getElementById('patient-note').value;
 
@@ -288,6 +294,9 @@ function saveUpdate() {
         reservationStatusCheck = "ba";
     } else if (document.getElementById('reservation-status-none').checked) {
         reservationStatusCheck = "없음";
+    }else {
+        alert("예약 미이행 상태를 선택해 주세요.");
+        return; // 빈값이 있으면 중지
     }
 
     const indexNumber = document.getElementById('index-number').innerHTML.trim();
@@ -359,7 +368,6 @@ function saveUpdate() {
                         .then(response => {
                             const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
                             dateReservationList(dateOnly);
-                            console.log("!!!!!!!!!!" + indexNumber);
                         })
                         .catch(error => {
                             console.error('실패:', error);
