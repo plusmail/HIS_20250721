@@ -44,7 +44,7 @@ public class HomeController {
         return "home";
     }
 
-//    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    //    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @GetMapping("/admin_management")
     public String adminManagement() {
         return "admin_management";
