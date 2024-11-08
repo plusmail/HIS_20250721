@@ -20,6 +20,9 @@ public class ChatMessageDTO {
     private List<String> recipientIds;
     private String senderName;
     private LocalDateTime timestamp;
+
+    public ChatMessageDTO(String lastMessage) {
+    }
 }
 
 

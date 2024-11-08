@@ -64,47 +64,91 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
     }
 
-    // 모든 채팅방 목록을 DTO로 반환하는 메서드
+    public ChatRoomDTO createOrGetPrivateChatRoom(String member1Mid, String member2Mid) {
+        // 기존 개인 채팅방 확인
+        Optional<ChatRoom> existingRoom = chatRoomRepository.findPrivateChatRoomBetween(member1Mid, member2Mid);
+
+        if (existingRoom.isPresent()) {
+            // 기존 채팅방이 존재할 경우 DTO로 반환
+            return convertToDTO(existingRoom.get());
+        }
+
+        // 기존 채팅방이 없으면 새 채팅방 생성
+        Member member1 = memberRepository.findById(member1Mid)
+                .orElseThrow(() -> new IllegalArgumentException("Member 1 not found"));
+        Member member2 = memberRepository.findById(member2Mid)
+                .orElseThrow(() -> new IllegalArgumentException("Member 2 not found"));
+
+        ChatRoom newRoom = ChatRoom.builder()
+                .roomName(member2.getName() + "와의 채팅") // 상대방 이름으로 방 이름 설정
+                .members(new HashSet<>(Set.of(member1, member2)))
+                .memberMids(Set.of(member1Mid, member2Mid))
+                .build();
+
+        ChatRoom savedRoom = chatRoomRepository.save(newRoom);
+        return convertToDTO(savedRoom);
+    }
+
+    private ChatRoomDTO convertToDTO(ChatRoom chatRoom) {
+        return ChatRoomDTO.builder()
+                .id(chatRoom.getId())
+                .roomName(chatRoom.getRoomName())
+                .memberMids(chatRoom.getMemberMids())
+                .recipientIds(chatRoom.getRecipientIds())
+                .lastMessage(chatRoom.getLastMessage() != null
+                        ? new ChatMessageDTO(chatRoom.getLastMessage()) : null)
+                .lastMessageTimestamp(chatRoom.getLastMessageTimestamp())
+                .build();
+    }
+
+    @Override
     public List<ChatRoomDTO> getAllChatRoomsForUserWithLastMessage(String userId) {
         List<ChatRoom> chatRooms = chatRoomRepository.findByMembers_Mid(userId);
+
         return chatRooms.stream()
-                .map(chatRoom -> convertToDto(chatRoom, userId))
+                .map(chatRoom -> {
+                    // 채팅방 이름을 현재 사용자를 제외한 멤버 이름으로 설정
+                    String roomName = chatRoom.getMembers().stream()
+                            .filter(member -> !member.getMid().equals(userId)) // 현재 사용자를 제외한 멤버
+                            .map(Member::getName) // 멤버 이름 추출
+                            .collect(Collectors.joining(", ")) // 쉼표로 구분하여 조합
+                            + (chatRoom.getMembers().size() > 2 ? "와의 그룹 채팅" : "와의 채팅");
+
+                    return convertToDtoWithRoomName(chatRoom, roomName, userId);
+                })
                 .collect(Collectors.toList());
     }
 
-
-    private ChatRoomDTO convertToDto(ChatRoom chatRoom, String currentUserId) {
+    private ChatRoomDTO convertToDtoWithRoomName(ChatRoom chatRoom, String roomName, String currentUserId) {
         List<String> recipientIds = chatRoom.getMembers().stream()
-                .filter(member -> !member.getMid().equals(currentUserId)) // 현재 사용자를 제외한 모든 멤버
+                .filter(member -> !member.getMid().equals(currentUserId))
                 .map(Member::getMid)
                 .collect(Collectors.toList());
 
-        ChatRoomDTO dto = ChatRoomDTO.builder()
-                .id(chatRoom.getId())
-                .roomName(chatRoom.getRoomName())
-                .memberMids(chatRoom.getMembers().stream()
-                        .map(Member::getMid)
-                        .collect(Collectors.toSet()))
-                .recipientIds(recipientIds) // recipientIds 필드에 모든 수신자 ID 설정
-                .build();
-
         ChatMessage lastMessage = chatMessageRepository.findTopByChatRoomOrderByTimestampDesc(chatRoom);
+
+        ChatMessageDTO lastMessageDto = null;
         if (lastMessage != null) {
-            ChatMessageDTO lastMessageDto = ChatMessageDTO.builder()
-                    .messageId(lastMessage.getMessageId()) // 메시지 ID 설정
-                    .roomId(lastMessage.getChatRoom().getId()) // 채팅방 ID 설정
+            lastMessageDto = ChatMessageDTO.builder()
+                    .messageId(lastMessage.getMessageId())
+                    .roomId(chatRoom.getId())
                     .content(lastMessage.getContent())
                     .timestamp(lastMessage.getTimestamp())
                     .senderId(lastMessage.getSender().getMid())
                     .senderName(lastMessage.getSender().getName())
-                    .recipientIds(lastMessage.getRecipient() != null
-                            ? Collections.singletonList(lastMessage.getRecipient().getMid())
-                            : Collections.emptyList()) // 빈 리스트로 설정
                     .build();
-            dto.setLastMessage(lastMessageDto);
         }
-        return dto;
 
+        return ChatRoomDTO.builder()
+                .id(chatRoom.getId())
+                .roomName(roomName)
+                .memberMids(chatRoom.getMembers().stream()
+                        .map(Member::getMid)
+                        .collect(Collectors.toSet()))
+                .recipientIds(recipientIds)
+                .lastMessage(lastMessageDto)
+                .lastMessageTimestamp(chatRoom.getLastMessageTimestamp())
+                .build();
     }
 
     @Override

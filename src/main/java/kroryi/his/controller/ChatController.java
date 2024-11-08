@@ -99,6 +99,13 @@ public class ChatController {
         return ResponseEntity.ok(rooms);
     }
 
+    @PostMapping("/private-room")
+    public ResponseEntity<ChatRoomDTO> createOrGetPrivateChatRoom(@RequestParam String member1Mid,
+                                                                  @RequestParam String member2Mid) {
+        ChatRoomDTO chatRoom = chatRoomService.createOrGetPrivateChatRoom(member1Mid, member2Mid);
+        return ResponseEntity.ok(chatRoom);
+    }
+
 
     // ChatController에 사용자 목록 반환 엔드포인트 추가
     @GetMapping("/member/list")
@@ -160,35 +167,6 @@ public class ChatController {
         }
         return Collections.emptyList();  // 기본 수신자가 없을 경우 빈 리스트 반환
     }
-
-
-//    @MessageMapping("/chat.send")
-//    @SendTo("/topic/rooms")
-//    public void sendMessage(ChatMessageDTO message, SimpMessageHeaderAccessor headerAccessor) throws JsonProcessingException {
-//        log.info("Received message: {}", message);
-//
-//        if (message.getRoomId() == null || message.getContent() == null) {
-//            log.error("Message is missing required fields: {}", message);
-//            return;
-//        }
-//
-//        ChatMessageDTO savedMessage = chatRoomService.createMessage(
-//                message.getRoomId(),
-//                message.getContent(),
-//                message.getSenderId(),
-//                message.getRecipientIds(),
-//                message.getSenderName(),
-//                message.getTimestamp()
-//        );
-//
-//        log.info("Saved message: {}", savedMessage);
-//
-//        String messageChat = objectMapper.writeValueAsString(savedMessage);
-//
-//        // 각 roomId에 대한 채널로 전송
-//        String roomChannel = "chatChannel-" + message.getRoomId();
-//        redisTemplate.convertAndSend(roomChannel, messageChat);
-//    }
 
     // WebSocket 메시지 전송 메서드 - 다중 및 1:1 채팅 지원
     @MessageMapping("/chat.send/{roomId}")
