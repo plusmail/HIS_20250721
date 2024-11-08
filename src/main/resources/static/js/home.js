@@ -134,12 +134,14 @@ function updatePatientCounts(counts) {
 
 // 진료 접수 페이지로 이동
 function goToReception() {
-    window.location.href = "/reception";
+    window.location.href = '/reception';
 }
 
 // 예약 페이지로 이동
 function goToReservation() {
-    window.location.href = "/reservation";
+    window.location.href = '/reservation';
 }
 
-
+function goToBoardList() {
+    window.location.href = '/board/list';
+}

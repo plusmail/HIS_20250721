@@ -133,3 +133,18 @@ body {
     transform: scale(1.1);
     color: #007bff;
 }
+
+.move-to-reception:hover {
+    transform: scale(1.1);
+    color: #007bff;
+}
+
+.move-to-reservation:hover {
+    transform: scale(1.1);
+    color: #007bff;
+}
+
+.move-to-board-list:hover {
+    transform: scale(1.1);
+    color: #007bff;
+}
