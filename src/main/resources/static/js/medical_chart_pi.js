@@ -188,7 +188,7 @@ if (!window.MedicalChartPIModule) {
         }
 
         function updateTextarea() {
-            const memoTextarea = document.getElementById('memo-textarea');
+            const memoTextarea = document.getElementById('pi-textarea');
             const checkboxes = document.querySelectorAll('.form-check-input');
             const selectedValues = [];
 

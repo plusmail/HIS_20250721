@@ -32,9 +32,13 @@ public class ChartCPController {
 
 
     @GetMapping("/getDataByCnum")
-    @ResponseBody
-    public MedicalChart getDataByCnum(@RequestParam Integer cnum) {
-        return chartCPService.getChartDataByCnum(cnum);
+    public ResponseEntity<MedicalChartDTO> getDataByCnum(@RequestParam("cnum") Integer cnum) {
+        MedicalChartDTO medicalChartDTO = chartCPService.getMedicalChartByCnum(cnum);
+        if (medicalChartDTO != null) {
+            return ResponseEntity.ok(medicalChartDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

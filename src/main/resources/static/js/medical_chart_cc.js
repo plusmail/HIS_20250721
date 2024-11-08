@@ -39,7 +39,6 @@ if (!window.MedicalChartCCModule) {
                 ccCheckDoc.selectedIndex = 1;
             }
         }
-
         // 주요 요소 이벤트 리스너 등록
         function setupEventListeners() {
             tooth.addEventListener("click", handleToothClickCc);

@@ -1,5 +1,7 @@
 let patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
-document.addEventListener("DOMContentLoaded", function() {
+
+let cnumGlogal = null;
+document.addEventListener("DOMContentLoaded", function () {
     let SearchModal = document.getElementById('Search-Modal');
     let mTooth = document.querySelector("#Search-container"); // id로 수정
     let saveToothBtn = document.getElementById('search-save-tooth');  // 치아 저장 버튼 ID 수정
@@ -257,9 +259,6 @@ function readPaChart() {
                 // 데이터를 순회하여 테이블에 추가
                 data.forEach(chart => {
                     let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
-                    let cnum = chart.cnum;
-                    populateFieldsWithCC(cnum);
-
                     // 각 치아 번호를 분할하여 사분면 형식으로 정렬
                     let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
 
@@ -298,6 +297,13 @@ function readPaChart() {
                             <td class="text-center medical-content-cell">${chart.checkDoc}</td>
                         </tr>
                     `);
+
+                    row.on('dblclick', function () {
+
+                        cnumGlogal = chart.cnum;
+
+                        loadDataIntoFields(cnumGlogal);
+                    });
 
                     // 각 데이터 클릭 이벤트 추가
                     row.on('click', function () {
@@ -380,7 +386,7 @@ function renderItems(itemsArray) {
 }
 
 // 엔터 키 입력 시 버튼 기능 실행
-document.getElementById('History_keyword').addEventListener('keypress', function(event) {
+document.getElementById('History_keyword').addEventListener('keypress', function (event) {
     if (event.key === 'Enter') { // Enter 키 확인
         event.preventDefault(); // 기본 엔터 동작 방지 (필요 시)
         document.getElementById('searchButton').click(); // 버튼 클릭 실행
@@ -400,3 +406,7 @@ function performSearch() {
         console.log("Please enter a keyword to search.");
     }
 }
+
+
+
+

@@ -44,6 +44,6 @@ public interface MedicalChartRepository extends JpaRepository<MedicalChart, Inte
     @Modifying
     void deleteByCnum(Integer cnum);
 
-    Optional<MedicalChart> findByCnum(Integer cnum);
+    MedicalChart findByCnum(Integer cnum);
 
 }

@@ -11,6 +11,6 @@ public interface ChartCPService {
 
     void saveMedicalChart(MedicalChartDTO medicalChartDTO);
 
-    MedicalChart getChartDataByCnum(Integer cnum);
+    MedicalChartDTO getMedicalChartByCnum(Integer cnum);
 
 }

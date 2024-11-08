@@ -7,6 +7,7 @@ import kroryi.his.repository.MedicalChartRepository;
 import kroryi.his.service.ChartCPService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.List;
 public class ChartCPServiceImpl implements ChartCPService {
 
     private final MedicalChartRepository medicalChartRepository;
+
+    private final ModelMapper modelMapper;
 
     private List<List<String>> toothList = new ArrayList<>();
     private List<List<String>> symptomList = new ArrayList<>();
@@ -58,9 +61,12 @@ public class ChartCPServiceImpl implements ChartCPService {
 
 
     @Override
-    public MedicalChart getChartDataByCnum(Integer cnum) {
-        return medicalChartRepository.findByCnum(cnum)
-                .orElseThrow(() -> new EntityNotFoundException("Chart data not found for cnum: " + cnum));
+    public MedicalChartDTO getMedicalChartByCnum(Integer cnum) {
+        MedicalChart medicalChart = medicalChartRepository.findByCnum(cnum);
+        if (medicalChart != null) {
+            return modelMapper.map(medicalChart, MedicalChartDTO.class); // 자동으로 매핑
+        }
+        return null;
     }
 
 }
