@@ -46,25 +46,41 @@ public class ChartCPServiceImpl implements ChartCPService {
 
     @Override
     public void saveMedicalChart(MedicalChartDTO medicalChartDTO) {
-        MedicalChart medicalChart = MedicalChart.builder()
-                .mdTime(medicalChartDTO.getMdTime())
-                .checkDoc(medicalChartDTO.getCheckDoc())
-                .medicalContent(medicalChartDTO.getMedicalContent())
-                .teethNum(medicalChartDTO.getTeethNum())
-                .medicalDivision(medicalChartDTO.getMedicalDivision())
-                .chartNum(medicalChartDTO.getChartNum())
-                .paName(medicalChartDTO.getPaName())
-                .build();
-
+        MedicalChart medicalChart;
+        if (medicalChartDTO.getCnum() != null) {
+            // cnum  값 존재시 기존 데이터 수정
+            medicalChart = medicalChartRepository.findByCnum(medicalChartDTO.getCnum());
+            if (medicalChart != null) {
+                medicalChart.setMdTime(medicalChartDTO.getMdTime());
+                medicalChart.setCheckDoc(medicalChartDTO.getCheckDoc());
+                medicalChart.setMedicalContent(medicalChartDTO.getMedicalContent());
+                medicalChart.setTeethNum(medicalChartDTO.getTeethNum());
+                medicalChart.setMedicalDivision(medicalChartDTO.getMedicalDivision());
+                medicalChart.setChartNum(medicalChartDTO.getChartNum());
+                medicalChart.setPaName(medicalChartDTO.getPaName());
+            } else {
+                throw new IllegalArgumentException("유효하지 않은 cnum: " + medicalChartDTO.getCnum());
+            }
+        } else {
+            // 새 데이터 생성
+            medicalChart = MedicalChart.builder()
+                    .mdTime(medicalChartDTO.getMdTime())
+                    .checkDoc(medicalChartDTO.getCheckDoc())
+                    .medicalContent(medicalChartDTO.getMedicalContent())
+                    .teethNum(medicalChartDTO.getTeethNum())
+                    .medicalDivision(medicalChartDTO.getMedicalDivision())
+                    .chartNum(medicalChartDTO.getChartNum())
+                    .paName(medicalChartDTO.getPaName())
+                    .build();
+        }
         medicalChartRepository.save(medicalChart);
     }
-
 
     @Override
     public MedicalChartDTO getMedicalChartByCnum(Integer cnum) {
         MedicalChart medicalChart = medicalChartRepository.findByCnum(cnum);
         if (medicalChart != null) {
-            return modelMapper.map(medicalChart, MedicalChartDTO.class); // 자동으로 매핑
+            return modelMapper.map(medicalChart, MedicalChartDTO.class);
         }
         return null;
     }

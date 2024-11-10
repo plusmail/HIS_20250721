@@ -337,6 +337,7 @@ function readPaChart() {
                                         }
                                     });
                                     readPaChart();
+                                    resetFormFields();
                                 },
                                 error: function (xhr, status, error) {
                                     console.error('Error:', error);
@@ -407,6 +408,22 @@ function performSearch() {
     }
 }
 
+function resetFormFields() {
+    // Reset all input fields to their default state
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false; // Reset checkboxes and radios
+        } else {
+            input.value = ''; // Reset text and select fields
+        }
+    });
 
+    // Reset any other state or styles, such as button highlights or active classes
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.classList.remove('opacity-50'); // Remove button opacity if needed
+    });
+}
 
 

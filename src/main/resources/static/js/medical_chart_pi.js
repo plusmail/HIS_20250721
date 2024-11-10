@@ -4,7 +4,7 @@ if (!window.MedicalChartPIModule) {
         let symptomList = [];
         let listIndex = 0;
 
-        let tooth, symptom, memo, savePi, mUpTooth, mDownTooth, mAllTooth, mUpToothY, mDownToothY, mAllToothY;
+        let tooth, symptom, memo, savePi, resetPi, mUpTooth, mDownTooth, mAllTooth, mUpToothY, mDownToothY, mAllToothY;
         let mUpToothValues, mDownToothValues, mYUpToothValues, mYDownToothValues, modalData, allToothLists;
 
         // 초기화 함수
@@ -13,6 +13,7 @@ if (!window.MedicalChartPIModule) {
             symptom = document.querySelector(".pi-symptom");
             memo = document.querySelector(".memo");
             savePi = document.querySelector(".save-pi");
+            resetPi = document.querySelector(".reset-pi");
             mUpTooth = document.querySelector(".up-control");
             mDownTooth = document.querySelector(".down-control");
             mAllTooth = document.querySelector(".all-control");
@@ -39,11 +40,14 @@ if (!window.MedicalChartPIModule) {
             if (!piCheckDoc.value) {
                 piCheckDoc.selectedIndex = 1;
             }
+
+            cnumGlobal = null;
+
         }
 
         // 주요 요소 이벤트 리스너 등록
         function setupEventListeners() {
-            tooth.addEventListener("click", handleToothClick);
+            tooth.addEventListener("click", handleToothClickPi);
             symptom.addEventListener("click", handleSymptomClick);
 
             // 체크박스에 이벤트 리스너 추가
@@ -52,13 +56,13 @@ if (!window.MedicalChartPIModule) {
                 checkbox.addEventListener('change', updateTextarea);
             });
 
-            // 저장 버튼 클릭 이벤트 리스너 추가
             savePi.addEventListener('click', saveMedicalPiChart);
+            resetPi.addEventListener('click', resetFormFields);
         }
 
         // 모듈 초기화 및 정리
         function cleanup() {
-            tooth.removeEventListener("click", handleToothClick);
+            tooth.removeEventListener("click", handleToothClickPi);
             symptom.removeEventListener("click", handleSymptomClick);
 
             toothList = [];
@@ -67,103 +71,85 @@ if (!window.MedicalChartPIModule) {
         }
 
         // 치아 버튼 클릭시 호출
-        function handleToothClick(e) {
-            modalToothList = [];
-            modalToothList.push(e.target.value);
+        function handleToothClickPi(e) {
             if (e.target.tagName === "BUTTON" && e.target.id === '') {
                 const toothValue = e.target.value;
 
-                // 치아 리스트에 추가하거나 제거
-                if (toothList.includes(toothValue)) {
-                    toothList = toothList.filter(tooth => tooth !== toothValue);
-                } else {
-                    toothList.push(toothValue);
+                if (!Array.isArray(window.toothList)) {
+                    window.toothList = [];
                 }
 
-                // 버튼의 스타일을 업데이트
+                if (window.toothList.includes(toothValue)) {
+                    window.toothList = window.toothList.filter(tooth => tooth !== toothValue);
+                } else {
+                    window.toothList.push(toothValue);
+                }
+
                 e.target.classList.toggle("opacity-50");
-            }else if (e.target.tagName === "BUTTON") {
-                toothTerminal(e.target.id);
+
+                updateToothButtonStyles(window.toothList);
+            } else if (e.target.tagName === "BUTTON") {
+                toothTerminalPi(e.target.id);
             }
         }
-        function toothTerminal(id) {
-            toothList = [];
 
+        function toothTerminalPi(id) {
+            const isSelected = document.getElementById(id).classList.contains("opacity-50");
+
+            let selectedTeethValues = [];
             switch (id) {
                 case "upTooth":
-                    mUpToothValues.forEach(upToothValue => {
-                        if (!isNaN(upToothValue.value)) {
-                            toothList.push(upToothValue.value);
-                        }
-                    });
-                    toggleOpacity(mUpTooth, mUpToothValues, "상악");
+                    selectedTeethValues = Array.from(mUpToothValues).map(tooth => tooth.value);
+                    toggleOpacityPi(mUpTooth, mUpToothValues, "상악");
                     break;
-
                 case "allTooth":
-                    mUpToothValues.forEach(upToothValue => {
-                        if (!isNaN(upToothValue.value)) {
-                            toothList.push(upToothValue.value);
-                        }
-                    });
-                    mDownToothValues.forEach(downToothValue => {
-                        if (!isNaN(downToothValue.value)) {
-                            toothList.push(downToothValue.value);
-                        }
-                    });
-                    toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                    selectedTeethValues = [
+                        ...Array.from(mUpToothValues).map(tooth => tooth.value),
+                        ...Array.from(mDownToothValues).map(tooth => tooth.value)
+                    ];
+                    toggleOpacityPi(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
                     break;
-
                 case "downTooth":
-                    mDownToothValues.forEach(downToothValue => {
-                        if (!isNaN(downToothValue.value)) {
-                            toothList.push(downToothValue.value);
-                        }
-                    });
-                    toggleOpacity(mDownTooth, mDownToothValues, "하악");
+                    selectedTeethValues = Array.from(mDownToothValues).map(tooth => tooth.value);
+                    toggleOpacityPi(mDownTooth, mDownToothValues, "하악");
                     break;
-
                 case "upToothY":
-                    mYUpToothValues.forEach(yUpToothValue => {
-                        if (!isNaN(yUpToothValue.value)) {
-                            toothList.push(yUpToothValue.value);
-                        }
-                    });
-                    toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
+                    selectedTeethValues = Array.from(mYUpToothValues).map(tooth => tooth.value);
+                    toggleOpacityPi(mUpToothY, mYUpToothValues, "유치상악");
                     break;
-
                 case "allToothY":
-                    mYUpToothValues.forEach(yUpToothValue => {
-                        if (!isNaN(yUpToothValue.value)) {
-                            toothList.push(yUpToothValue.value);
-                        }
-                    });
-                    mYDownToothValues.forEach(yDownToothValue => {
-                        if (!isNaN(yDownToothValue.value)) {
-                            toothList.push(yDownToothValue.value);
-                        }
-                    });
-                    toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                    selectedTeethValues = [
+                        ...Array.from(mYUpToothValues).map(tooth => tooth.value),
+                        ...Array.from(mYDownToothValues).map(tooth => tooth.value)
+                    ];
+                    toggleOpacityPi(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
                     break;
-
                 case "downToothY":
-                    mYDownToothValues.forEach(yDownToothValue => {
-                        if (!isNaN(yDownToothValue.value)) {
-                            toothList.push(yDownToothValue.value);
-                        }
-                    });
-                    toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
+                    selectedTeethValues = Array.from(mYDownToothValues).map(tooth => tooth.value);
+                    toggleOpacityPi(mDownToothY, mYDownToothValues, "유치하악");
                     break;
-
                 default:
                     alert("올바르지 않은 버튼을 선택하였습니다.");
-                    break;
+                    return;
             }
+
+            if (isSelected) {
+                window.toothList = window.toothList.filter(tooth => !selectedTeethValues.includes(tooth));
+            } else {
+                selectedTeethValues.forEach(tooth => {
+                    if (!window.toothList.includes(tooth)) {
+                        window.toothList.push(tooth);
+                    }
+                });
+            }
+            updateToothButtonStyles(window.toothList);
         }
 
-        function toggleOpacity(button, elements, logMessage) {
+        function toggleOpacityPi(button, elements, logMessage) {
             button.classList.toggle("opacity-50");
             elements.forEach(element => element.classList.toggle("opacity-50"));
         }
+
 
         // 증상 체크박스 클릭
         function handleSymptomClick(e) {
@@ -179,13 +165,37 @@ if (!window.MedicalChartPIModule) {
             }
         }
 
-        // 모든 치아와 증상 선택을 초기 상태로 돌림
-        function toothValueReset() {
+        function toothValueResetPi() {
             allToothLists.forEach(button => button.classList.remove("opacity-50"));
             toothList = [];
             symptomList = [];
             memo.value = ''; // 메모 초기화
         }
+
+        function resetCheckboxes() {
+            const checkboxes = document.querySelectorAll('.form-check-input');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;  // Uncheck all checkboxes
+            });
+        }
+
+        function resetFormFields() {
+            cnumGlobal = null;
+            document.getElementById('piCheckDoc').selectedIndex = 0;
+
+            // Reset the date to today's date
+            const today = new Date().toISOString().split("T")[0];
+            document.getElementById('mdTime').value = today;
+            const piCheckDoc = document.getElementById("piCheckDoc");
+            if (!piCheckDoc.value) {
+                piCheckDoc.selectedIndex = 1;
+            }
+            memo.value = '';
+            window.toothList = [];
+            resetCheckboxes();
+            toothValueResetPi();
+        }
+
 
         function updateTextarea() {
             const memoTextarea = document.getElementById('pi-textarea');
@@ -206,15 +216,26 @@ if (!window.MedicalChartPIModule) {
 
             const mdTime = document.getElementById('mdTime').value;
             const piCheckDoc = document.getElementById('piCheckDoc').value;
-
             const memoContent = memo.value;
             const paName = patientInfos.name || '';
             const chartNum = patientInfos.chartNum || '';
+            const cnum = cnumGlobal;
+
+            console.log(cnumGlogal);
+
+            let updatedToothList = [...window.toothList];
+
+            toothList.forEach(tooth => {
+                if (!updatedToothList.includes(tooth)) {
+                    updatedToothList.push(tooth);
+                }
+            });
 
             const medicalChartData = {
+                cnum: cnum,
                 mdTime: mdTime,
                 checkDoc: piCheckDoc,
-                teethNum: toothList.join(', '),
+                teethNum: updatedToothList.join(', '),
                 medicalContent: memoContent,
                 medicalDivision: "PI",
                 chartNum: chartNum,
@@ -230,8 +251,8 @@ if (!window.MedicalChartPIModule) {
             })
                 .then(response => {
                     if (response.ok) {
-                        alert('저장되었습니다.');
-                        toothValueReset();
+                        alert(cnum ? '수정되었습니다.' : '저장되었습니다.');
+                        resetFormFields();
                         readPaChart();
                     } else {
                         alert('저장 실패.');

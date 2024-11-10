@@ -554,12 +554,12 @@
                         $('#cc-textarea').val(response.medicalContent || '');
                         $('#piCheckDoc').val(response.checkDoc || '');
                         $('#pi-textarea').val(response.medicalContent || '');
+                        cnumGlobal = cnum;
 
                         if (response.teethNum) {
                             const teethArray = response.teethNum.split(',').map(tooth => tooth.trim());
-                            window.toothList = teethArray;
-
-                            updateToothButtonStyles(teethArray);
+                            window.toothList = teethArray;  // 기존 치아 배열 로드
+                            updateToothButtonStyles(teethArray);  // 버튼 상태 업데이트
                         }
                     } else {
                         console.warn("No data found for cnum:", cnum);
@@ -574,12 +574,16 @@
         }
 
 
-        //저장된 치아 클릭 함수
         function updateToothButtonStyles(teethArray) {
-            $('.tooth-btn, .small-tooth-btn').removeClass("opacity-50");
+            $('.tooth-btn, .small-tooth-btn').each(function() {
+                const toothValue = $(this).val();
 
-            teethArray.forEach(toothValue => {
-                $(`.tooth-btn[value="${toothValue}"], .small-tooth-btn[value="${toothValue}"]`).addClass("opacity-50");
+                // 버튼이 `toothArray`에 있으면 선택 상태로 유지, 없으면 비활성화
+                if (teethArray.includes(toothValue)) {
+                    $(this).addClass("opacity-50");
+                } else {
+                    $(this).removeClass("opacity-50");
+                }
             });
         }
 
