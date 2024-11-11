@@ -25,8 +25,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -43,6 +46,9 @@ public class HomeController {
 //        this.patientRegisterService = patientRegisterService;
 //    }
 //
+
+
+
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal UserDetails user, Model model, HttpSession session) {
         try {
@@ -54,7 +60,7 @@ public class HomeController {
             }
             log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
-            List<Board> latestPosts = boardService.getLatestPosts();
+            List<BoardDTO> latestPosts = boardService.getLatestPosts();
 
             // 포맷된 날짜를 포함하는 DTO 리스트 생성
             List<BoardDTO> boardDTOS = latestPosts.stream()

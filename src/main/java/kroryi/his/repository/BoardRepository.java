@@ -23,7 +23,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardSearch
     @Query("SELECT b FROM Board b ORDER BY b.regDate DESC")
     List<Board> findTop3ByOrderByRegDateDesc(Pageable pageable);
 
-
-
-
+    @Query("SELECT b FROM Board b ORDER BY b.regDate DESC")
+    List<Board> findLatestPosts(Pageable pageable);  // Pageable을 통해 개수 제한
 }
+
