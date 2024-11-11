@@ -276,18 +276,21 @@ document.addEventListener("DOMContentLoaded", function () {
                                         type: 'GET',
                                         dataType: 'json',
                                         success: function (data) {
-                                            let tableBody = $("#plan-data");
-                                            tableBody.empty();
-                                            data.forEach(chart => {
-                                                createTableRowWithData(chart, doctorNames, tableBody);
-                                            });
-                                            createNewTableRow(doctorNames, tableBody);
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error:', error);
+                                            // 삭제후 진료차트 업데이트
+                                            updateChartTable(patientInfos.chartNum);
+
+                                            // 차트 로딩후 폼 초기화
+                                            if (window.MedicalChartCCModule) {
+                                                window.MedicalChartCCModule.resetFormFields();
+                                            }
+                                            if (window.MedicalChartPIModule) {
+                                                window.MedicalChartPIModule.resetFormFields();
+                                            }
+
+                                            // 차트 재로딩
+                                            readPaChart();
                                         }
-                                    });
-                                    readPaChart();
+                                    })
                                 },
                                 error: function (xhr, status, error) {
                                     console.error('Error:', error);
@@ -485,18 +488,21 @@ document.addEventListener("DOMContentLoaded", function () {
                                         type: 'GET',
                                         dataType: 'json',
                                         success: function (data) {
-                                            let tableBody = $("#plan-data");
-                                            tableBody.empty();
-                                            data.forEach(chart => {
-                                                createTableRowWithData(chart, doctorNames, tableBody);
-                                            });
-                                            createNewTableRow(doctorNames, tableBody);
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error:', error);
+                                            // 삭제후 진료차트 업데이트
+                                            updateChartTable(patientInfos.chartNum);
+
+                                            // 차트 로딩후 폼 초기화
+                                            if (window.MedicalChartCCModule) {
+                                                window.MedicalChartCCModule.resetFormFields();
+                                            }
+                                            if (window.MedicalChartPIModule) {
+                                                window.MedicalChartPIModule.resetFormFields();
+                                            }
+
+                                            // 차트 재로딩
+                                            readPaChart();
                                         }
-                                    });
-                                    readPaChart();
+                                    })
                                 },
                                 error: function (xhr, status, error) {
                                     console.error('Error:', error);

@@ -572,6 +572,20 @@
             });
         }
 
+        // 탭 클릭 시 이벤트
+        $(document).on('click', '.nav-link', function () {
+            // 탭 이동 시 toothList 초기화
+            window.toothList = [];
+            resetToothButtonStyles(); // 버튼 스타일 초기화
+        });
+
+        // 버튼 스타일 초기화 함수
+        function resetToothButtonStyles() {
+            $('.tooth-btn, .small-tooth-btn').each(function() {
+                $(this).removeClass("opacity-50");
+            });
+        }
+
 
         function updateToothButtonStyles(teethArray) {
             $('.tooth-btn, .small-tooth-btn').each(function() {

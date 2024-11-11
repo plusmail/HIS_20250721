@@ -75,64 +75,87 @@ if (!window.MedicalChartPIModule) {
             if (e.target.tagName === "BUTTON" && e.target.id === '') {
                 const toothValue = e.target.value;
 
+                // 배열 초기화 확인
                 if (!Array.isArray(window.toothList)) {
                     window.toothList = [];
                 }
 
+                // 치아 값 추가/제거
                 if (window.toothList.includes(toothValue)) {
                     window.toothList = window.toothList.filter(tooth => tooth !== toothValue);
                 } else {
                     window.toothList.push(toothValue);
                 }
 
+                // 버튼 스타일 토글
                 e.target.classList.toggle("opacity-50");
 
+                // 스타일 업데이트
                 updateToothButtonStyles(window.toothList);
             } else if (e.target.tagName === "BUTTON") {
-                toothTerminalPi(e.target.id);
+                // ID 유효성 검증
+                if (document.getElementById(e.target.id)) {
+                    toothTerminalPi(e.target.id);
+                } else {
+                    console.warn("유효하지 않은 버튼 ID:", e.target.id);
+                }
             }
         }
 
+// 치아 영역 선택
         function toothTerminalPi(id) {
-            const isSelected = document.getElementById(id).classList.contains("opacity-50");
+            // 배열 초기화 확인
+            if (!Array.isArray(window.toothList)) {
+                window.toothList = [];
+            }
 
+            const button = document.getElementById(id);
+            if (!button) {
+                console.error("올바르지 않은 ID:", id);
+                return;
+            }
+
+            const isSelected = button.classList.contains("opacity-50");
             let selectedTeethValues = [];
+
+            // 각 ID에 따른 치아 목록 설정
             switch (id) {
                 case "upTooth":
-                    selectedTeethValues = Array.from(mUpToothValues).map(tooth => tooth.value);
+                    selectedTeethValues = Array.from(mUpToothValues || []).map(tooth => tooth.value || '');
                     toggleOpacityPi(mUpTooth, mUpToothValues, "상악");
                     break;
                 case "allTooth":
                     selectedTeethValues = [
-                        ...Array.from(mUpToothValues).map(tooth => tooth.value),
-                        ...Array.from(mDownToothValues).map(tooth => tooth.value)
+                        ...Array.from(mUpToothValues || []).map(tooth => tooth.value || ''),
+                        ...Array.from(mDownToothValues || []).map(tooth => tooth.value || '')
                     ];
                     toggleOpacityPi(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
                     break;
                 case "downTooth":
-                    selectedTeethValues = Array.from(mDownToothValues).map(tooth => tooth.value);
+                    selectedTeethValues = Array.from(mDownToothValues || []).map(tooth => tooth.value || '');
                     toggleOpacityPi(mDownTooth, mDownToothValues, "하악");
                     break;
                 case "upToothY":
-                    selectedTeethValues = Array.from(mYUpToothValues).map(tooth => tooth.value);
+                    selectedTeethValues = Array.from(mYUpToothValues || []).map(tooth => tooth.value || '');
                     toggleOpacityPi(mUpToothY, mYUpToothValues, "유치상악");
                     break;
                 case "allToothY":
                     selectedTeethValues = [
-                        ...Array.from(mYUpToothValues).map(tooth => tooth.value),
-                        ...Array.from(mYDownToothValues).map(tooth => tooth.value)
+                        ...Array.from(mYUpToothValues || []).map(tooth => tooth.value || ''),
+                        ...Array.from(mYDownToothValues || []).map(tooth => tooth.value || '')
                     ];
                     toggleOpacityPi(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
                     break;
                 case "downToothY":
-                    selectedTeethValues = Array.from(mYDownToothValues).map(tooth => tooth.value);
+                    selectedTeethValues = Array.from(mYDownToothValues || []).map(tooth => tooth.value || '');
                     toggleOpacityPi(mDownToothY, mYDownToothValues, "유치하악");
                     break;
                 default:
-                    alert("올바르지 않은 버튼을 선택하였습니다.");
+                    console.error("올바르지 않은 ID:", id);
                     return;
             }
 
+            // 선택 상태 업데이트
             if (isSelected) {
                 window.toothList = window.toothList.filter(tooth => !selectedTeethValues.includes(tooth));
             } else {
@@ -142,6 +165,8 @@ if (!window.MedicalChartPIModule) {
                     }
                 });
             }
+
+            // 버튼 스타일 업데이트
             updateToothButtonStyles(window.toothList);
         }
 
