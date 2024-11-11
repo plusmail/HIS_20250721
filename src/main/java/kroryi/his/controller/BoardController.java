@@ -75,17 +75,14 @@ public class BoardController {
         BoardDTO boardDTO = boardService.readOne(bno);
         log.info("/board/modify ---> {}", boardDTO);
         model.addAttribute("dto", boardDTO);
-
         return "board/modify";
     }
-
     @PostMapping("/modify")
     public String modify(@Valid BoardDTO boardDTO,
                          PageRequestDTO pageRequestDTO,
                          BindingResult bindingResult,
                          RedirectAttributes redirectAttributes) {
         log.info("-------modify post -------");
-
         if (bindingResult.hasErrors()) {
             log.info("/modify post 에러 발생 : {}", bindingResult.getAllErrors());
             String link = pageRequestDTO.getLink();
@@ -93,22 +90,17 @@ public class BoardController {
             redirectAttributes.addAttribute("bno", boardDTO.getBno());
             return "redirect:/board/modify?" + link;
         }
-
         boardService.modify(boardDTO);
         redirectAttributes.addFlashAttribute("result", "수정됨");
         redirectAttributes.addAttribute("bno", boardDTO.getBno());
-
-
         return "redirect:/board/read";
     }
-
     @PostMapping("/remove")
     public String remove(Long bno, RedirectAttributes redirectAttributes) {
         boardService.remove(bno);
         redirectAttributes.addFlashAttribute("result", "삭제되었습니다.");
         return "redirect:/board/list";
     }
-
 //    @GetMapping("/board/view/{bno}")
 //    public String view(@PathVariable Long bno, Model model) {
 //        // 게시글을 조회하는 서비스 호출
