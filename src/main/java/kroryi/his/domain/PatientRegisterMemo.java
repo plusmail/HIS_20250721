@@ -27,6 +27,12 @@ public class PatientRegisterMemo {
     private Long mmo;
 
     private String memoChartNum;
+    private String memoChartNum;
+
+//    // 차트번호 (PatientRegister와 연결)
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "memo_chartnum", referencedColumnName = "chart_num", nullable = false)
+//    private PatientRegister patientRegister;
 
     // 등록 날짜
     @Column(name = "reg_date")
@@ -39,4 +45,7 @@ public class PatientRegisterMemo {
     public void changeText(String content) {
         this.content = content;
     }
+
+    // 기타 필드
+    // 필요한 경우 여기에 추가 필드를 정의할 수 있습니다.
 }
