@@ -5,6 +5,11 @@ import kroryi.his.domain.Board;
 import kroryi.his.dto.BoardDTO;
 import kroryi.his.dto.PageRequestDTO;
 import kroryi.his.dto.PageResponseDTO;
+import kroryi.his.repository.BoardRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -14,8 +19,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Service
 public interface BoardService {
-   List<Board> getLatestPosts();
+
+    List<Board> getLatestPosts();
 
     Long register(BoardDTO dto);
 
@@ -26,4 +33,5 @@ public interface BoardService {
     void remove(Long id);
 
     PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO);
+
 }

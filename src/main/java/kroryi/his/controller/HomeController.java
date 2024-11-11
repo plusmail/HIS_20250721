@@ -10,8 +10,10 @@ import kroryi.his.dto.PageRequestDTO;
 import kroryi.his.dto.PageResponseDTO;
 import kroryi.his.service.BoardService;
 import kroryi.his.service.PatientRegisterService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,6 +37,12 @@ public class HomeController {
     private final PatientRegisterService patientRegisterService;
     private final BoardService boardService;
 
+    //    @Autowired
+//    public HomeController(BoardService boardService, PatientRegisterService patientRegisterService) {
+//        this.boardService = boardService;
+//        this.patientRegisterService = patientRegisterService;
+//    }
+//
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal UserDetails user, Model model, HttpSession session) {
         try {
@@ -89,7 +97,9 @@ public class HomeController {
 
     //    진료예약
     @GetMapping("/reservation")
-    public String reservation() { return "reservation"; }
+    public String reservation() {
+        return "reservation";
+    }
 
     //    진료차트
     @GetMapping("/medical_chart")
@@ -121,7 +131,7 @@ public class HomeController {
 //        PageResponseDTO<BoardListReplyCountDTO> responseDTO = boardService.listWithReplyCount(pageRequestDTO);
 //        PageResponseDTO<BoardListAllDTO> responseDTO = boardService.listWithAll(pageRequestDTO);
 
-        log.info("!!!!!!!!!!"+responseDTO);
+        log.info("!!!!!!!!!!" + responseDTO);
 
         model.addAttribute("responseDTO", responseDTO);
 

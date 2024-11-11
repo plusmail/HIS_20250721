@@ -1,5 +1,6 @@
 package kroryi.his.dto;
 
+import io.swagger.annotations.Info;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import kroryi.his.domain.Board;
@@ -12,9 +13,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
+//@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class BoardDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
