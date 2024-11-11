@@ -84,16 +84,21 @@ public class PatientAdmissionController {
         patientAdmissionDTO.setTreatStatus("1"); // 대기 상태는 1
 
         // DB에 저장
-        PatientAdmission patientAdmissionDTO1 = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
+        PatientAdmission savedPatientAdmission = patientAdmissionService.savePatientAdmission(patientAdmissionDTO);
 
-        messagingTemplate.convertAndSend("/topic/waitingPatients", patientAdmissionDTO1);
+        System.out.println("저장된 환자 ID (pid): " + savedPatientAdmission.getPid());
+        System.out.println("저장된 예약 시간 (rvTime): " + savedPatientAdmission.getRvTime());
 
-        response.put("data", patientAdmissionDTO1);
+        messagingTemplate.convertAndSend("/topic/waitingPatients", savedPatientAdmission);
+
+        // 저장된 객체에서 pid와 rvTime을 가져와 응답에 포함
+        response.put("data", savedPatientAdmission);
         response.put("message", "환자가 대기 상태로 등록되었습니다.");
-        response.put("rvTime", patientAdmissionDTO.getRvTime());
+        response.put("rvTime", savedPatientAdmission.getRvTime());  // 저장된 객체에서 가져오기
 
         return ResponseEntity.ok(response);
     }
+
 
 
     @MessageMapping("/waitingPatients")
@@ -160,8 +165,9 @@ public class PatientAdmissionController {
 
         // 새로 접수된 환자 처리
         for (PatientAdmission patient : existingPatients) {
-            // PID가 다르고 TreatStatus가 "1"인 환자만 업데이트
-            if (!patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("1")) {
+            // PID가 같은 환자만 처리
+            if (patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("1")) {
+                // 진료 시작 처리
                 patient.setViTime(LocalDateTime.now());
                 patient.setTreatStatus("2");
                 patient.setMainDoc(patientAdmissionDTO.getMainDoc());
@@ -178,11 +184,12 @@ public class PatientAdmissionController {
             }
         }
 
-        // 모든 환자가 이미 진료 중인 경우
+        // 모든 환자가 이미 진료 중이거나 업데이트할 환자가 없을 경우
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", "이미 진료 중이거나 업데이트할 환자가 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
 
 
     //    진료완료
@@ -208,9 +215,16 @@ public class PatientAdmissionController {
                 Integer.valueOf(String.valueOf(patientAdmissionDTO.getChartNum())),
                 patientAdmissionDTO.getReceptionTime().toLocalDate().atStartOfDay());
 
-        // 상태가 2이고 pid가 다른 경우 진료 완료 처리
+        // 확인용 로그 추가: existingPatients가 비어있는지 확인
+        System.out.println("찾은 환자 수: " + existingPatients.size());
+        if (existingPatients.isEmpty()) {
+            response.put("message", "해당하는 환자가 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        // 상태가 2인 환자만 진료 완료 처리
         for (PatientAdmission patient : existingPatients) {
-            if (!patient.getPid().equals(patientAdmissionDTO.getPid()) && patient.getTreatStatus().equals("2")) {
+            if (patient.getTreatStatus().equals("2")) { // TreatStatus가 "2"인 환자만 진료 완료 처리
                 patient.setTreatStatus("3"); // 치료 상태를 "3"으로 설정
                 patient.setCompletionTime(completionTime); // 진료 완료 시간 설정
 
@@ -225,10 +239,11 @@ public class PatientAdmissionController {
             }
         }
 
-        // 모든 환자가 이미 진료 완료 상태이거나 업데이트할 환자가 없는 경우
+        // 상태가 2인 환자가 없을 경우
         response.put("message", "이미 진료 완료 상태이거나 업데이트할 환자가 없습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 
 

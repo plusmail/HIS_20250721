@@ -1,6 +1,7 @@
 package kroryi.his.controller;
 
 import jakarta.servlet.http.HttpSession;
+import kroryi.his.domain.MedicalChart;
 import kroryi.his.dto.MedicalChartDTO;
 import kroryi.his.service.ChartCPService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,17 @@ public class ChartCPController {
     public ResponseEntity<Void> saveMedicalPiChart(@RequestBody MedicalChartDTO medicalChartDTO) {
         chartCPService.saveMedicalChart(medicalChartDTO);
         return ResponseEntity.ok().build(); // 성공적으로 저장된 경우
+    }
+
+
+    @GetMapping("/getDataByCnum")
+    public ResponseEntity<MedicalChartDTO> getDataByCnum(@RequestParam("cnum") Integer cnum) {
+        MedicalChartDTO medicalChartDTO = chartCPService.getMedicalChartByCnum(cnum);
+        if (medicalChartDTO != null) {
+            return ResponseEntity.ok(medicalChartDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
