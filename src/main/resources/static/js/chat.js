@@ -13,92 +13,84 @@ const sendMessageButton = document.getElementById('sendMessageButton');
 const notificationBadge = document.getElementById('notificationBadge');
 const deleteChatRoomsBtn = document.getElementById('deleteChatRoomsBtn');
 
-let selectedUsers = []; // 선택된 사용자 목록을 저장할 배열
-let chatRooms = [];
-let currentRoomId = null;
-let loggedInUserId = null;
-let recipientIds = [];
+let selectedUsers = []; // 선택된 사용자 ID 저장
+let chatRooms = []; // 채팅방 목록
+let currentRoomId = null; // 현재 열린 채팅방 ID
+let loggedInUserId = null; // 현재 로그인된 사용자 ID
+let recipientIds = []; // 현재 메시지의 수신자 목록
 
-
-// WebSocket 설정 및 구독
+// WebSocket 설정 및 초기화
 document.addEventListener('DOMContentLoaded', () => {
-        window.stompClient.connect({}, function (frame) {
-            console.log('Connected to server:', frame);
+    window.stompClient.connect({}, function (frame) {
+        console.log('Connected to server:', frame);
 
-            // 모든 채팅방의 새로운 메시지 수신
-            window.stompClient.subscribe(`/topic/rooms`, function (message) {
-                const newMessage = JSON.parse(message.body);
-                console.log("New message received:", newMessage);
-                // 현재 열려 있는 채팅방이 아닌 경우 알림 배지를 표시
-                if (currentRoomId !== newMessage.roomId) {
-                    incrementUnreadMessages(newMessage.roomId);
-                    showNotificationBadge(newMessage.roomId, getUnreadMessagesCount(newMessage.roomId));
-                }
+        // 모든 채팅방의 새로운 메시지 수신 구독
+        window.stompClient.subscribe(`/topic/rooms`, function (message) {
+            const newMessage = JSON.parse(message.body);
+            console.log("New message received:", newMessage);
 
-                // 채팅방 목록에 최근 메시지 업데이트
-                updateChatRoomList(newMessage);
-            });
-        }, function (error) {
-            console.error("WebSocket connection error:", error);
+            // 현재 열려 있는 채팅방이 아닌 경우 읽지 않은 메시지 처리
+            if (currentRoomId !== newMessage.roomId) {
+                incrementUnreadMessages(newMessage.roomId); // 읽지 않은 메시지 수 증가
+                showNotificationBadge(newMessage.roomId, getUnreadMessagesCount(newMessage.roomId)); // 알림 배지 표시
+            }
+
+            updateChatRoomList(newMessage); // 채팅방 목록 업데이트
         });
+    }, function (error) {
+        console.error("WebSocket connection error:", error);
+    });
 
-        // 초기 사용자 정보 및 채팅방 목록 불러오기
-        fetchCurrentUser();
-        loadChatRooms();
-        loadUnreadMessages();
-        clearUnreadMessages(null, true);
+    // 초기 사용자 정보 및 채팅방 목록 불러오기
+    fetchCurrentUser(); // 현재 사용자 정보 불러오기
+    loadChatRooms(); // 채팅방 목록 불러오기
+    loadUnreadMessages(); // 읽지 않은 메시지 불러오기
+    clearUnreadMessages(null, true); // 읽지 않은 메시지 초기화
 
-        // 채팅방 삭제 버튼 클릭 이벤트
-        if (deleteChatRoomsBtn) {
-            deleteChatRoomsBtn.addEventListener('click', () => {
-                const selectedRooms = Array.from(document.querySelectorAll('.room-checkbox:checked'))
-                    .map(cb => cb.getAttribute('data-room-id'));
+    // 채팅방 삭제 버튼 이벤트
+    if (deleteChatRoomsBtn) {
+        deleteChatRoomsBtn.addEventListener('click', () => {
+            const selectedRooms = Array.from(document.querySelectorAll('.room-checkbox:checked'))
+                .map(cb => cb.getAttribute('data-room-id'));
 
-                if (selectedRooms.length === 0) {
-                    alert("삭제할 채팅방을 선택하세요.");
-                    return;
-                }
+            if (selectedRooms.length === 0) {
+                alert("삭제할 채팅방을 선택하세요.");
+                return;
+            }
 
-                if (confirm("선택한 채팅방을 삭제하시겠습니까?")) {
-                    deleteSelectedRooms(selectedRooms);
-                }
-            });
-        } else {
-            console.error("삭제 버튼을 찾을 수 없습니다.");
-        }
-
-        // 메시지 전송 버튼 클릭 이벤트
-        sendMessageButton.addEventListener('click', sendMessage);
-
-        // Enter 키로 메시지 전송 기능 추가
-        messageInput.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // 기본 엔터 동작 방지
-                sendMessageButton.click(); // 전송 버튼 클릭 이벤트 트리거
+            if (confirm("선택한 채팅방을 삭제하시겠습니까?")) {
+                deleteSelectedRooms(selectedRooms);
             }
         });
-        // 사용자 선택 모달이 닫힐 때 선택 초기화
-        document.getElementById('userSelectionModal').addEventListener('hidden.bs.modal', () => {
-            // 선택된 사용자 초기화
-            selectedUsers = [];
-
-            // 모든 사용자 리스트 항목에서 'selected' 클래스 제거
-            const userListItems = document.querySelectorAll('#userList .list-group-item');
-            userListItems.forEach(item => item.classList.remove('selected'));
-
-            console.log("사용자 선택이 초기화되었습니다.");
-        });
     }
-);
 
-// 읽지 않은 메시지 수를 `localStorage`에 저장
+    // 메시지 전송 버튼 클릭 이벤트
+    sendMessageButton.addEventListener('click', sendMessage);
+
+    // Enter 키로 메시지 전송
+    messageInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // 기본 동작 방지
+            sendMessageButton.click(); // 전송 버튼 클릭
+        }
+    });
+
+    // 사용자 선택 모달이 닫힐 때 선택 초기화
+    document.getElementById('userSelectionModal').addEventListener('hidden.bs.modal', () => {
+        selectedUsers = []; // 선택 초기화
+        document.querySelectorAll('#userList .list-group-item').forEach(item => item.classList.remove('selected'));
+        console.log("사용자 선택이 초기화되었습니다.");
+    });
+});
+
+// 읽지 않은 메시지 증가
 function incrementUnreadMessages(roomId) {
     let unreadMessages = JSON.parse(localStorage.getItem('unreadMessages')) || {};
     unreadMessages[roomId] = (unreadMessages[roomId] || 0) + 1;
     localStorage.setItem('unreadMessages', JSON.stringify(unreadMessages));
 }
 
-// 특정 채팅방의 읽지 않은 메시지 개수를 반환
+// 특정 채팅방의 읽지 않은 메시지 개수 반환
 function getUnreadMessagesCount(roomId) {
     const unreadMessages = JSON.parse(localStorage.getItem('unreadMessages')) || {};
     return unreadMessages[roomId] || 0;
@@ -114,30 +106,29 @@ function loadUnreadMessages() {
     });
 }
 
-// 특정 채팅방의 읽지 않은 메시지 초기화 (채팅방에 들어갈 때 호출)
+// 읽지 않은 메시지 초기화
 function clearUnreadMessages(roomId, persist = false) {
     let unreadMessages = JSON.parse(localStorage.getItem('unreadMessages')) || {};
 
     if (roomId) {
-        // 특정 채팅방의 알림 초기화
-        unreadMessages[roomId] = 0;
-        hideNotificationBadge(roomId);
+        unreadMessages[roomId] = 0; // 특정 채팅방 초기화
+        hideNotificationBadge(roomId); // 알림 배지 숨김
     } else if (!persist) {
-        // 전체 알림을 초기화하면서 유효하지 않은 방 정리 (페이지 이동 시 유지)
+        // 모든 메시지 초기화
         const validRoomIds = chatRooms.map(room => room.id.toString());
         Object.keys(unreadMessages).forEach(id => {
             if (!validRoomIds.includes(id)) {
-                delete unreadMessages[id]; // 유효하지 않은 방 제거
+                delete unreadMessages[id];
             }
         });
     }
 
     localStorage.setItem('unreadMessages', JSON.stringify(unreadMessages));
 
-    // 전역 알림 배지 업데이트
     const hasUnreadMessages = Object.values(unreadMessages).some(count => count > 0);
-    showGlobalNotificationBadge(hasUnreadMessages);
+    showGlobalNotificationBadge(hasUnreadMessages); // 전역 알림 배지 업데이트
 }
+
 
 // 채팅 버튼 클릭 이벤트: 채팅 목록 열기/닫기
 chatButton.addEventListener('click', (event) => {
@@ -148,30 +139,18 @@ chatButton.addEventListener('click', (event) => {
     event.stopPropagation();
 });
 
-// 페이지에서 다른 빈 공간을 클릭하면 채팅 패널 닫기
+// 페이지 빈 공간 클릭 시 패널 닫기
 document.addEventListener('click', (event) => {
-    const chatPanel = document.getElementById('chatPanel');
-    const chatButton = document.getElementById('chatButton');
-    const chatModalEl = document.getElementById('chatModal');
-
-    // 클릭한 대상이 채팅 패널, 버튼, 모달이 아닌 경우만 패널 닫기
     if (
-        !chatPanel.contains(event.target) && // 채팅 패널 내부가 아니고
-        !chatButton.contains(event.target) && // 채팅 버튼이 아니고
-        !chatModalEl.contains(event.target)  // 채팅 모달 내부가 아닌 경우
+        !chatPanel.contains(event.target) &&
+        !chatButton.contains(event.target) &&
+        !chatModalEl.contains(event.target)
     ) {
-        chatPanel.classList.remove('open'); // 패널 닫기
+        chatPanel.classList.remove('open');
     }
 });
 
-// 채팅 모달 열기/닫기 이벤트로 패널 상태 제어
-chatModalEl.addEventListener('show.bs.modal', () => {
-    const chatPanel = document.getElementById('chatPanel');
-    chatPanel.classList.add('open'); // 채팅 패널 유지
-});
-
 chatModalEl.addEventListener('hide.bs.modal', () => {
-    const chatPanel = document.getElementById('chatPanel');
     // 채팅 모달이 닫혀도 패널이 열려 있도록 유지
     chatPanel.classList.add('open');
 });
@@ -180,20 +159,17 @@ chatModalEl.addEventListener('hide.bs.modal', () => {
 function fetchCurrentUser() {
     axios.get('/api/user/session')
         .then(response => {
-            globalUserData = response.data; // 응답 데이터를 globalUserData에 할당
-            loggedInUserId = globalUserData.username || globalUserData.mid; // mid 또는 username 사용
-            console.log('로그인된 사용자 ID:', loggedInUserId);
-
-            // 사용자 목록 로드
-            loadUsers();
+            globalUserData = response.data;
+            loggedInUserId = globalUserData.username || globalUserData.mid; // 사용자 ID 설정
+            loadUsers(); // 사용자 목록 불러오기
         })
         .catch(error => {
             console.error('Error fetching user session:', error);
-            alert("사용자 세션 정보를 불러오지 못했습니다. 다시 로그인해 주세요.");
+            alert("사용자 정보를 불러오지 못했습니다.");
         });
 }
 
-
+// 채팅방 목록 불러오기
 function loadChatRooms() {
     axios.get(window.location.origin + '/api/chat/rooms')
         .then(response => {
@@ -208,7 +184,7 @@ function loadChatRooms() {
 
 // 채팅방 목록 렌더링 함수
 function renderChatRooms() {
-    roomList.innerHTML = '';
+    roomList.innerHTML = ''; // 기존 목록 초기화
     chatRooms.forEach(room => {
         const li = document.createElement('li');
         li.classList.add('list-group-item', 'chat-room-item');
@@ -275,7 +251,6 @@ function renderChatRooms() {
     }
 }
 
-
 // 사용자 불러오기
 function loadUsers() {
     axios.get('/api/chat/member/list')
@@ -331,20 +306,19 @@ function renderUserList(users) {
     });
 }
 
-
+// 선택한 채팅방을 삭제하는 함수
 function deleteSelectedRooms(selectedRooms) {
-    const unreadMessages = JSON.parse(localStorage.getItem('unreadMessages')) || {};
+    const unreadMessages = JSON.parse(localStorage.getItem('unreadMessages')) || {}; // 읽지 않은 메시지 정보 로드
 
     selectedRooms.forEach(roomId => {
+        // 채팅방 삭제 API 호출
         axios.delete(`/api/chat/rooms/${roomId}`)
             .then(response => {
                 console.log(`채팅방 ${roomId}이 삭제되었습니다.`);
 
-                // 알림 데이터에서 해당 방 제거
+                // 읽지 않은 메시지 정보에서 해당 채팅방 제거
                 delete unreadMessages[roomId];
-
-                // 로컬스토리지 업데이트
-                localStorage.setItem('unreadMessages', JSON.stringify(unreadMessages));
+                localStorage.setItem('unreadMessages', JSON.stringify(unreadMessages)); // 업데이트
 
                 // 전역 알림 배지 갱신
                 const hasUnreadMessages = Object.values(unreadMessages).some(count => count > 0);
@@ -359,17 +333,17 @@ function deleteSelectedRooms(selectedRooms) {
     });
 }
 
-
-
+// 새 채팅방을 시작하는 버튼의 클릭 이벤트 핸들러
 startChatBtn.addEventListener('click', () => {
     if (selectedUsers.length === 0) {
         alert("채팅에 추가할 사용자를 선택하세요.");
         return;
     }
 
-    const selectedUserSet = new Set([loggedInUserId, ...selectedUsers]); // 현재 사용자 + 선택한 사용자들
+    // 현재 사용자와 선택한 사용자들의 Set 생성
+    const selectedUserSet = new Set([loggedInUserId, ...selectedUsers]);
 
-    // 다중 채팅방 확인 (같은 멤버로 구성된 방이 있는지)
+    // 기존에 동일한 멤버로 구성된 방이 있는지 확인
     const existingRoom = chatRooms.find(room => {
         const roomMembers = new Set(room.memberMids);
         return (
@@ -379,34 +353,33 @@ startChatBtn.addEventListener('click', () => {
     });
 
     if (existingRoom) {
-        // 동일한 멤버로 구성된 방이 이미 존재할 경우
+        // 동일한 방이 존재하면 경고하고 해당 방으로 이동
         alert("이미 동일한 멤버로 구성된 채팅방이 존재합니다.");
-        openChatRoom(existingRoom.id); // 해당 방으로 이동
+        openChatRoom(existingRoom.id);
         return;
     }
 
-    // 새 채팅방 이름 생성
+    // 새 채팅방 이름 생성 (선택된 사용자들의 이름 기반)
     const roomName = selectedUsers.map(userId => {
         const userElement = userList.querySelector(`[data-user-id="${userId}"]`);
         if (userElement) {
-            // 이름과 ID가 함께 있을 경우, 괄호 앞의 이름만 추출
-            return userElement.textContent.split(' (')[0];
+            return userElement.textContent.split(' (')[0]; // 이름만 추출
         }
-        return userId; // 만약 userElement가 없다면 ID를 반환 (예외 처리)
+        return userId; // 예외 처리로 ID 반환
     }).join(", ") + "와의 그룹 채팅";
 
     console.log("새 채팅방 요청:", roomName, selectedUsers);
 
-    // 새로운 채팅방 생성 API 호출
+    // 채팅방 생성 API 호출
     axios.post('/api/chat/rooms', {
         roomName: roomName,
-        memberMids: [loggedInUserId, ...selectedUsers], // 현재 사용자와 선택된 사용자들 포함
-        recipientIds: selectedUsers // 선택된 사용자를 수신자 목록으로 추가
+        memberMids: [loggedInUserId, ...selectedUsers],
+        recipientIds: selectedUsers
     })
         .then(response => {
             const newRoom = response.data;
             chatRooms.push(newRoom); // 새 채팅방 추가
-            renderChatRooms(); // 채팅방 목록 다시 렌더링
+            renderChatRooms(); // 채팅방 목록 렌더링
             openChatRoom(newRoom.id); // 새 채팅방 열기
             selectedUsers = []; // 선택 초기화
         })
@@ -415,31 +388,31 @@ startChatBtn.addEventListener('click', () => {
         });
 });
 
-
 // 스크롤을 맨 아래로 이동시키는 함수
 function scrollToBottom() {
     setTimeout(() => {
-        messageList.scrollTop = messageList.scrollHeight;
-    }, 300); // 지연 시간 300ms로 설정
+        messageList.scrollTop = messageList.scrollHeight; // 메시지 목록의 최하단으로 이동
+    }, 300); // 300ms 지연 후 실행
 }
 
-// 말풍선 알림 배지 표시 함수
+// 전역 알림 배지 표시 여부를 제어하는 함수
 function showGlobalNotificationBadge(show) {
     notificationBadge.style.display = show ? 'inline-flex' : 'none';
 }
 
-// 알림 배지 표시 함수
+// 특정 채팅방의 알림 배지를 표시하는 함수
 function showNotificationBadge(roomId, count) {
     console.log(`Displaying notification badge for roomId ${roomId} with count ${count}`);
     const roomElement = document.querySelector(`[data-room-id="${roomId}"]`);
     if (roomElement) {
         let badge = roomElement.querySelector('.notification-badge');
         if (!badge) {
+            // 알림 배지가 없으면 생성
             badge = document.createElement('span');
             badge.classList.add('notification-badge');
             roomElement.querySelector('.message-and-badge-container').appendChild(badge);
         }
-        badge.textContent = count;
+        badge.textContent = count; // 알림 개수 설정
         badge.style.display = count > 0 ? 'inline-flex' : 'none';
 
         // 전역 알림 배지 표시
@@ -449,7 +422,7 @@ function showNotificationBadge(roomId, count) {
     }
 }
 
-// 특정 채팅방 알림 배지 숨기기
+// 특정 채팅방의 알림 배지를 숨기는 함수
 function hideNotificationBadge(roomId) {
     const roomElement = document.querySelector(`[data-room-id="${roomId}"]`);
     if (roomElement) {
@@ -526,6 +499,7 @@ function openChatRoom(roomId) {
         });
 }
 
+// 채팅방 목록 업데이트 함수
 function updateChatRoomList(message) {
     const roomIndex = chatRooms.findIndex(room => room.id === message.roomId);
 

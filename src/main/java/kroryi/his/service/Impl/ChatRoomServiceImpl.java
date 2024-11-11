@@ -6,7 +6,6 @@ import kroryi.his.domain.ChatRoom;
 import kroryi.his.domain.Member;
 import kroryi.his.dto.ChatMessageDTO;
 import kroryi.his.dto.ChatRoomDTO;
-import kroryi.his.dto.MemberJoinDTO;
 import kroryi.his.repository.ChatMessageRepository;
 import kroryi.his.repository.ChatRoomRepository;
 import kroryi.his.repository.MemberRepository;
@@ -39,28 +38,32 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             recipientIds = new ArrayList<>();
         }
 
+        // 새로운 채팅방 객체 생성
         ChatRoom chatRoom = ChatRoom.builder()
-                .roomName(roomName)
-                .recipientIds(recipientIds)
+                .roomName(roomName) // 채팅방 이름 설정
+                .recipientIds(recipientIds) // 수신자 ID 설정
                 .build();
-        chatRoom = chatRoomRepository.save(chatRoom);
+        chatRoom = chatRoomRepository.save(chatRoom); // 채팅방 저장
 
+        // 멤버 리스트를 조회하고 설정
         Set<Member> members = new HashSet<>();
         for (String mid : memberMids) {
             Member member = memberRepository.findById(mid)
                     .orElseThrow(() -> new IllegalArgumentException("Member not found for ID: " + mid));
-            members.add(member);
+            members.add(member); // 멤버를 Set에 추가
         }
 
+        // 채팅방에 멤버 설정 후 저장
         chatRoom.setMembers(members);
         chatRoom = chatRoomRepository.save(chatRoom);
 
+        // DTO로 변환하여 반환
         return ChatRoomDTO.builder()
                 .id(chatRoom.getId())
                 .roomName(chatRoom.getRoomName())
                 .memberMids(members.stream().map(Member::getMid).collect(Collectors.toSet()))
                 .recipientIds(new ArrayList<>(recipientIds)) // 다중 채팅방이면 빈 리스트로 설정됨
-                .lastMessage(null)
+                .lastMessage(null) // 새로 생성된 방이므로 마지막 메시지는 없음
                 .build();
     }
 
@@ -79,17 +82,20 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Member member2 = memberRepository.findById(member2Mid)
                 .orElseThrow(() -> new IllegalArgumentException("Member 2 not found"));
 
+        // 새로운 채팅방 생성
         ChatRoom newRoom = ChatRoom.builder()
                 .roomName(member2.getName() + "와의 채팅") // 상대방 이름으로 방 이름 설정
-                .members(new HashSet<>(Set.of(member1, member2)))
-                .memberMids(Set.of(member1Mid, member2Mid))
+                .members(new HashSet<>(Set.of(member1, member2))) // 멤버 설정
+                .memberMids(Set.of(member1Mid, member2Mid)) // 멤버 ID 설정
                 .build();
 
+        // 채팅방 저장 및 DTO 반환
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
         return convertToDTO(savedRoom);
     }
 
     private ChatRoomDTO convertToDTO(ChatRoom chatRoom) {
+        // 채팅방 엔티티를 DTO로 변환
         return ChatRoomDTO.builder()
                 .id(chatRoom.getId())
                 .roomName(chatRoom.getRoomName())
@@ -103,8 +109,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatRoomDTO> getAllChatRoomsForUserWithLastMessage(String userId) {
+        // 사용자와 연관된 모든 채팅방 조회
         List<ChatRoom> chatRooms = chatRoomRepository.findByMembers_Mid(userId);
 
+        // 각 채팅방을 DTO로 변환
         return chatRooms.stream()
                 .map(chatRoom -> {
                     // 채팅방 이름을 현재 사용자를 제외한 멤버 이름으로 설정
@@ -120,15 +128,18 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     private ChatRoomDTO convertToDtoWithRoomName(ChatRoom chatRoom, String roomName, String currentUserId) {
+        // 현재 사용자를 제외한 수신자 ID 목록 생성
         List<String> recipientIds = chatRoom.getMembers().stream()
                 .filter(member -> !member.getMid().equals(currentUserId))
                 .map(Member::getMid)
                 .collect(Collectors.toList());
 
+        // 채팅방의 최근 메시지 조회
         ChatMessage lastMessage = chatMessageRepository.findTopByChatRoomOrderByTimestampDesc(chatRoom);
 
         ChatMessageDTO lastMessageDto = null;
         if (lastMessage != null) {
+            // 메시지가 존재하면 DTO로 변환
             lastMessageDto = ChatMessageDTO.builder()
                     .messageId(lastMessage.getMessageId())
                     .roomId(chatRoom.getId())
@@ -139,6 +150,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                     .build();
         }
 
+        // 채팅방 DTO 반환
         return ChatRoomDTO.builder()
                 .id(chatRoom.getId())
                 .roomName(roomName)
@@ -152,7 +164,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    @Transactional // 트랜잭션을 시작하는 어노테이션
+    @Transactional // 트랜잭션으로 메시지 삭제와 채팅방 삭제를 묶음
     public void deleteChatRoom(Long roomId) {
         // 먼저 해당 채팅방의 메시지를 삭제
         chatMessageRepository.deleteByChatRoomId(roomId);
@@ -163,7 +175,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatMessageDTO> getMessagesByRoomId(Long roomId) {
+        // 특정 채팅방의 메시지 조회
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomId(roomId);
+
+        // 메시지를 DTO로 변환
         return messages.stream()
                 .map(message -> ChatMessageDTO.builder()
                         .messageId(message.getMessageId()) // 메시지 ID 설정
@@ -177,10 +192,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                                 : Collections.emptyList()) // 수신자가 없을 경우 빈 리스트
                         .build())
                 .collect(Collectors.toList());
-
     }
 
     public ChatMessageDTO createMessage(Long roomId, String content, String senderId, List<String> recipientIds, String senderName, LocalDateTime timestamp) {
+        // 채팅방 및 발신자 확인
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
 
@@ -189,6 +204,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         log.info("Chat-----> {}", sender);
 
+        // 메시지 객체 생성
         ChatMessage message = ChatMessage.builder()
                 .content(content)
                 .timestamp(timestamp != null ? timestamp : LocalDateTime.now())
@@ -196,7 +212,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .chatRoom(chatRoom)
                 .build();
 
-        // 메시지를 DB에 저장하여 자동 생성된 messageId를 얻음
+        // 메시지 저장
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
         // 채팅방의 최근 메시지 업데이트
@@ -204,6 +220,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoom.setLastMessageTimestamp(savedMessage.getTimestamp());
         chatRoomRepository.save(chatRoom);
 
+        // 메시지 DTO 생성
         ChatMessageDTO messageDTO = ChatMessageDTO.builder()
                 .messageId(savedMessage.getMessageId()) // 자동 생성된 messageId
                 .roomId(chatRoom.getId())
@@ -220,8 +237,4 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         // messageId를 포함하여 ChatMessageDTO 반환
         return messageDTO;
     }
-
 }
-
-
-

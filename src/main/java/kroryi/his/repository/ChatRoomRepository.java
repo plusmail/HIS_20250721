@@ -17,7 +17,4 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "JOIN cr.members m2 " +
             "WHERE m1.mid = :member1 AND m2.mid = :member2 AND SIZE(cr.members) = 2")
     Optional<ChatRoom> findPrivateChatRoomBetween(@Param("member1") String member1Mid, @Param("member2") String member2Mid);
-
-
-
 }
