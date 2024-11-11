@@ -111,4 +111,12 @@ public class BoardController {
 //        return "board/view";
 //    }
 
+    @GetMapping("/board/list")
+    public String list(PageRequestDTO pageRequestDTO, Model model) {
+        PageResponseDTO<BoardDTO> pageResponseDTO = boardService.getList(pageRequestDTO);
+        model.addAttribute("pageResponseDTO", pageResponseDTO);
+        return "board/list";
+    }
+
+
 }

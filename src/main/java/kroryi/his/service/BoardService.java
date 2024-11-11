@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public interface BoardService {
 
-    List<Board> getLatestPosts();
+    List<BoardDTO> getLatestPosts();
 
     Long register(BoardDTO dto);
 
@@ -34,4 +34,5 @@ public interface BoardService {
 
     PageResponseDTO<BoardDTO> list(PageRequestDTO pageRequestDTO);
 
+    PageResponseDTO<BoardDTO> getList(PageRequestDTO pageRequestDTO);
 }
