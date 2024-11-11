@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "medical_chart")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class MedicalChart {
     @Id
     @Column(name = "cnum", nullable = false)

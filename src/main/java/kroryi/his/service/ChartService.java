@@ -3,9 +3,8 @@ package kroryi.his.service;
 
 import kroryi.his.domain.ChartMemo;
 import kroryi.his.domain.MedicalChart;
-import kroryi.his.domain.PatientRegister;
-import kroryi.his.dto.BoardDTO;
 import kroryi.his.dto.MedicalChartDTO;
+import kroryi.his.dto.MedicalChartSearchDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,4 +34,8 @@ public interface ChartService {
     MedicalChartDTO deleteChart(String charNum, String paName, String teethNum, String plan);
 
     void deleteChart(Integer cnum);
+
+    //    List<MedicalChart> searchMedicalCharts(MedicalChartSearchDTO medicalChartSearchDTO);
+//    List<MedicalChart> searchMedicalCharts(String chartNum, List<String> teethNums, LocalDate mdTimeStart, LocalDate mdTimeEnd);
+    List<MedicalChart> searchMedicalCharts(MedicalChartSearchDTO searchDTO);
 }
