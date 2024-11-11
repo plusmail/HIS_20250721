@@ -175,9 +175,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     chartNum: patientInfos.chartNum
                 });
 
-                // 서버로부터 받은 검색 결과를 처리
-                console.log("검색 결과:", response.data);
-
                 let tableBody1 = $("#paChart-list");
                 tableBody1.empty();
                 let previousMdTime = null;
@@ -376,9 +373,6 @@ document.addEventListener("DOMContentLoaded", function () {
     async function performSearch() {
         const keyword = document.getElementById('History_keyword').value;
         if (keyword.trim() !== "") { // 키워드가 비어있지 않을 경우에만 실행
-            console.log("Searching for:", keyword);
-            console.log(selectedTeethValue)
-            console.log(selectedDoctor)
             try {
                 // Axios로 검색 요청을 보냅니다.
                 const response = await axios.post('/medical_chart/search', {
@@ -390,10 +384,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     chartNum: patientInfos.chartNum,
                     keyword: keyword || null
                 });
-
-                // 서버로부터 받은 검색 결과를 처리
-                console.log("검색 결과:", response.data);
-
                 let tableBody1 = $("#paChart-list");
                 tableBody1.empty();
                 let previousMdTime = null;
