@@ -486,7 +486,7 @@
                                     MedicalPlanModule.init();
                                     if (patientInfos) {
                                         $.ajax({
-                                            url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,  // 서버에서 데이터를 가져올 API 경로
+                                            url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
                                             type: 'GET',  // GET 요청
                                             dataType: 'json',  // 서버에서 JSON 응답을 기대
                                             success: function (data) {
@@ -542,7 +542,6 @@
 
 
         function loadDataIntoFields(cnum) {
-            console.log("Fetching data for cnum:", cnum);
             $.ajax({
                 url: `/medical_chart/getDataByCnum?cnum=${cnum}`,  // 템플릿 리터럴 사용
                 method: 'GET',

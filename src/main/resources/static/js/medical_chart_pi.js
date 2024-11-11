@@ -181,20 +181,35 @@ if (!window.MedicalChartPIModule) {
 
         function resetFormFields() {
             cnumGlobal = null;
-            document.getElementById('piCheckDoc').selectedIndex = 0;
-
-            // Reset the date to today's date
-            const today = new Date().toISOString().split("T")[0];
-            document.getElementById('mdTime').value = today;
-            const piCheckDoc = document.getElementById("piCheckDoc");
-            if (!piCheckDoc.value) {
-                piCheckDoc.selectedIndex = 1;
+            const piCheckDoc = document.getElementById('piCheckDoc');
+            if (piCheckDoc) {
+                piCheckDoc.selectedIndex = 0;
+                if (!piCheckDoc.value) {
+                    piCheckDoc.selectedIndex = 1;
+                }
             }
-            memo.value = '';
+            const mdTime = document.getElementById('mdTime');
+            if (mdTime) {
+                const today = new Date().toISOString().split("T")[0];
+                mdTime.value = today;
+            }
+
+            const memo = document.querySelector('.memo');
+            if (memo) {
+                memo.value = '';
+            }
+
             window.toothList = [];
-            resetCheckboxes();
-            toothValueResetPi();
+
+            if (typeof resetCheckboxes === 'function') {
+                resetCheckboxes();
+            }
+
+            if (typeof toothValueResetPi === 'function') {
+                toothValueResetPi();
+            }
         }
+
 
 
         function updateTextarea() {
@@ -220,8 +235,6 @@ if (!window.MedicalChartPIModule) {
             const paName = patientInfos.name || '';
             const chartNum = patientInfos.chartNum || '';
             const cnum = cnumGlobal;
-
-            console.log(cnumGlogal);
 
             let updatedToothList = [...window.toothList];
 
@@ -265,6 +278,6 @@ if (!window.MedicalChartPIModule) {
         }
 
 
-        return { init, cleanup };
+        return { init, cleanup, resetFormFields };
     })();
 }

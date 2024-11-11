@@ -206,10 +206,27 @@ $(document).ready(function () {
     saveChartNum()
     readPaChart()
     fetchSessionItems();
-
-    // 예시: 주기적으로 데이터 갱신 (5초마다)
-    // setInterval(renderingItems, 5000);
 });
+
+function updateChartTable(chartNum) {
+    $.ajax({
+        url: '/medical_chart/PLANChartData?chartNum=' + chartNum,
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            let tableBody = $("#plan-data");
+            tableBody.empty();
+            data.forEach(chart => {
+                createTableRowWithData(chart, doctorNames, tableBody);
+            });
+            createNewTableRow(doctorNames, tableBody);
+        },
+        error: function (xhr, status, error) {
+            console.error('데이터 갱신 실패:', error);
+            alert('데이터 갱신 중 문제가 발생했습니다.');
+        }
+    });
+}
 
 function readPaChart() {
     if (patientInfos) {
@@ -298,60 +315,56 @@ function readPaChart() {
                         </tr>
                     `);
 
+                    // 행 더블 클릭시 해당 행 데이터의 cnum 값 불러오기
                     row.on('dblclick', function () {
-
                         cnumGlogal = chart.cnum;
-
                         loadDataIntoFields(cnumGlogal);
                     });
 
-                    // 각 데이터 클릭 이벤트 추가
-                    row.on('click', function () {
+                    // 행 클릭후 삭제 기능 이벤트
+                    row.off('click').on('click', function () {
                         $('.medical-content-cell .delete-icon').remove();
                         let medicalContentCell = row.find('.medical-content-cell');
                         if (!medicalContentCell.find('.delete-icon').length) {
                             medicalContentCell.append('<span class="delete-icon">X</span>');
                         }
-                        medicalContentCell.on('click', '.delete-icon', function (event) {
+
+                        medicalContentCell.off('click', '.delete-icon').on('click', '.delete-icon', function (event) {
                             event.stopPropagation();
                             let cnum = chart.cnum;
                             $.ajax({
                                 url: '/medical_chart/deleteChart',
                                 type: 'DELETE',
-                                data: {cnum: cnum},
+                                data: { cnum: cnum },
                                 success: function (response) {
-                                    $.ajax({
-                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
-                                        type: 'GET',
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            let tableBody = $("#plan-data");
-                                            tableBody.empty();
-                                            data.forEach(chart => {
-                                                createTableRowWithData(chart, doctorNames, tableBody);
-                                            });
-                                            createNewTableRow(doctorNames, tableBody);
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error:', error);
-                                        }
-                                    });
+                                    // 삭제후 진료차트 업데이트
+                                    updateChartTable(patientInfos.chartNum);
+
+                                    // 차트 로딩후 폼 초기화
+                                    if (window.MedicalChartCCModule) {
+                                        window.MedicalChartCCModule.resetFormFields();
+                                    }
+                                    if (window.MedicalChartPIModule) {
+                                        window.MedicalChartPIModule.resetFormFields();
+                                    }
+
+                                    // 차트 재로딩
                                     readPaChart();
-                                    resetFormFields();
                                 },
                                 error: function (xhr, status, error) {
-                                    console.error('Error:', error);
+                                    console.error('삭제 실패:', error);
+                                    alert('삭제 중 문제가 발생했습니다.');
                                 }
                             });
                         });
                     });
-
                     tableBody.append(row);
                     previousMdTime = chart.mdTime;
                 });
             },
             error: function (xhr, status, error) {
-                console.error('Error:', error);
+                console.error('데이터 가져오기 실패:', error);
+                alert('데이터를 불러오는 중 문제가 발생했습니다.');
             }
         });
     }
@@ -406,24 +419,6 @@ function performSearch() {
     } else {
         console.log("Please enter a keyword to search.");
     }
-}
-
-function resetFormFields() {
-    // Reset all input fields to their default state
-    const inputs = document.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        if (input.type === 'checkbox' || input.type === 'radio') {
-            input.checked = false; // Reset checkboxes and radios
-        } else {
-            input.value = ''; // Reset text and select fields
-        }
-    });
-
-    // Reset any other state or styles, such as button highlights or active classes
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.classList.remove('opacity-50'); // Remove button opacity if needed
-    });
 }
 
 

@@ -160,16 +160,21 @@ if (!window.MedicalChartCCModule) {
 
         function resetFormFields() {
             cnumGlogal = null;
-            document.getElementById('ccCheckDoc').selectedIndex = 0;
 
-            // Reset the date to today's date
-            const today = new Date().toISOString().split("T")[0];
-            document.getElementById('mdTime').value = today;
             const ccCheckDoc = document.getElementById("ccCheckDoc");
-            if (!ccCheckDoc.value) {
-                ccCheckDoc.selectedIndex = 1;
+            if (ccCheckDoc) {
+                ccCheckDoc.selectedIndex = 0;
             }
-            memo.value = '';
+
+            const today = new Date().toISOString().split("T")[0];
+            const mdTime = document.getElementById("mdTime");
+            if (mdTime) {
+                mdTime.value = today;
+            }
+            const memo = document.querySelector(".ccMemo");
+            if (memo) {
+                memo.value = '';
+            }
             window.toothList = [];
             toothValueResetCc();
         }
@@ -227,10 +232,6 @@ if (!window.MedicalChartCCModule) {
                 });
         }
 
-
-
-
-
-        return { init, cleanUp };
+        return { init, cleanUp, resetFormFields };
     })();
 }
