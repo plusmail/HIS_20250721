@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let appointmentDateEnd = '';
     let selectedDoctor = '';
     let selectedMedicalDivision = '';
+    let keyword = '';
 
 
     setupEventListeners();
@@ -142,6 +143,137 @@ document.addEventListener("DOMContentLoaded", function () {
         elements.forEach(element => element.classList.toggle("opacity-50"));
     }
 
+    async function searchList(){
+        try {
+            // Axios로 검색 요청을 보냅니다.
+            const response = await axios.post('/medical_chart/search', {
+                mdTimeStart: appointmentDateStart || null,   // 시작일자
+                mdTimeEnd: appointmentDateEnd || null,
+                checkDoc: selectedDoctor || null,
+                medicalDivision: selectedMedicalDivision || null,
+                teethNum: selectedTeethValue || [],
+                chartNum: patientInfos.chartNum,
+                keyword: keyword || null
+            });
+
+            let tableBody1 = $("#paChart-list");
+            tableBody1.empty();
+            let previousMdTime = null;
+
+            // 각 사분면별 치아 번호와 색상
+            const upperLeftRed = [18, 17, 16, 15, 14, 13, 12, 11];
+            const upperLeftBlack = [55, 54, 53, 52, 51];
+            const upperRightRed = [21, 22, 23, 24, 25, 26, 27, 28];
+            const upperRightBlack = [61, 62, 63, 64, 65];
+            const lowerLeftRed = [48, 47, 46, 45, 44, 43, 42, 41];
+            const lowerLeftBlack = [85, 84, 83, 82, 81];
+            const lowerRightRed = [31, 32, 33, 34, 35, 36, 37, 38];
+            const lowerRightBlack = [71, 72, 73, 74, 75];
+
+            // 1의 자리를 문자로 변환하는 함수
+            function convertDigitToLetter(digit) {
+                switch (digit) {
+                    case 1:
+                        return 'A';
+                    case 2:
+                        return 'B';
+                    case 3:
+                        return 'C';
+                    case 4:
+                        return 'D';
+                    case 5:
+                        return 'E';
+                    default:
+                        return digit; // 변환되지 않는 경우 숫자를 그대로 사용
+                }
+            }
+
+            // 치아 번호에 따라 색상 및 표시할 문자 처리
+            function getTeethCellContent(teethNum, isRed) {
+                let displayNum = isRed ? teethNum % 10 : convertDigitToLetter(teethNum % 10); // 빨간색은 숫자, 검은색은 문자 변환
+                return `<span style="color: ${isRed ? 'red' : 'black'};">${displayNum}</span>`;
+            }
+
+            // 데이터를 순회하여 테이블에 추가
+            response.data.forEach(chart => {
+                let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
+
+                // 각 치아 번호를 분할하여 사분면 형식으로 정렬
+                let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
+
+                // 각 사분면의 텍스트를 빨간색과 검은색으로 분리하여 정렬
+                let upperLeftRedText = teethNums.filter(num => upperLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+                let upperLeftBlackText = teethNums.filter(num => upperLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+
+                let upperRightRedText = teethNums.filter(num => upperRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+                let upperRightBlackText = teethNums.filter(num => upperRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+
+                let lowerLeftBlackText = teethNums.filter(num => lowerLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+                let lowerLeftRedText = teethNums.filter(num => lowerLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+
+                let lowerRightBlackText = teethNums.filter(num => lowerRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
+                let lowerRightRedText = teethNums.filter(num => lowerRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
+
+                // 사분면 형식으로 테이블 셀 생성
+                let teethNumCell = `
+                        <td style="font-size: 0.9rem; width: 100px">
+                            <div class="quadrant-container">
+                                <div class="quadrant upper-left">${upperLeftRedText}<br>${upperLeftBlackText}</div>
+                                <div class="quadrant upper-right">${upperRightRedText}<br>${upperRightBlackText}</div>
+                                <div class="quadrant lower-left">${lowerLeftBlackText}<br>${lowerLeftRedText}</div>
+                                <div class="quadrant lower-right">${lowerRightBlackText}<br>${lowerRightRedText}</div>
+                            </div>
+                        </td>
+                    `;
+
+                // 행 생성
+                let row = $(`
+                        <tr>
+                            <td class="text-center">${mdTimeCell}</td>
+                            ${teethNumCell}
+                            <td class="text-center">${chart.medicalDivision}</td>
+                            <td class="text-center">${chart.medicalContent}</td>
+                            <td class="text-center medical-content-cell">${chart.checkDoc}</td>
+                        </tr>
+                    `);
+
+                // 각 데이터 클릭 이벤트 추가
+                row.on('click', function () {
+                    $('.medical-content-cell .delete-icon').remove();
+                    let medicalContentCell = row.find('.medical-content-cell');
+                    if (!medicalContentCell.find('.delete-icon').length) {
+                        medicalContentCell.append('<span class="delete-icon"><i class="bi bi-trash"></i></span>');
+                    }
+                    medicalContentCell.on('click', '.delete-icon', function (event) {
+                        event.stopPropagation();
+                        let cnum = chart.cnum;
+                        $.ajax({
+                            url: '/medical_chart/deleteChart',
+                            type: 'DELETE',
+                            data: {cnum: cnum},
+                            success: function (response) {
+                                searchList();
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    });
+                });
+
+                tableBody1.append(row);
+                previousMdTime = chart.mdTime;
+            });
+            if (appointmentDateStart || appointmentDateEnd || selectedDoctor || selectedMedicalDivision || selectedTeethValue.length > 0) {
+                const filterButton = document.querySelector('.select-pTag');
+                filterButton.innerHTML = '<i class="bi bi-hourglass-split"></i> 필터 적용중';
+            }
+
+        } catch (error) {
+            console.error("검색 요청 중 오류 발생:", error);
+        }
+    }
+
     async function saveSelectedTeeth() {
         if (selectedPTag) {
             const buttons = SearchModal.querySelectorAll('button.opacity-50');
@@ -163,153 +295,9 @@ document.addEventListener("DOMContentLoaded", function () {
             appointmentDateEnd = document.getElementById('appointmentDateEnd').value;
             selectedDoctor = document.getElementById('checkDoc').value;
             selectedMedicalDivision = document.getElementById('medicalDivision').value;
+            keyword = document.getElementById('History_keyword').value;
 
-            try {
-                // Axios로 검색 요청을 보냅니다.
-                const response = await axios.post('/medical_chart/search', {
-                    mdTimeStart: appointmentDateStart || null,   // 시작일자
-                    mdTimeEnd: appointmentDateEnd || null,
-                    checkDoc: selectedDoctor || null,
-                    medicalDivision: selectedMedicalDivision || null,
-                    teethNum: selectedTeethValue || [],
-                    chartNum: patientInfos.chartNum
-                });
-
-                let tableBody1 = $("#paChart-list");
-                tableBody1.empty();
-                let previousMdTime = null;
-
-                // 각 사분면별 치아 번호와 색상
-                const upperLeftRed = [18, 17, 16, 15, 14, 13, 12, 11];
-                const upperLeftBlack = [55, 54, 53, 52, 51];
-                const upperRightRed = [21, 22, 23, 24, 25, 26, 27, 28];
-                const upperRightBlack = [61, 62, 63, 64, 65];
-                const lowerLeftRed = [48, 47, 46, 45, 44, 43, 42, 41];
-                const lowerLeftBlack = [85, 84, 83, 82, 81];
-                const lowerRightRed = [31, 32, 33, 34, 35, 36, 37, 38];
-                const lowerRightBlack = [71, 72, 73, 74, 75];
-
-                // 1의 자리를 문자로 변환하는 함수
-                function convertDigitToLetter(digit) {
-                    switch (digit) {
-                        case 1:
-                            return 'A';
-                        case 2:
-                            return 'B';
-                        case 3:
-                            return 'C';
-                        case 4:
-                            return 'D';
-                        case 5:
-                            return 'E';
-                        default:
-                            return digit; // 변환되지 않는 경우 숫자를 그대로 사용
-                    }
-                }
-
-                // 치아 번호에 따라 색상 및 표시할 문자 처리
-                function getTeethCellContent(teethNum, isRed) {
-                    let displayNum = isRed ? teethNum % 10 : convertDigitToLetter(teethNum % 10); // 빨간색은 숫자, 검은색은 문자 변환
-                    return `<span style="color: ${isRed ? 'red' : 'black'};">${displayNum}</span>`;
-                }
-
-                // 데이터를 순회하여 테이블에 추가
-                response.data.forEach(chart => {
-                    let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
-
-                    // 각 치아 번호를 분할하여 사분면 형식으로 정렬
-                    let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
-
-                    // 각 사분면의 텍스트를 빨간색과 검은색으로 분리하여 정렬
-                    let upperLeftRedText = teethNums.filter(num => upperLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-                    let upperLeftBlackText = teethNums.filter(num => upperLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-
-                    let upperRightRedText = teethNums.filter(num => upperRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-                    let upperRightBlackText = teethNums.filter(num => upperRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-
-                    let lowerLeftBlackText = teethNums.filter(num => lowerLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-                    let lowerLeftRedText = teethNums.filter(num => lowerLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-
-                    let lowerRightBlackText = teethNums.filter(num => lowerRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-                    let lowerRightRedText = teethNums.filter(num => lowerRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-
-                    // 사분면 형식으로 테이블 셀 생성
-                    let teethNumCell = `
-                        <td style="font-size: 0.9rem; width: 100px">
-                            <div class="quadrant-container">
-                                <div class="quadrant upper-left">${upperLeftRedText}<br>${upperLeftBlackText}</div>
-                                <div class="quadrant upper-right">${upperRightRedText}<br>${upperRightBlackText}</div>
-                                <div class="quadrant lower-left">${lowerLeftBlackText}<br>${lowerLeftRedText}</div>
-                                <div class="quadrant lower-right">${lowerRightBlackText}<br>${lowerRightRedText}</div>
-                            </div>
-                        </td>
-                    `;
-
-                    // 행 생성
-                    let row = $(`
-                        <tr>
-                            <td class="text-center">${mdTimeCell}</td>
-                            ${teethNumCell}
-                            <td class="text-center">${chart.medicalDivision}</td>
-                            <td class="text-center">${chart.medicalContent}</td>
-                            <td class="text-center medical-content-cell">${chart.checkDoc}</td>
-                        </tr>
-                    `);
-
-                    // 각 데이터 클릭 이벤트 추가
-                    row.on('click', function () {
-                        $('.medical-content-cell .delete-icon').remove();
-                        let medicalContentCell = row.find('.medical-content-cell');
-                        if (!medicalContentCell.find('.delete-icon').length) {
-                            medicalContentCell.append('<span class="delete-icon"><i class="bi bi-trash"></i></span>');
-                        }
-                        medicalContentCell.on('click', '.delete-icon', function (event) {
-                            event.stopPropagation();
-                            let cnum = chart.cnum;
-                            $.ajax({
-                                url: '/medical_chart/deleteChart',
-                                type: 'DELETE',
-                                data: {cnum: cnum},
-                                success: function (response) {
-                                    $.ajax({
-                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
-                                        type: 'GET',
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            // 삭제후 진료차트 업데이트
-                                            updateChartTable(patientInfos.chartNum);
-
-                                            // 차트 로딩후 폼 초기화
-                                            if (window.MedicalChartCCModule) {
-                                                window.MedicalChartCCModule.resetFormFields();
-                                            }
-                                            if (window.MedicalChartPIModule) {
-                                                window.MedicalChartPIModule.resetFormFields();
-                                            }
-
-                                            // 차트 재로딩
-                                            readPaChart();
-                                        }
-                                    })
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error('Error:', error);
-                                }
-                            });
-                        });
-                    });
-
-                    tableBody1.append(row);
-                    previousMdTime = chart.mdTime;
-                });
-                if(appointmentDateStart || appointmentDateEnd || selectedDoctor || selectedMedicalDivision || selectedTeethValue.length>0) {
-                    const filterButton = document.querySelector('.select-pTag');
-                    filterButton.innerHTML = '<i class="bi bi-hourglass-split"></i> 필터 적용중';
-                }
-
-            } catch (error) {
-                console.error("검색 요청 중 오류 발생:", error);
-            }
+            await searchList();
 
             // 모달 닫기
             const bootstrapModal = bootstrap.Modal.getInstance(SearchModal);
@@ -347,12 +335,13 @@ document.addEventListener("DOMContentLoaded", function () {
     SearchModal.addEventListener('show.bs.modal', initializeModal);
 
     //검색 리셋
-    document.getElementById('resetButton').addEventListener('click', function() {
+    document.getElementById('resetButton').addEventListener('click', function () {
         selectedTeethValue = '';
         appointmentDateStart = '';
         appointmentDateEnd = '';
         selectedDoctor = '';
         selectedMedicalDivision = '';
+        keyword = '';
         document.getElementById('History_keyword').value = '';
         readPaChart();
 
@@ -374,154 +363,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 검색 기능 함수
     async function performSearch() {
-        const keyword = document.getElementById('History_keyword').value;
+        keyword = document.getElementById('History_keyword').value;
         if (keyword.trim() !== "") { // 키워드가 비어있지 않을 경우에만 실행
-            try {
-                // Axios로 검색 요청을 보냅니다.
-                const response = await axios.post('/medical_chart/search', {
-                    mdTimeStart: appointmentDateStart || null,   // 시작일자
-                    mdTimeEnd: appointmentDateEnd || null,
-                    checkDoc: selectedDoctor || null,
-                    medicalDivision: selectedMedicalDivision || null,
-                    teethNum: selectedTeethValue || [],
-                    chartNum: patientInfos.chartNum,
-                    keyword: keyword || null
-                });
-                let tableBody1 = $("#paChart-list");
-                tableBody1.empty();
-                let previousMdTime = null;
-
-                // 각 사분면별 치아 번호와 색상
-                const upperLeftRed = [18, 17, 16, 15, 14, 13, 12, 11];
-                const upperLeftBlack = [55, 54, 53, 52, 51];
-                const upperRightRed = [21, 22, 23, 24, 25, 26, 27, 28];
-                const upperRightBlack = [61, 62, 63, 64, 65];
-                const lowerLeftRed = [48, 47, 46, 45, 44, 43, 42, 41];
-                const lowerLeftBlack = [85, 84, 83, 82, 81];
-                const lowerRightRed = [31, 32, 33, 34, 35, 36, 37, 38];
-                const lowerRightBlack = [71, 72, 73, 74, 75];
-
-                // 1의 자리를 문자로 변환하는 함수
-                function convertDigitToLetter(digit) {
-                    switch (digit) {
-                        case 1:
-                            return 'A';
-                        case 2:
-                            return 'B';
-                        case 3:
-                            return 'C';
-                        case 4:
-                            return 'D';
-                        case 5:
-                            return 'E';
-                        default:
-                            return digit; // 변환되지 않는 경우 숫자를 그대로 사용
-                    }
-                }
-
-                // 치아 번호에 따라 색상 및 표시할 문자 처리
-                function getTeethCellContent(teethNum, isRed) {
-                    let displayNum = isRed ? teethNum % 10 : convertDigitToLetter(teethNum % 10); // 빨간색은 숫자, 검은색은 문자 변환
-                    return `<span style="color: ${isRed ? 'red' : 'black'};">${displayNum}</span>`;
-                }
-
-                // 데이터를 순회하여 테이블에 추가
-                response.data.forEach(chart => {
-                    let mdTimeCell = (previousMdTime === chart.mdTime) ? '' : chart.mdTime;
-
-                    // 각 치아 번호를 분할하여 사분면 형식으로 정렬
-                    let teethNums = chart.teethNum.split(',').map(num => parseInt(num.trim()));
-
-                    // 각 사분면의 텍스트를 빨간색과 검은색으로 분리하여 정렬
-                    let upperLeftRedText = teethNums.filter(num => upperLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-                    let upperLeftBlackText = teethNums.filter(num => upperLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-
-                    let upperRightRedText = teethNums.filter(num => upperRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-                    let upperRightBlackText = teethNums.filter(num => upperRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-
-                    let lowerLeftBlackText = teethNums.filter(num => lowerLeftBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-                    let lowerLeftRedText = teethNums.filter(num => lowerLeftRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-
-                    let lowerRightBlackText = teethNums.filter(num => lowerRightBlack.includes(num)).map(num => getTeethCellContent(num, false)).join(', ');
-                    let lowerRightRedText = teethNums.filter(num => lowerRightRed.includes(num)).map(num => getTeethCellContent(num, true)).join(', ');
-
-                    // 사분면 형식으로 테이블 셀 생성
-                    let teethNumCell = `
-                        <td style="font-size: 0.9rem; width: 100px">
-                            <div class="quadrant-container">
-                                <div class="quadrant upper-left">${upperLeftRedText}<br>${upperLeftBlackText}</div>
-                                <div class="quadrant upper-right">${upperRightRedText}<br>${upperRightBlackText}</div>
-                                <div class="quadrant lower-left">${lowerLeftBlackText}<br>${lowerLeftRedText}</div>
-                                <div class="quadrant lower-right">${lowerRightBlackText}<br>${lowerRightRedText}</div>
-                            </div>
-                        </td>
-                    `;
-
-                    // 행 생성
-                    let row = $(`
-                        <tr>
-                            <td class="text-center">${mdTimeCell}</td>
-                            ${teethNumCell}
-                            <td class="text-center">${chart.medicalDivision}</td>
-                            <td class="text-center">${chart.medicalContent}</td>
-                            <td class="text-center medical-content-cell">${chart.checkDoc}</td>
-                        </tr>
-                    `);
-
-                    // 각 데이터 클릭 이벤트 추가
-                    row.on('click', function () {
-                        $('.medical-content-cell .delete-icon').remove();
-                        let medicalContentCell = row.find('.medical-content-cell');
-                        if (!medicalContentCell.find('.delete-icon').length) {
-                            medicalContentCell.append('<span class="delete-icon"><i class="bi bi-trash"></i></span>');
-                        }
-                        medicalContentCell.on('click', '.delete-icon', function (event) {
-                            event.stopPropagation();
-                            let cnum = chart.cnum;
-                            $.ajax({
-                                url: '/medical_chart/deleteChart',
-                                type: 'DELETE',
-                                data: {cnum: cnum},
-                                success: function (response) {
-                                    $.ajax({
-                                        url: '/medical_chart/PLANChartData?chartNum=' + patientInfos.chartNum,
-                                        type: 'GET',
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            // 삭제후 진료차트 업데이트
-                                            updateChartTable(patientInfos.chartNum);
-
-                                            // 차트 로딩후 폼 초기화
-                                            if (window.MedicalChartCCModule) {
-                                                window.MedicalChartCCModule.resetFormFields();
-                                            }
-                                            if (window.MedicalChartPIModule) {
-                                                window.MedicalChartPIModule.resetFormFields();
-                                            }
-
-                                            // 차트 재로딩
-                                            readPaChart();
-                                        }
-                                    })
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error('Error:', error);
-                                }
-                            });
-                        });
-                    });
-
-                    tableBody1.append(row);
-                    previousMdTime = chart.mdTime;
-                });
-                if(appointmentDateStart || appointmentDateEnd || selectedDoctor || selectedMedicalDivision || selectedTeethValue.length>0) {
-                    const filterButton = document.querySelector('.select-pTag');
-                    filterButton.innerHTML = '<i class="bi bi-hourglass-split"></i> 필터 적용중';
-                }
-
-            } catch (error) {
-                console.error("검색 요청 중 오류 발생:", error);
-            }
+            await searchList();
 
             // 여기서 원하는 검색 기능 또는 AJAX 요청을 추가할 수 있습니다.
         } else {
@@ -709,7 +553,7 @@ function readPaChart() {
                             $.ajax({
                                 url: '/medical_chart/deleteChart',
                                 type: 'DELETE',
-                                data: { cnum: cnum },
+                                data: {cnum: cnum},
                                 success: function (response) {
                                     // 삭제후 진료차트 업데이트
                                     updateChartTable(patientInfos.chartNum);
