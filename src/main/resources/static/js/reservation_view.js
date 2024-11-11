@@ -1,3 +1,4 @@
+
 renderCalendar();
 function dateReservationList(selectedDate) {
     fetch('reservation/selectedDatePatientList', {
@@ -48,7 +49,12 @@ function dateReservationList(selectedDate) {
                                 <td>${item.department}</td>
                                 <td>${item.patientNote}</td>
                                 `; // 각 열에 데이터 삽입
+                row.onclick = function () {
 
+                    if(PageName === 'registerAdd'){
+                        selectList(item.seq);
+                    }
+                };
                 tableBody.appendChild(row); // tbody에 행 추가
             });
 
@@ -182,10 +188,31 @@ async function generateTimetable(data) {
     // 예약 데이터 처리
     const reservations = data.map(item => {
         const time = item.reservationDate.split('T')[1].substring(0, 5); // 'HH:MM' 형식으로 추출
+
+        // 예약 타입에 맞는 클래스 이름을 설정
+        let treatmentClass = '';
+        if (item.treatmentType === '리콜') {
+            treatmentClass = 'recall';  // 리콜 예약
+        } else if (item.treatmentType === '수술') {
+            treatmentClass = 'surgery'; // 수술 예약
+        } else {
+            treatmentClass = 'general'; // 일반 예약
+        }
+
         return {
             time: time,
             doctor: item.doctor,
-            info: `${item.department} <br> ${item.patientNote} (${item.treatmentType})`, // 여러 정보 결합
+            info: `
+            <div class="reservation ${treatmentClass}" style="display: flex; padding-right: 10px;">
+    <div style="flex: 3; padding-right: 20px; border-right: 2px solid gray; display: flex; justify-content: center; align-items: center;">
+        ${item.department}
+    </div>
+    <div style="flex: 7; padding-left: 20px;">
+        ${item.patientNote} <br> ${item.treatmentType}
+    </div>
+</div>
+
+        `, // HTML로 나누어 표시
             treatmentType: item.treatmentType // treatmentType 추가
         };
     });
@@ -207,7 +234,7 @@ async function generateTimetable(data) {
 
             // 현재 시간과 의사에 맞는 예약 찾기
             const matchedReservations = reservations.filter(r => r.time === slot && r.doctor === doctor);
-            console.log(`슬롯: ${slot}, 의사: ${doctor}, 예약:`, matchedReservations); // 예약 정보 확인
+            // console.log(`슬롯: ${slot}, 의사: ${doctor}, 예약:`, matchedReservations); // 예약 정보 확인
 
             // 모든 예약 정보를 줄바꿈으로 결합하고, 각 예약에 대해 treatmentType에 맞는 클래스를 추가
             td.innerHTML = matchedReservations.length > 0

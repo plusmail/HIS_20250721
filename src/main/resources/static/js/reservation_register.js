@@ -1,15 +1,27 @@
 // 이벤트 리스너 등록
 window.addEventListener('sessionStorageChanged', (event) => {
-    console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
+    console.log('sessionStorage 값이 변경되었습니다:', event.detail.key, event.detail.value);
     patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
 
     sessionCallData(patientInfos);
-    console.log(patientInfos);
 });
 
 patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
-console.log(patientInfos);
 sessionCallData(patientInfos);
+
+function sessionCallData(responseData) {
+    const departmentElement = document.getElementById('departmentInput');
+    const chartNumberElement = document.getElementById('chart-numberInput');
+    // 'reservation-date' input의 value를 오늘 날짜로 설정
+    document.getElementById('reservation-date').value = new Date().toISOString().split('T')[0];
+
+    // 받아온 데이터로 데이터 새로 등록
+    // 환자 이름
+    departmentElement.value = responseData.name;
+    // 차트 번호
+    chartNumberElement.value = responseData.chartNum;
+
+}
 
 // 드롭다운 메뉴 초기화
 reservationTimes.forEach((time, index) => {
@@ -27,66 +39,53 @@ reservationTimes.forEach((time, index) => {
 });
 
 
+// 페이지가 로드될 때 자동으로 현재 날짜를 받아오는 코드
+document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date().toISOString().split('T')[0]; // 현재 날짜를 YYYY-MM-DD 형식으로
+    dateReservationList(today); // 오늘 날짜를 전달하여 예약 목록을 자동으로 불러오기
+});
 
+// 날짜를 클릭했을 때 호출되는 함수
 function dateReservationList(selectedDate) {
     console.log(selectedDate);
     fetch('reservation/selectedDatePatientList', {
-
         method: 'POST', // POST 요청
         headers: {
             'Content-Type': 'application/json' // JSON 형식으로 데이터 전송
         },
         body: JSON.stringify({
             reservationDate: selectedDate
-
         }) // JSON 객체로 전송
     })
         .then(response => {
-            // 응답 상태가 성공적인 경우 JSON으로 변환
             if (!response.ok) {
                 throw new Error('네트워크 응답이 실패했습니다.');
             }
             return response.json(); // JSON 데이터로 변환
         })
         .then(data => {
-            // 환자 데이터가 들어갈 ID값 보관
             const tableBody = document.querySelector('#reservationTableList');
-
-            // 테이블의 기존 데이터를 지우고 새 데이터를 추가
-            // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
             tableBody.innerHTML = ''; // 기존 내용 제거
-
-            // 데이터 배열을 순회하여 테이블에 추가
             data.forEach(item => {
-
-                // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
                 const time = new Date(item.reservationDate).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
-
-
-                const row = document.createElement('tr'); // 새로운 행 생성
-                row.id = 'reservationTableListParent'; // ID 추가
+                const row = document.createElement('tr');
+                row.id = 'reservationTableListParent';
                 row.innerHTML =
                     `<td>${time}</td>
-                <td>${item.department}</td>
-                <td>${item.patientNote}</td>
-                `; // 각 열에 데이터 삽입
-
-                row.onclick = function () {
-                    selectList(item.seq);
-                };
-
+                     <td>${item.department}</td>
+                     <td>${item.patientNote}</td>
+                    `;
                 tableBody.appendChild(row); // tbody에 행 추가
             });
-
         })
         .catch(error => {
-            // 에러 처리
             console.error('에러 발생:', error);
         });
 }
+
 
 // 예약 목록에서 환자 정보를 눌렀을때 데이터 받아온 뒤 수정 가능한 화면 만들기
 function selectList(indexNumber) {
@@ -167,20 +166,6 @@ function rReset(reset) {
     // 인덱스
     const indexNumberElement = document.getElementById('index-number');
     indexNumberElement.value = '';
-
-}
-
-function sessionCallData(responseData) {
-    const departmentElement = document.getElementById('departmentInput');
-    const chartNumberElement = document.getElementById('chart-numberInput');
-    // 'reservation-date' input의 value를 오늘 날짜로 설정
-    document.getElementById('reservation-date').value = new Date().toISOString().split('T')[0];
-
-    // 받아온 데이터로 데이터 새로 등록
-    // 환자 이름
-    departmentElement.value = responseData.name;
-    // 차트 번호
-    chartNumberElement.value = responseData.chartNum;
 
 }
 
@@ -294,7 +279,7 @@ function saveUpdate() {
         reservationStatusCheck = "ba";
     } else if (document.getElementById('reservation-status-none').checked) {
         reservationStatusCheck = "없음";
-    }else {
+    } else {
         alert("예약 미이행 상태를 선택해 주세요.");
         return; // 빈값이 있으면 중지
     }
@@ -313,6 +298,7 @@ function saveUpdate() {
         reservationStatusCheck: reservationStatusCheck
     };
 
+    // 중복 예약 확인: 동일한 예약일자, 예약시간, 환자 이름으로 예약이 존재하는지 확인
     fetch('reservation/selectedReservation', {
         method: 'POST',
         headers: {
@@ -327,57 +313,49 @@ function saveUpdate() {
             return response.json();
         })
         .then(reservations => {
-            console.log(reservations.length);
-            if (reservations.length === 0) {
-                console.log(JSON.stringify(reservation_data));
-                fetch('reservation/insertReservationInformation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(reservation_data)
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(reservations => {
-                        const indexNumberElement = document.getElementById('index-number');
-                        reservations.forEach(res => {
-                            console.log(res.seq);
-                            const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
-                            dateReservationList(dateOnly);
-                            indexNumberElement.innerHTML = res.seq;
-                        });
-                    })
-                    .catch(error => {
-                        console.error('실패:', error);
-                    });
-            } else {
-                if (indexNumber) {
-                    reservation_data.seq = indexNumber;
-                    fetch('reservation/updateReservationInformation', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(reservation_data)
-                    })
-                        .then(response => {
-                            const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
-                            dateReservationList(dateOnly);
-                        })
-                        .catch(error => {
-                            console.error('실패:', error);
-                        });
-                }
+            // 중복 예약 확인: 환자 이름과 예약 시간이 동일한 경우 중복 처리
+            const isDuplicate = reservations.some(reservation => {
+                // 예약이 이미 존재하는지 체크 (환자 이름과 예약 시간 일치)
+                return reservation.department === department && reservation.reservationDate === formattedDateTime;
+            });
+
+            if (isDuplicate) {
+                alert("이미 선택된 환자가 같은시간에 등록 되어 있습니다.");
+                return; // 중복이면 등록을 중단
             }
+
+            // 중복이 아니면 새 예약 등록
+            console.log("중복된 예약 없음. 새 예약을 등록합니다.");
+            fetch('reservation/insertReservationInformation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reservation_data)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(reservations => {
+                    const indexNumberElement = document.getElementById('index-number');
+                    reservations.forEach(res => {
+                        console.log(res.seq);
+                        const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
+                        dateReservationList(dateOnly);
+                        indexNumberElement.innerHTML = res.seq;
+                    });
+                })
+                .catch(error => {
+                    console.error('실패:', error);
+                });
         })
         .catch(error => {
             console.error('오류 발생:', error);
         });
+
 }
 
 

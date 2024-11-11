@@ -9,11 +9,11 @@
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a class="nav-link active" data-bs-toggle="tab" href="#reservation_view" aria-selected="true"
-               role="tab" onclick="loadContent('/reservation_view')">예약현황보기</a>
+               role="tab" onclick="loadContent('/reservation_view','registerStatus')">예약현황보기</a>
         </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" data-bs-toggle="tab" href="#reservation_register" aria-selected="false"
-               role="tab" onclick="loadContent('/reservation_register')">예약등록하기</a>
+               role="tab" onclick="loadContent('/reservation_register', 'registerAdd')">예약등록하기</a>
         </li>
     </ul>
 
@@ -58,7 +58,7 @@
                                     <!-- 예약목록, 개인 예약 현황 구간 -->
                                     <div class="d-flex mt-2">
                                         <button class="btn btn-primary me-2 button_test_1" type="button">예약 목록</button>
-                                        <button class="btn btn-secondary button_test_2" type="submit">개인 예약 현황</button>
+                                        <button onclick="person()" class="btn btn-secondary button_test_2" type="button">개인 예약 현황</button>
                                     </div>
 
                                     <!-- 해당 날짜 테이블 ? -->
@@ -96,6 +96,9 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
+
+        let PageName = null;
+
         const reservationTimes = [
             "09:00", "09:30", "10:00", "10:30", "11:00",
             "11:30", "12:00", "12:30", "13:00", "13:30",
@@ -117,7 +120,8 @@
         const currentDate = new Date();
 
 
-        function loadContent(page) {
+        function loadContent(page, st) {
+            PageName = st
             $("#bodyContent").load(page, function (response, status, xhr) {
                 if (status === "error") {
                     $("#bodyContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
@@ -178,6 +182,7 @@
                             cell.classList.add('selected');
                             // Call for today's date
                             const todayDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+
                             dateReservationList(todayDate);
 
                             selectedCell = cell; // Keep track of today's cell
@@ -186,7 +191,7 @@
                         date++;
                     }
                     row.appendChild(cell);
-                    console.log(cell);
+                    // console.log(cell);
                 }
 
                 calendarBody.appendChild(row);
@@ -244,7 +249,30 @@
             renderCalendar();
         }
 
+        function person() {
+            // 세션 스토리지에서 'selectedPatient' 값을 가져오기
+            const selectedPatient = sessionStorage.getItem('selectedPatient');
 
+            // 세션 값이 있으면 JSON 객체로 파싱
+            if (selectedPatient !== null) {
+                const patientData = JSON.parse(selectedPatient);  // JSON 문자열을 객체로 변환
+
+                // 'chartNum' 값을 추출
+                const chartNum = patientData.chartNum;
+
+                // 'chartNum'이 있으면 출력, 없으면 경고 메시지 출력
+                if (chartNum !== undefined) {
+                    console.log('차트 번호:', chartNum);
+                    alert('차트 번호: ' + chartNum);  // 알림으로 차트 번호 표시
+                } else {
+                    console.log('차트 번호가 없습니다.');
+                    alert('차트 번호가 없습니다.');
+                }
+            } else {
+                console.log('선택된 환자 정보가 없습니다.');
+                alert('선택된 환자 정보가 없습니다.');
+            }
+        }
 
 
     </script>
