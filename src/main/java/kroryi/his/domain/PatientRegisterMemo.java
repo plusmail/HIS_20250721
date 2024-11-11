@@ -1,13 +1,12 @@
 package kroryi.his.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -26,7 +25,6 @@ public class PatientRegisterMemo {
     @Column(name = "mmo")
     private Long mmo;
 
-    private String memoChartNum;
     private String memoChartNum;
 
 //    // 차트번호 (PatientRegister와 연결)

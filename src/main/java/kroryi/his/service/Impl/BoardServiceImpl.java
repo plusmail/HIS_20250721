@@ -181,4 +181,4 @@ public class BoardServiceImpl implements BoardService {
 //        return boardRepository.findById(bno)
 //                .map(entity -> new BoardDTO(entity)) // 엔티티를 DTO로 변환
 //                .orElse(null); // bno에 해당하는 게시글이 없으면 null 반환
-}
+//}
