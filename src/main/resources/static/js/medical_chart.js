@@ -237,6 +237,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         </tr>
                     `);
 
+                row.on('dblclick', function () {
+                    cnumGlogal = chart.cnum;
+                    loadDataIntoFields(cnumGlogal);
+                });
+
                 // 각 데이터 클릭 이벤트 추가
                 row.on('click', function () {
                     $('.medical-content-cell .delete-icon').remove();
