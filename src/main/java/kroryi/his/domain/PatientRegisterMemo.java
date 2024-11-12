@@ -1,13 +1,12 @@
 package kroryi.his.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -28,6 +27,11 @@ public class PatientRegisterMemo {
 
     private String memoChartNum;
 
+//    // 차트번호 (PatientRegister와 연결)
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "memo_chartnum", referencedColumnName = "chart_num", nullable = false)
+//    private PatientRegister patientRegister;
+
     // 등록 날짜
     @Column(name = "reg_date")
     private LocalDate regDate;
@@ -39,4 +43,7 @@ public class PatientRegisterMemo {
     public void changeText(String content) {
         this.content = content;
     }
+
+    // 기타 필드
+    // 필요한 경우 여기에 추가 필드를 정의할 수 있습니다.
 }

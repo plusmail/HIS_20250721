@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -162,13 +163,44 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<Board> getLatestPosts() {
-        return boardRepository.findAll(PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "regDate"))).getContent();
+    public PageResponseDTO<BoardDTO> getList(PageRequestDTO pageRequestDTO) {
+        return null;
     }
+
+    @Override
+    public List<BoardDTO> getLatestPosts() {
+        // 최신 게시글 3개만 가져오기 위한 Pageable 설정
+        Pageable pageable = PageRequest.of(0, 3);  // 페이지 0부터 시작하고, 3개만 가져옴
+        List<Board> latestPosts = boardRepository.findLatestPosts(pageable);
+
+        // 포맷팅을 포함하여 BoardDTO 리스트로 변환
+        return latestPosts.stream()
+                .map(post -> new BoardDTO(
+                        post.getBno(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getRegDate() != null
+                                ? post.getRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                : "N/A"  // null일 경우 "N/A"로 대체
+                ))
+                .collect(Collectors.toList());
+    }
+}
+
 
 //    @Override
 //    public BoardDTO getPost(Long bno) {
 //        return boardRepository.findById(bno)
 //                .map(entity -> new BoardDTO(entity)) // 엔티티를 DTO로 변환
 //                .orElse(null); // bno에 해당하는 게시글이 없으면 null 반환
-}
+
+
+
+
+
+//    @Override
+//    public BoardDTO getPost(Long bno) {
+//        return boardRepository.findById(bno)
+//                .map(entity -> new BoardDTO(entity)) // 엔티티를 DTO로 변환
+//                .orElse(null); // bno에 해당하는 게시글이 없으면 null 반환
+//}

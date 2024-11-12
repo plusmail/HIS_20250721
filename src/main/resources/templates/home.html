@@ -156,7 +156,7 @@
                                 <tbody th:if="${not #lists.isEmpty(latestPosts)}">
                                 <tr th:each="post : ${latestPosts}">
                                     <td th:text="${post.title}"></td>
-                                    <td th:text="${post.content}"></td>
+                                    <td th:text="${#strings.abbreviate(post.content, 10)}"></td>
                                     <td th:text="${#temporals.format(post.regDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 </tbody>

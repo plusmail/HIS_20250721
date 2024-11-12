@@ -1,7 +1,7 @@
 package kroryi.his.repository;
 
 import kroryi.his.domain.MedicalChart;
-import kroryi.his.domain.QMedicalChart;
+
 import kroryi.his.dto.MedicalChartDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

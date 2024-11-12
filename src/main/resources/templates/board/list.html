@@ -32,11 +32,11 @@
         </form>
     </div>
     <div class="card m-2">
-        <div class="card-header">
-            게시판
+        <div class="card-header text-center">
+            공지사항
         </div>
         <div class="card-body">
-            <h5 class="card-title">목록</h5>
+            <h5 class="card-title"></h5>
             <table class="table">
                 <thead>
                 <tr>
@@ -49,7 +49,9 @@
                 <tbody><!--th:with="link=${pageRequestDTO.getLink()}"-->
                 <tr th:each="dto:${responseDTO.dtoList}">
                     <th scope="row">[[${dto.bno}]]</th>
-                    <td>[[${dto.title}]]</td>
+                    <td>
+                        <a th:href="|@{/board/read(bno =${dto.bno})}&${link}|"> [[${dto.title}]]</a>
+                    </td>
                     <td>[[${dto.writer}]]</td>
                     <td>[[${#temporals.format(dto.regDate, 'yyyy-MM-dd')}]]</td>
                 </tr>
@@ -63,48 +65,74 @@
             <div class="float-end">
                 <ul class="pagination flex-wrap">
                     <li class="page-item" th:if="${responseDTO.prev}">
-                        <a class="page-link" th:data-num="${responseDTO.start -1}">이전</a>
+                        <a class="page-link" th:data-num="${responseDTO.start - 1}">이전</a>
                     </li>
-
-                    <th:block th:each="i:${#numbers.sequence(responseDTO.start,responseDTO.end)}">
-                        <li th:class="${responseDTO.page == i}?'page-item active':'page-item'">
+                    <th:block th:each="i:${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                        <li th:class="${responseDTO.page == i} ? 'page-item active' :'page-item'">
                             <a class="page-link" th:data-num="${i}">[[${i}]]</a>
                         </li>
                     </th:block>
 
                     <li class="page-item" th:if="${responseDTO.next}">
-                        <a class="page-link" th:data-num="${responseDTO.end +1}">다음</a>
+                        <a class="page-link" th:data-num="${responseDTO.end + 1}">다음</a>
                     </li>
                 </ul>
             </div>
+
+            <div class="mb-1">
+                <a href="/board/register" class="text-decoration-none"
+                   th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                    <button type="button" class="btn btn-primary">등록</button>
+                </a>
+            </div>
         </div>
     </div>
-    <script layout:fragment="script" th:inline="javascript">
-        console.log("asdasdada")
-        document.querySelector(".pagination").addEventListener("click", (e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            const target = e.target
-            console.log(target)
-            if (target.tagName !== "A") {
-                return
-            }
-            const num = target.getAttribute("data-num")
-
-            const formObj = document.getElementById("listForm")
-
-            formObj.innerHTML += `<input type='hidden' name='page' value='${num}'>`
-
-            formObj.submit();
-        }, false)
-
-        document.querySelector(".clearBtn").addEventListener("click", (e) => {
-            e.preventDefault()
-            e.stopPropagation()
-
-            self.location = '/board/list'
-        }, false)
-    </script>
 </div>
+<script layout:fragment="script" th:inline="javascript">
+
+    // 권한 체크
+    const hasPermission = globalUserData.authorities.some(auth =>
+        auth.authority === 'ROLE_ADMIN'
+    );
+
+    document.querySelector("#registerButton").addEventListener("click", (e) => {
+        if (!hasPermission) {
+            e.preventDefault();
+            alert("권한이 없습니다. 관리자만 등록할 수 있습니다.");
+            return; // 등록 중단
+        }
+    });
+
+
+    console.log("asdasdada")
+    document.querySelector(".pagination").addEventListener("click", (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const target = e.target
+        console.log(target)
+        if (target.tagName !== "A") {
+            return
+        }
+        const num = target.getAttribute("data-num")
+
+        const formObj = document.getElementById("listForm")
+
+        formObj.innerHTML += `<input type='hidden' name='page' value='${num}'>`
+
+        formObj.submit();
+    }, false)
+
+
+    document.querySelector(".clearBtn").addEventListener("click", (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+
+        self.location = '/board/list'
+
+
+    }, false)
+
+</script>
 
 
