@@ -45,7 +45,7 @@ if (!window.MedicalPlanModule) {
             mTooth.addEventListener("click", handleToothClick);
 
             planData.on('click', 'button.save-db-btn', handleSaveButtonClick);
-            // planData.on('click', 'button.update-db-btn', handleUpdateButtonClick);
+            planData.on('click', 'button.update-db-btn', handleUpdateButtonClick);
         }
 
         function cleanup() {
@@ -297,6 +297,7 @@ if (!window.MedicalPlanModule) {
                         saveButton.classList.add('btn-success', 'update-db-btn');
                         saveButton.textContent = '수정';
                     }
+                    alert("등록되었습니다.")
                     fetchChartData();
                     readPaChart();
                     // addNewRow();
@@ -355,6 +356,7 @@ if (!window.MedicalPlanModule) {
                     cnum: cnum // 전체 데이터를 전송
                 }),
                 success: function(response) {
+                    alert("수정이 되었습니다.")
                     fetchChartData();
                     readPaChart();
                 },

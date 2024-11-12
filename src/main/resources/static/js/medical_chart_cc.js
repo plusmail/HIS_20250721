@@ -216,8 +216,25 @@ if (!window.MedicalChartCCModule) {
             const chartNum = patientInfos.chartNum || '';
             const cnum = cnumGlogal;
 
-
             let updatedToothList = [...window.toothList];
+
+            // 모든 필드가 입력되었는지 확인
+            if (!mdTime) {
+                alert("진료 날짜를 선택해주세요.");
+                return;
+            }
+            if (!ccCheckDoc) {
+                alert("진료의를 선택해주세요.");
+                return;
+            }
+            if (updatedToothList.length === 0) {
+                alert("치식을 선택해주세요.");
+                return;
+            }
+            if (!memoContent) {
+                alert("CC 내역을 입력해주세요.");
+                return;
+            }
 
             toothList.forEach(tooth => {
                 if (!updatedToothList.includes(tooth)) {
