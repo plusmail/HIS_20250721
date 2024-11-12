@@ -31,7 +31,6 @@ if (!window.MedicalPlanModule) {
 
             mdTime = document.getElementById("mdTime");
             checkDoc = document.getElementById("planCheckDoc");
-
             setupEventListeners();
         }
 
@@ -105,6 +104,8 @@ if (!window.MedicalPlanModule) {
             }
         }
 
+        let lastActiveButton = null; // 마지막으로 클릭된 버튼 추적
+
         function handleToothClick(e) {
             if (e.target.tagName === "BUTTON" && e.target.id === '') {
                 e.target.classList.toggle("opacity-50");
@@ -114,6 +115,12 @@ if (!window.MedicalPlanModule) {
         }
 
         function toothTerminal(id) {
+            // 현재 활성화된 버튼이 있다면 초기화
+            if (lastActiveButton && lastActiveButton !== id) {
+                resetToggleOpacity(lastActiveButton); // 이전 버튼과 관련된 상태 초기화
+            }
+
+
             toothList = []; // Initialize an empty list to store only numeric tooth values
 
             switch (id) {
@@ -121,7 +128,7 @@ if (!window.MedicalPlanModule) {
                     // Filter only numeric values for upper teeth
                     mUpToothValues.forEach(upToothValue => {
                         if (!isNaN(upToothValue.value)) {  // Ensure the value is numeric
-                            toothList.push(upToothValue.value);
+                            toothList.push(upToothValue.value || '');
                         }
                     });
                     toggleOpacity(mUpTooth, mUpToothValues, "상악");
@@ -131,12 +138,12 @@ if (!window.MedicalPlanModule) {
                     // Filter only numeric values for both upper and lower teeth
                     mUpToothValues.forEach(upToothValue => {
                         if (!isNaN(upToothValue.value)) {
-                            toothList.push(upToothValue.value);
+                            toothList.push(upToothValue.value || '');
                         }
                     });
                     mDownToothValues.forEach(downToothValue => {
                         if (!isNaN(downToothValue.value)) {
-                            toothList.push(downToothValue.value);
+                            toothList.push(downToothValue.value || '');
                         }
                     });
                     toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
@@ -146,7 +153,7 @@ if (!window.MedicalPlanModule) {
                     // Filter only numeric values for lower teeth
                     mDownToothValues.forEach(downToothValue => {
                         if (!isNaN(downToothValue.value)) {
-                            toothList.push(downToothValue.value);
+                            toothList.push(downToothValue.value || '');
                         }
                     });
                     toggleOpacity(mDownTooth, mDownToothValues, "하악");
@@ -156,7 +163,7 @@ if (!window.MedicalPlanModule) {
                     // Filter only numeric values for deciduous upper teeth
                     mYUpToothValues.forEach(yUpToothValue => {
                         if (!isNaN(yUpToothValue.value)) {
-                            toothList.push(yUpToothValue.value);
+                            toothList.push(yUpToothValue.value || '');
                         }
                     });
                     toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
@@ -166,12 +173,12 @@ if (!window.MedicalPlanModule) {
                     // Filter only numeric values for deciduous upper and lower teeth
                     mYUpToothValues.forEach(yUpToothValue => {
                         if (!isNaN(yUpToothValue.value)) {
-                            toothList.push(yUpToothValue.value);
+                            toothList.push(yUpToothValue.value || '');
                         }
                     });
                     mYDownToothValues.forEach(yDownToothValue => {
                         if (!isNaN(yDownToothValue.value)) {
-                            toothList.push(yDownToothValue.value);
+                            toothList.push(yDownToothValue.value || '');
                         }
                     });
                     toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
@@ -181,7 +188,7 @@ if (!window.MedicalPlanModule) {
                     // Filter only numeric values for deciduous lower teeth
                     mYDownToothValues.forEach(yDownToothValue => {
                         if (!isNaN(yDownToothValue.value)) {
-                            toothList.push(yDownToothValue.value);
+                            toothList.push(yDownToothValue.value || '');
                         }
                     });
                     toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
@@ -191,6 +198,8 @@ if (!window.MedicalPlanModule) {
                     alert("올바르지 않은 버튼을 선택하였습니다.");
                     break;
             }
+
+            lastActiveButton = id;
         }
 
 // Helper function to toggle opacity and log messages
@@ -199,6 +208,40 @@ if (!window.MedicalPlanModule) {
             elements.forEach(element => element.classList.toggle("opacity-50"));
         }
 
+        // 이전 상태를 초기화하는 함수
+        function resetToggleOpacity(id) {
+            switch (id) {
+                case "modal-upTooth":
+                    mUpTooth.classList.remove("opacity-50");
+                    mUpToothValues.forEach(upToothValue => upToothValue.classList.remove("opacity-50"));
+                    break;
+
+                case "modal-allTooth":
+                    mAllTooth.classList.remove("opacity-50");
+                    [...mUpToothValues, ...mDownToothValues].forEach(toothValue => toothValue.classList.remove("opacity-50"));
+                    break;
+
+                case "modal-downTooth":
+                    mDownTooth.classList.remove("opacity-50");
+                    mDownToothValues.forEach(downToothValue => downToothValue.classList.remove("opacity-50"));
+                    break;
+
+                case "modal-upToothY":
+                    mUpToothY.classList.remove("opacity-50");
+                    mYUpToothValues.forEach(yUpToothValue => yUpToothValue.classList.remove("opacity-50"));
+                    break;
+
+                case "modal-allToothY":
+                    mAllToothY.classList.remove("opacity-50");
+                    [...mYUpToothValues, ...mYDownToothValues].forEach(toothValue => toothValue.classList.remove("opacity-50"));
+                    break;
+
+                case "modal-downToothY":
+                    mDownToothY.classList.remove("opacity-50");
+                    mYDownToothValues.forEach(yDownToothValue => yDownToothValue.classList.remove("opacity-50"));
+                    break;
+            }
+        }
 
         function saveSelectedTeeth() {
             if (selectedPTag) {
@@ -299,8 +342,7 @@ if (!window.MedicalPlanModule) {
                     }
                     alert("등록되었습니다.")
                     fetchChartData();
-                    readPaChart();
-                    // addNewRow();
+                    searchList();
                 },
                 error: function (error) {
                     console.error('Error saving data:', error);
@@ -355,33 +397,15 @@ if (!window.MedicalPlanModule) {
                     checkDoc: checkDoc.value,
                     cnum: cnum // 전체 데이터를 전송
                 }),
-                success: function(response) {
+                success: function (response) {
                     alert("수정이 되었습니다.")
                     fetchChartData();
-                    readPaChart();
+                    searchList();
                 },
-                error: function(error) {
+                error: function (error) {
                     console.error('Error updating data:', error);
                 }
             });
-        }
-
-        function addNewRow() {
-            const newRow = `
-                <tr>
-                     <td><input type="date" name="mdTime" id="mdTime" class="form-control" required></td>
-            <td>
-                <select class="form-select" name="checkDoc" id="planCheckDoc" required>
-                    <option value="" selected>진료의</option>
-                    ${doctorNames.map(doctor => `<option value="${doctor}">${doctor}</option>`).join('')}
-                </select>
-            </td>
-                    <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-tooth-Modal" class="select-pTag">치아 선택</p></td>
-                    <td><p style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#Plan-cure-modal" class="select-pTag">치료계획 선택</p></td>
-                    <td><button class="btn btn-primary save-db-btn" type="button">저장</button></td>
-                </tr>
-            `;
-            planData.append(newRow);
         }
 
         return {

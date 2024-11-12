@@ -160,8 +160,6 @@ if (!window.MedicalChartCCModule) {
         }
 
 
-
-
         function toggleOpacityCc(button, elements, logMessage) {
             button.classList.toggle("opacity-50");
             elements.forEach(element => element.classList.toggle("opacity-50"));
@@ -186,10 +184,13 @@ if (!window.MedicalChartCCModule) {
 
         function resetFormFields() {
             cnumGlogal = null;
+            const ccCheckDoc = document.getElementById('piCheckDoc');
 
-            const ccCheckDoc = document.getElementById("ccCheckDoc");
             if (ccCheckDoc) {
                 ccCheckDoc.selectedIndex = 0;
+                if (!ccCheckDoc.value) {
+                    ccCheckDoc.selectedIndex = 1;
+                }
             }
 
             const today = new Date().toISOString().split("T")[0];
@@ -264,7 +265,7 @@ if (!window.MedicalChartCCModule) {
                     if (response.ok) {
                         alert(cnum ? '수정되었습니다.' : '저장되었습니다.');
                         resetFormFields();
-                        readPaChart();
+                        searchList();
                     } else {
                         alert('저장 실패.');
                     }

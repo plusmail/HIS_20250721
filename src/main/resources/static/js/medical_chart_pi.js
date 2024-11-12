@@ -309,7 +309,7 @@ if (!window.MedicalChartPIModule) {
                     if (response.ok) {
                         alert(cnum ? '수정되었습니다.' : '저장되었습니다.');
                         resetFormFields();
-                        readPaChart();
+                        searchList();
                     } else {
                         alert('저장 실패.');
                     }
