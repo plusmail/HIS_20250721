@@ -78,6 +78,12 @@ function dateReservationList(selectedDate) {
                      <td>${item.department}</td>
                      <td>${item.patientNote}</td>
                     `;
+                row.onclick = function () {
+
+                    if(PageName === 'registerAdd'){
+                        selectList(item.seq);
+                    }
+                };
                 tableBody.appendChild(row); // tbody에 행 추가
 
             });
@@ -264,6 +270,10 @@ function saveUpdate() {
     // 치료 유형
     const treatmentType = document.getElementById('treatment-type').value;
 
+    if (!department || !chartNumber || !doctor || !treatmentType) {
+        alert("부서, 차트 번호, 의사, 치료 유형을 모두 입력해 주세요.");
+        return; // 빈값이 있으면 중지
+    }
     // 환자 노트
     const patientNote = document.getElementById('patient-note').value;
 
@@ -275,7 +285,11 @@ function saveUpdate() {
         reservationStatusCheck = "ba";
     } else if (document.getElementById('reservation-status-none').checked) {
         reservationStatusCheck = "없음";
+    } else {
+        alert("예약 미이행 상태를 선택해 주세요.");
+        return; // 빈값이 있으면 중지
     }
+
 
     const indexNumber = document.getElementById('index-number').innerHTML.trim();
 
