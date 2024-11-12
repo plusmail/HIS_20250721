@@ -79,6 +79,7 @@ function dateReservationList(selectedDate) {
                      <td>${item.patientNote}</td>
                     `;
                 tableBody.appendChild(row); // tbody에 행 추가
+
             });
         })
         .catch(error => {
@@ -263,11 +264,6 @@ function saveUpdate() {
     // 치료 유형
     const treatmentType = document.getElementById('treatment-type').value;
 
-    if (!department || !chartNumber || !doctor || !treatmentType) {
-        alert("부서, 차트 번호, 의사, 치료 유형을 모두 입력해 주세요.");
-        return; // 빈값이 있으면 중지
-    }
-
     // 환자 노트
     const patientNote = document.getElementById('patient-note').value;
 
@@ -279,9 +275,6 @@ function saveUpdate() {
         reservationStatusCheck = "ba";
     } else if (document.getElementById('reservation-status-none').checked) {
         reservationStatusCheck = "없음";
-    } else {
-        alert("예약 미이행 상태를 선택해 주세요.");
-        return; // 빈값이 있으면 중지
     }
 
     const indexNumber = document.getElementById('index-number').innerHTML.trim();
@@ -298,7 +291,6 @@ function saveUpdate() {
         reservationStatusCheck: reservationStatusCheck
     };
 
-    // 중복 예약 확인: 동일한 예약일자, 예약시간, 환자 이름으로 예약이 존재하는지 확인
     fetch('reservation/selectedReservation', {
         method: 'POST',
         headers: {
@@ -313,49 +305,58 @@ function saveUpdate() {
             return response.json();
         })
         .then(reservations => {
-            // 중복 예약 확인: 환자 이름과 예약 시간이 동일한 경우 중복 처리
-            const isDuplicate = reservations.some(reservation => {
-                // 예약이 이미 존재하는지 체크 (환자 이름과 예약 시간 일치)
-                return reservation.department === department && reservation.reservationDate === formattedDateTime;
-            });
-
-            if (isDuplicate) {
-                alert("이미 선택된 환자가 같은시간에 등록 되어 있습니다.");
-                return; // 중복이면 등록을 중단
-            }
-
-            // 중복이 아니면 새 예약 등록
-            console.log("중복된 예약 없음. 새 예약을 등록합니다.");
-            fetch('reservation/insertReservationInformation', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(reservation_data)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
+            console.log(reservations.length);
+            if (reservations.length === 0) {
+                console.log(JSON.stringify(reservation_data));
+                fetch('reservation/insertReservationInformation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reservation_data)
                 })
-                .then(reservations => {
-                    const indexNumberElement = document.getElementById('index-number');
-                    reservations.forEach(res => {
-                        console.log(res.seq);
-                        const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
-                        dateReservationList(dateOnly);
-                        indexNumberElement.innerHTML = res.seq;
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(reservations => {
+                        const indexNumberElement = document.getElementById('index-number');
+                        reservations.forEach(res => {
+                            console.log(res.seq);
+                            const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
+                            dateReservationList(dateOnly);
+                            indexNumberElement.innerHTML = res.seq;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('실패:', error);
                     });
-                })
-                .catch(error => {
-                    console.error('실패:', error);
-                });
+            } else {
+                if (indexNumber) {
+                    reservation_data.seq = indexNumber;
+                    fetch('reservation/updateReservationInformation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(reservation_data)
+                    })
+                        .then(response => {
+                            const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
+                            dateReservationList(dateOnly);
+                            console.log("!!!!!!!!!!" + indexNumber);
+                        })
+                        .catch(error => {
+                            console.error('실패:', error);
+                        });
+                }
+            }
         })
         .catch(error => {
             console.error('오류 발생:', error);
         });
-
 }
 
 
@@ -555,4 +556,3 @@ function deleteTerm(param) {
         console.error("유효하지 않은 매개변수입니다.");
     }
 }
-

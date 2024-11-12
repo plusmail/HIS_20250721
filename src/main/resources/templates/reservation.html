@@ -57,8 +57,12 @@
 
                                     <!-- 예약목록, 개인 예약 현황 구간 -->
                                     <div class="d-flex mt-2">
-                                        <button class="btn btn-primary me-2 button_test_1" type="button">예약 목록</button>
-                                        <button onclick="person()" class="btn btn-secondary button_test_2" type="button">개인 예약 현황</button>
+                                        <button class="btn btn-primary me-2 button_test_1" type="button"
+                                                onclick='loadReservationForSelectedDate()'>예약 목록
+                                        </button>
+                                        <button class="btn btn-secondary button_test_2" type="button"
+                                                onclick='fu_reservation_list_all("personal")'>개인 예약 현황
+                                        </button>
                                     </div>
 
                                     <!-- 해당 날짜 테이블 ? -->
@@ -70,14 +74,14 @@
                                             <th>내용</th>
                                         </tr>
                                         </thead>
-                                        <tbody  id="reservationTableList" class="table table-hover">
+                                        <tbody id="reservationTableList" class="table table-hover">
                                         </tbody>
                                     </table>
 
-<!--                                    &lt;!&ndash; 날짜 선택시 환자 데이터가 들어올 테이블 &ndash;&gt;-->
-<!--                                    <table id="reservationTableList" class="table table-hover">-->
+                                    <!--                                    &lt;!&ndash; 날짜 선택시 환자 데이터가 들어올 테이블 &ndash;&gt;-->
+                                    <!--                                    <table id="reservationTableList" class="table table-hover">-->
 
-<!--                                    </table>-->
+                                    <!--                                    </table>-->
 
                                 </div>
                                 <div id="bodyContent" class="col-md-8">
@@ -97,7 +101,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
 
+
+
+
         let PageName = null;
+        let reservation_list_all;
 
         const reservationTimes = [
             "09:00", "09:30", "10:00", "10:30", "11:00",
@@ -137,9 +145,9 @@
         }
 
 
+        let selectedDate = '';  // 전역 변수로 선택된 날짜 저장
 
         function renderCalendar() {
-
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             const firstDay = new Date(year, month, 1).getDay();
@@ -150,8 +158,6 @@
             calendarBody.innerHTML = '';
 
             let date = 1;
-
-            // Variable to hold the currently selected cell
             let selectedCell = null;
 
             for (let i = 0; i < 6; i++) {
@@ -165,78 +171,54 @@
                     } else if (date > lastDate) {
                         break;
                     } else {
-                        // 일요일이면 색갈이 빨간색으로
                         if (j === 0) {
-                            cell.style.color = 'red'; // 숫자 색상을 빨간색으로 변경
-                        }
-                        // 토요일
-                        else if (j === 6) {
-                            cell.style.color = 'blue'; // 숫자 색상을 빨간색으로 변경
+                            cell.style.color = 'red';  // 일요일
+                        } else if (j === 6) {
+                            cell.style.color = 'blue'; // 토요일
                         } else {
                             cell.style.color = 'black';
                         }
                         cell.innerHTML = date;
 
-                        // Highlight today’s date
+                        // 오늘 날짜 강조
                         if (date === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
                             cell.classList.add('selected');
-                            // Call for today's date
                             const todayDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-
-                            dateReservationList(todayDate);
-
-                            selectedCell = cell; // Keep track of today's cell
+                            selectedDate = todayDate;  // 오늘 날짜 저장
+                            dateReservationList(todayDate);  // 오늘 예약 목록 불러오기
+                            selectedCell = cell;  // 오늘 날짜 셀 저장
                         }
 
                         date++;
                     }
                     row.appendChild(cell);
-                    // console.log(cell);
                 }
 
                 calendarBody.appendChild(row);
             }
 
+            // 날짜 선택 시
             calendarBody.addEventListener('click', function (event) {
-                // 클릭한 요소가 <td>이고 class가 'calendarDate'일 때
                 if (event.target.tagName === 'TD' && event.target.classList.contains('calendarDate')) {
                     const tdElement = event.target;
+                    const day = tdElement.textContent;
+                    selectedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;  // 선택한 날짜 저장
+                    dateReservationList(selectedDate);  // 선택된 날짜 예약 목록 불러오기
 
-                    // 기존에 선택된 td에서 배경색을 제거
-                    const selected = document.querySelector('.calendarDate[style*="background-color: blue"]');
-                    if (selected) {
-                        selected.style.backgroundColor = ''; // 이전 선택 제거
-                        selected.style.color = ''; // 이전 선택의 글자색 초기화
-                    }
-
+                    // 선택된 셀에 스타일 추가
                     const selectedCells = document.querySelectorAll("td.calendarDate.selected");
                     selectedCells.forEach(cell => cell.classList.remove("selected"));
                     tdElement.classList.add("selected");
-
-
-                    // 클릭한 날짜에 배경색 추가
-                    // console.log()
-                    // tdElement.style.backgroundColor = 'blue'; // 클릭한 td에 배경색 설정
-                    // tdElement.style.color = 'white'; // 클릭한 td의 글자색 설정
-
                 }
             });
+        }
 
-
-            // 캘린더 날짜 선택시 오늘 날짜 정보 받아오기
-            document.querySelectorAll('.calendarDate').forEach(function (calendarDate) {
-                calendarDate.addEventListener('click', function () {
-                    // 클릭된 날짜의 텍스트 가져오기
-                    const day = this.textContent;
-
-                    // 저장한 날짜 텍스트, 날짜 형식으로 재변환
-                    const selectedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-                    dateReservationList(selectedDate);
-
-                });
-            });
-
+        function loadReservationForSelectedDate() {
+            if (selectedDate) {
+                dateReservationList(selectedDate);  // 선택된 날짜에 대한 예약 목록 불러오기
+            } else {
+                alert("날짜를 선택해주세요.");  // 날짜가 선택되지 않으면 알림
+            }
         }
 
         function prevMonth() {
@@ -248,32 +230,6 @@
             currentDate.setMonth(currentDate.getMonth() + 1);
             renderCalendar();
         }
-
-        function person() {
-            // 세션 스토리지에서 'selectedPatient' 값을 가져오기
-            const selectedPatient = sessionStorage.getItem('selectedPatient');
-
-            // 세션 값이 있으면 JSON 객체로 파싱
-            if (selectedPatient !== null) {
-                const patientData = JSON.parse(selectedPatient);  // JSON 문자열을 객체로 변환
-
-                // 'chartNum' 값을 추출
-                const chartNum = patientData.chartNum;
-
-                // 'chartNum'이 있으면 출력, 없으면 경고 메시지 출력
-                if (chartNum !== undefined) {
-                    console.log('차트 번호:', chartNum);
-                    alert('차트 번호: ' + chartNum);  // 알림으로 차트 번호 표시
-                } else {
-                    console.log('차트 번호가 없습니다.');
-                    alert('차트 번호가 없습니다.');
-                }
-            } else {
-                console.log('선택된 환자 정보가 없습니다.');
-                alert('선택된 환자 정보가 없습니다.');
-            }
-        }
-
 
     </script>
 

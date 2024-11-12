@@ -1,4 +1,3 @@
-
 renderCalendar();
 function dateReservationList(selectedDate) {
     fetch('reservation/selectedDatePatientList', {
@@ -19,6 +18,9 @@ function dateReservationList(selectedDate) {
             return response.json(); // JSON 데이터로 변환
         })
         .then(data => {
+            // 전역 변수에 데이터 값 보관
+            reservation_list_all = data;
+
             // 환자 데이터가 들어갈 ID값 보관
             const tableBody = document.querySelector('#reservationTableList');
 
@@ -64,6 +66,143 @@ function dateReservationList(selectedDate) {
             console.error('에러 발생:', error);
         });
 }
+
+async function fu_reservation_list_all(type) {
+
+    // 세션 스토리지에서 selectedPatient 객체를 가져와 chartNum 추출
+    const selectedPatient = JSON.parse(sessionStorage.getItem('selectedPatient'));
+    const chartNum = selectedPatient ? selectedPatient.chartNum : null;
+
+    // 환자 데이터를 임시로 담을 변수
+    let temp_data = [];
+
+    if(type==="personal") {
+
+// reservation_list_all 배열에서 순차적으로 접근
+        for (let i = 0; i < reservation_list_all.length; i++) {
+            // reservation_list_all[i]에서 chartNumber만 비교
+            if (reservation_list_all[i].chartNumber === chartNum) {
+                temp_data.push(reservation_list_all[i]);
+            }
+
+        }
+
+        // 환자 데이터가 들어갈 ID값 보관
+        const tableBody_2 = document.querySelector('#reservationTableList');
+
+        // 테이블의 기존 데이터를 지우고 새 데이터를 추가
+        // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
+        tableBody_2.innerHTML = ''; // 기존 내용 제거
+
+        const timetable = document.getElementById('timetable');
+
+        // 데이터 배열을 순회하여 테이블에 추가
+        temp_data.forEach(item => {
+
+            // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
+            const time = new Date(item.reservationDate).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+
+            const row = document.createElement('tr'); // 새로운 행 생성
+            row.id = 'reservationTableListParent'; // ID 추가
+            row.innerHTML = `
+                                <td>${time}</td>
+                                <td>${item.department}</td>
+                                <td>${item.patientNote}</td>
+                                `; // 각 열에 데이터 삽입
+            row.onclick = function () {
+
+                if(PageName === 'registerAdd'){
+                    selectList(item.seq);
+                }
+
+            };
+            tableBody_2.appendChild(row); // tbody에 행 추가
+        });
+
+    }
+
+
+    const doctors = await fetchDoctors(); // 의사 목록 가져오기
+    const tableHead = document.querySelector("#timetable thead tr");
+    const tableBody = document.querySelector("#timetable tbody");
+
+// 의사 헤더 셀 초기화
+    tableHead.innerHTML = '<th>&nbsp;</th>'; // 기존 헤더 초기화
+    tableBody.innerHTML = ""; // 기존 바디 초기화
+
+// 의사 헤더 셀 생성
+    doctors.forEach(doctor => {
+        const th = document.createElement("th");
+        th.innerText = doctor; // 의사 이름 삽입
+        tableHead.appendChild(th);
+    });
+
+// 예약 데이터 처리
+    const reservations = temp_data.map(item => {
+        const time = item.reservationDate.split('T')[1].substring(0, 5); // 'HH:MM' 형식으로 추출
+
+        // 예약 타입에 맞는 클래스 이름을 설정
+        let treatmentClass = '';
+        if (item.treatmentType === '리콜') {
+            treatmentClass = 'recall';  // 리콜 예약
+        } else if (item.treatmentType === '수술') {
+            treatmentClass = 'surgery'; // 수술 예약
+        } else {
+            treatmentClass = 'general'; // 일반 예약
+        }
+
+        return {
+            time: time,
+            doctor: item.doctor,
+            info: `
+            <div class="reservation ${treatmentClass}" style="display: flex; padding-right: 10px;">
+                <div style="flex: 3; padding-right: 20px; border-right: 2px solid gray; display: flex; justify-content: center; align-items: center;">
+                    ${item.department}
+                </div>
+                <div style="flex: 7; padding-left: 20px;">
+                    ${item.patientNote} <br> ${item.treatmentType}
+                </div>
+            </div>
+        `, // HTML로 나누어 표시
+            treatmentType: item.treatmentType // treatmentType 추가
+        };
+    });
+
+    console.log("예약 정보:", reservations); // 예약 정보 확인
+
+// 시간 슬롯 생성
+    reservationTimes.forEach(slot => {
+        const tr = document.createElement("tr");
+
+        // 시간 셀 생성
+        const timeCell = document.createElement("td");
+        timeCell.innerText = slot;
+        tr.appendChild(timeCell);
+
+        // 각 의사에 대한 예약 정보 생성
+        doctors.forEach(doctor => {
+            const td = document.createElement("td");
+
+            // 현재 시간과 의사에 맞는 예약 찾기
+            const matchedReservations = reservations.filter(r => r.time === slot && r.doctor === doctor);
+
+            // 모든 예약 정보를 줄바꿈으로 결합하고, 각 예약에 대해 treatmentType에 맞는 클래스를 추가
+            td.innerHTML = matchedReservations.length > 0
+                ? matchedReservations.map(r => r.info).join('<br>') // 예약 정보
+                : ""; // 예약 정보가 없으면 빈 값으로 둡니다.
+
+            tr.appendChild(td); // 의사별 예약 셀 추가
+        });
+
+        tableBody.appendChild(tr); // 행을 테이블 바디에 추가
+    });
+
+}
+
 
 // 모든 의사 목록을 가져오는 함수
 async function fetchDoctors() {
