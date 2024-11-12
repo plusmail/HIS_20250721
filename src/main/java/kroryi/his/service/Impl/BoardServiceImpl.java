@@ -13,7 +13,9 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
@@ -159,4 +161,14 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
+    @Override
+    public List<Board> getLatestPosts() {
+        return boardRepository.findAll(PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "regDate"))).getContent();
+    }
+
+//    @Override
+//    public BoardDTO getPost(Long bno) {
+//        return boardRepository.findById(bno)
+//                .map(entity -> new BoardDTO(entity)) // 엔티티를 DTO로 변환
+//                .orElse(null); // bno에 해당하는 게시글이 없으면 null 반환
 }

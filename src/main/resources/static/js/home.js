@@ -34,7 +34,7 @@ function goToMaterialManagementPage() {
 
 
 // WebSocket을 위한 전역 변수 설정
-const socket = new SockJS("/ws");
+const socket = new SockJS("http://localhost:8080/ws");
 
 document.addEventListener("DOMContentLoaded", function () {
     const stompClient = Stomp.over(socket);
@@ -134,12 +134,14 @@ function updatePatientCounts(counts) {
 
 // 진료 접수 페이지로 이동
 function goToReception() {
-    window.location.href = "/reception";
+    window.location.href = '/reception';
 }
 
 // 예약 페이지로 이동
 function goToReservation() {
-    window.location.href = "/reservation";
+    window.location.href = '/reservation';
 }
 
-
+function goToBoardList() {
+    window.location.href = '/board/list';
+}

@@ -1,6 +1,7 @@
 package kroryi.his.service;
 
 
+import kroryi.his.domain.Board;
 import kroryi.his.dto.BoardDTO;
 import kroryi.his.dto.PageRequestDTO;
 import kroryi.his.dto.PageResponseDTO;
@@ -14,6 +15,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public interface BoardService {
+   List<Board> getLatestPosts();
+
     Long register(BoardDTO dto);
 
     BoardDTO readOne(Long id);
