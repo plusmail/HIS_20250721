@@ -129,7 +129,7 @@ if (!window.MedicalChartPIModule) {
                         ...Array.from(mUpToothValues || []).map(tooth => tooth.value || ''),
                         ...Array.from(mDownToothValues || []).map(tooth => tooth.value || '')
                     ];
-                    toggleOpacityPi(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                    toggleOpacityPi(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전체 치아");
                     break;
                 case "downTooth":
                     selectedTeethValues = Array.from(mDownToothValues || []).map(tooth => tooth.value || '');
@@ -137,18 +137,18 @@ if (!window.MedicalChartPIModule) {
                     break;
                 case "upToothY":
                     selectedTeethValues = Array.from(mYUpToothValues || []).map(tooth => tooth.value || '');
-                    toggleOpacityPi(mUpToothY, mYUpToothValues, "유치상악");
+                    toggleOpacityPi(mUpToothY, mYUpToothValues, "유치 상악");
                     break;
                 case "allToothY":
                     selectedTeethValues = [
                         ...Array.from(mYUpToothValues || []).map(tooth => tooth.value || ''),
                         ...Array.from(mYDownToothValues || []).map(tooth => tooth.value || '')
                     ];
-                    toggleOpacityPi(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                    toggleOpacityPi(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치 전체 치아");
                     break;
                 case "downToothY":
                     selectedTeethValues = Array.from(mYDownToothValues || []).map(tooth => tooth.value || '');
-                    toggleOpacityPi(mDownToothY, mYDownToothValues, "유치하악");
+                    toggleOpacityPi(mDownToothY, mYDownToothValues, "유치 하악");
                     break;
                 default:
                     console.error("올바르지 않은 ID:", id);
@@ -170,9 +170,140 @@ if (!window.MedicalChartPIModule) {
             updateToothButtonStyles(window.toothList);
         }
 
-        function toggleOpacityPi(button, elements, logMessage) {
-            button.classList.toggle("opacity-50");
-            elements.forEach(element => element.classList.toggle("opacity-50"));
+        function toggleOpacityPi(button, elements, groupName) {
+            const isCurrentlySelected = button.classList.contains("opacity-50");
+
+            // 전체 치아, 상악, 하악에 대한 그룹 처리
+            if (["전체 치아", "상악", "하악"].includes(groupName)) {
+                if (groupName === "전체 치아") {
+                    // 전체 치아 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        // 전체 치아가 선택되면 상악과 하악 치아 모두 선택
+                        [...mUpToothValues, ...mDownToothValues].forEach(element => {
+                            element.classList.add("opacity-50");
+                        });
+                        // 상악/하악 버튼도 선택 상태로 변경
+                        mUpTooth.classList.add("opacity-50");
+                        mDownTooth.classList.add("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        // 전체 치아 해제 시 상악과 하악 치아 모두 해제
+                        [...mUpToothValues, ...mDownToothValues].forEach(element => {
+                            element.classList.remove("opacity-50");
+                        });
+                        // 상악/하악 버튼 해제
+                        mUpTooth.classList.remove("opacity-50");
+                        mDownTooth.classList.remove("opacity-50");
+                    }
+                }
+
+                if (groupName === "상악") {
+                    // 상악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllTooth.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mDownTooth.classList.contains("opacity-50")) {
+                        mAllTooth.classList.add("opacity-50");
+                    }
+                } else if (groupName === "하악") {
+                    // 하악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllTooth.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mUpTooth.classList.contains("opacity-50")) {
+                        mAllTooth.classList.add("opacity-50");
+                    }
+                }
+
+                // 상악과 하악 둘 중 하나라도 선택되지 않으면 전체 치아 선택 버튼 해제
+                if (!mUpTooth.classList.contains("opacity-50") || !mDownTooth.classList.contains("opacity-50")) {
+                    mAllTooth.classList.remove("opacity-50");
+                }
+            }
+
+            // 유치 치아 그룹 처리
+            if (["유치 전체 치아", "유치 상악", "유치 하악"].includes(groupName)) {
+                if (groupName === "유치 전체 치아") {
+                    // 전체 치아 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        // 전체 치아가 선택되면 상악과 하악 치아 모두 선택
+                        [...mYUpToothValues, ...mYDownToothValues].forEach(element => {
+                            element.classList.add("opacity-50");
+                        });
+                        // 상악/하악 버튼도 선택 상태로 변경
+                        mUpToothY.classList.add("opacity-50");
+                        mDownToothY.classList.add("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        // 전체 치아 해제 시 상악과 하악 치아 모두 해제
+                        [...mYUpToothValues, ...mYDownToothValues].forEach(element => {
+                            element.classList.remove("opacity-50");
+                        });
+                        // 상악/하악 버튼 해제
+                        mUpToothY.classList.remove("opacity-50");
+                        mDownToothY.classList.remove("opacity-50");
+                    }
+                }
+
+                if (groupName === "유치 상악") {
+                    // 상악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllToothY.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mDownToothY.classList.contains("opacity-50")) {
+                        mAllToothY.classList.add("opacity-50");
+                    }
+                } else if (groupName === "유치 하악") {
+                    // 하악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllToothY.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mUpToothY.classList.contains("opacity-50")) {
+                        mAllToothY.classList.add("opacity-50");
+                    }
+                }
+
+                // 상악과 하악 둘 중 하나라도 선택되지 않으면 전체 치아 선택 버튼 해제
+                if (!mUpToothY.classList.contains("opacity-50") || !mDownToothY.classList.contains("opacity-50")) {
+                    mAllToothY.classList.remove("opacity-50");
+                }
+            }
+
+            // 현재 버튼 상태 토글 (선택 해제)
+            if (isCurrentlySelected) {
+                button.classList.remove("opacity-50");
+                elements.forEach(element => element.classList.remove("opacity-50"));
+            }
         }
 
 

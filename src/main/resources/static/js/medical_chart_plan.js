@@ -13,7 +13,7 @@ if (!window.MedicalPlanModule) {
             modal = document.getElementById('Plan-cure-modal');
             toothModal = document.getElementById('Plan-tooth-Modal');
             saveBtn = document.getElementById('saveBtn');
-            saveToothBtn = document.getElementById('save-tooth');  // 치아 저장 버튼 추가
+            saveToothBtn = document.getElementById('save-tooth');
             planData = $('#plan-data');
             mTooth = document.querySelector(".modal-tooth-container");
 
@@ -40,7 +40,7 @@ if (!window.MedicalPlanModule) {
             }
             document.addEventListener("click", handleDocumentClick);
             saveBtn.addEventListener('click', saveSelectedLabels);
-            saveToothBtn.addEventListener('click', saveSelectedTeeth); // 치아 저장 버튼 이벤트 리스너 추가
+            saveToothBtn.addEventListener('click', saveSelectedTeeth);
             mTooth.addEventListener("click", handleToothClick);
 
             planData.on('click', 'button.save-db-btn', handleSaveButtonClick);
@@ -53,7 +53,7 @@ if (!window.MedicalPlanModule) {
             }
             document.removeEventListener("click", handleDocumentClick);
             saveBtn.removeEventListener('click', saveSelectedLabels);
-            saveToothBtn.removeEventListener('click', saveSelectedTeeth); // 치아 저장 버튼 이벤트 리스너 제거
+            saveToothBtn.removeEventListener('click', saveSelectedTeeth);
             mTooth.removeEventListener("click", handleToothClick);
 
             planData.off('click', 'button.save-db-btn', handleSaveButtonClick);
@@ -115,19 +115,12 @@ if (!window.MedicalPlanModule) {
         }
 
         function toothTerminal(id) {
-            // 현재 활성화된 버튼이 있다면 초기화
-            if (lastActiveButton && lastActiveButton !== id) {
-                resetToggleOpacity(lastActiveButton); // 이전 버튼과 관련된 상태 초기화
-            }
-
-
-            toothList = []; // Initialize an empty list to store only numeric tooth values
+            toothList = [];
 
             switch (id) {
                 case "modal-upTooth":
-                    // Filter only numeric values for upper teeth
                     mUpToothValues.forEach(upToothValue => {
-                        if (!isNaN(upToothValue.value)) {  // Ensure the value is numeric
+                        if (!isNaN(upToothValue.value)) {
                             toothList.push(upToothValue.value || '');
                         }
                     });
@@ -135,7 +128,6 @@ if (!window.MedicalPlanModule) {
                     break;
 
                 case "modal-allTooth":
-                    // Filter only numeric values for both upper and lower teeth
                     mUpToothValues.forEach(upToothValue => {
                         if (!isNaN(upToothValue.value)) {
                             toothList.push(upToothValue.value || '');
@@ -146,11 +138,10 @@ if (!window.MedicalPlanModule) {
                             toothList.push(downToothValue.value || '');
                         }
                     });
-                    toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전부");
+                    toggleOpacity(mAllTooth, [...mUpToothValues, ...mDownToothValues], "전체 치아");
                     break;
 
                 case "modal-downTooth":
-                    // Filter only numeric values for lower teeth
                     mDownToothValues.forEach(downToothValue => {
                         if (!isNaN(downToothValue.value)) {
                             toothList.push(downToothValue.value || '');
@@ -160,17 +151,15 @@ if (!window.MedicalPlanModule) {
                     break;
 
                 case "modal-upToothY":
-                    // Filter only numeric values for deciduous upper teeth
                     mYUpToothValues.forEach(yUpToothValue => {
                         if (!isNaN(yUpToothValue.value)) {
                             toothList.push(yUpToothValue.value || '');
                         }
                     });
-                    toggleOpacity(mUpToothY, mYUpToothValues, "유치상악");
+                    toggleOpacity(mUpToothY, mYUpToothValues, "유치 상악");
                     break;
 
                 case "modal-allToothY":
-                    // Filter only numeric values for deciduous upper and lower teeth
                     mYUpToothValues.forEach(yUpToothValue => {
                         if (!isNaN(yUpToothValue.value)) {
                             toothList.push(yUpToothValue.value || '');
@@ -181,17 +170,16 @@ if (!window.MedicalPlanModule) {
                             toothList.push(yDownToothValue.value || '');
                         }
                     });
-                    toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치전부");
+                    toggleOpacity(mAllToothY, [...mYUpToothValues, ...mYDownToothValues], "유치 전체 치아");
                     break;
 
                 case "modal-downToothY":
-                    // Filter only numeric values for deciduous lower teeth
                     mYDownToothValues.forEach(yDownToothValue => {
                         if (!isNaN(yDownToothValue.value)) {
                             toothList.push(yDownToothValue.value || '');
                         }
                     });
-                    toggleOpacity(mDownToothY, mYDownToothValues, "유치하악");
+                    toggleOpacity(mDownToothY, mYDownToothValues, "유치 하악");
                     break;
 
                 default:
@@ -202,44 +190,139 @@ if (!window.MedicalPlanModule) {
             lastActiveButton = id;
         }
 
-// Helper function to toggle opacity and log messages
-        function toggleOpacity(button, elements, logMessage) {
-            button.classList.toggle("opacity-50");
-            elements.forEach(element => element.classList.toggle("opacity-50"));
-        }
+        function toggleOpacity(button, elements, groupName) {
+            const isCurrentlySelected = button.classList.contains("opacity-50");
 
-        // 이전 상태를 초기화하는 함수
-        function resetToggleOpacity(id) {
-            switch (id) {
-                case "modal-upTooth":
-                    mUpTooth.classList.remove("opacity-50");
-                    mUpToothValues.forEach(upToothValue => upToothValue.classList.remove("opacity-50"));
-                    break;
+            // 전체 치아, 상악, 하악에 대한 그룹 처리
+            if (["전체 치아", "상악", "하악"].includes(groupName)) {
+                if (groupName === "전체 치아") {
+                    // 전체 치아 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        // 전체 치아가 선택되면 상악과 하악 치아 모두 선택
+                        [...mUpToothValues, ...mDownToothValues].forEach(element => {
+                            element.classList.add("opacity-50");
+                        });
+                        // 상악/하악 버튼도 선택 상태로 변경
+                        mUpTooth.classList.add("opacity-50");
+                        mDownTooth.classList.add("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        // 전체 치아 해제 시 상악과 하악 치아 모두 해제
+                        [...mUpToothValues, ...mDownToothValues].forEach(element => {
+                            element.classList.remove("opacity-50");
+                        });
+                        // 상악/하악 버튼 해제
+                        mUpTooth.classList.remove("opacity-50");
+                        mDownTooth.classList.remove("opacity-50");
+                    }
+                }
 
-                case "modal-allTooth":
+                if (groupName === "상악") {
+                    // 상악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllTooth.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mDownTooth.classList.contains("opacity-50")) {
+                        mAllTooth.classList.add("opacity-50");
+                    }
+                } else if (groupName === "하악") {
+                    // 하악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllTooth.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mUpTooth.classList.contains("opacity-50")) {
+                        mAllTooth.classList.add("opacity-50");
+                    }
+                }
+
+                // 상악과 하악 둘 중 하나라도 선택되지 않으면 전체 치아 선택 버튼 해제
+                if (!mUpTooth.classList.contains("opacity-50") || !mDownTooth.classList.contains("opacity-50")) {
                     mAllTooth.classList.remove("opacity-50");
-                    [...mUpToothValues, ...mDownToothValues].forEach(toothValue => toothValue.classList.remove("opacity-50"));
-                    break;
+                }
+            }
 
-                case "modal-downTooth":
-                    mDownTooth.classList.remove("opacity-50");
-                    mDownToothValues.forEach(downToothValue => downToothValue.classList.remove("opacity-50"));
-                    break;
+            // 유치 치아 그룹 처리
+            if (["유치 전체 치아", "유치 상악", "유치 하악"].includes(groupName)) {
+                if (groupName === "유치 전체 치아") {
+                    // 전체 치아 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        // 전체 치아가 선택되면 상악과 하악 치아 모두 선택
+                        [...mYUpToothValues, ...mYDownToothValues].forEach(element => {
+                            element.classList.add("opacity-50");
+                        });
+                        // 상악/하악 버튼도 선택 상태로 변경
+                        mUpToothY.classList.add("opacity-50");
+                        mDownToothY.classList.add("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        // 전체 치아 해제 시 상악과 하악 치아 모두 해제
+                        [...mYUpToothValues, ...mYDownToothValues].forEach(element => {
+                            element.classList.remove("opacity-50");
+                        });
+                        // 상악/하악 버튼 해제
+                        mUpToothY.classList.remove("opacity-50");
+                        mDownToothY.classList.remove("opacity-50");
+                    }
+                }
 
-                case "modal-upToothY":
-                    mUpToothY.classList.remove("opacity-50");
-                    mYUpToothValues.forEach(yUpToothValue => yUpToothValue.classList.remove("opacity-50"));
-                    break;
+                if (groupName === "유치 상악") {
+                    // 상악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllToothY.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mDownToothY.classList.contains("opacity-50")) {
+                        mAllToothY.classList.add("opacity-50");
+                    }
+                } else if (groupName === "유치 하악") {
+                    // 하악 선택/해제
+                    if (!isCurrentlySelected) {
+                        button.classList.add("opacity-50");
+                        elements.forEach(element => element.classList.add("opacity-50"));
+                        // 전체 치아 선택 버튼 해제
+                        mAllToothY.classList.remove("opacity-50");
+                    } else {
+                        button.classList.remove("opacity-50");
+                        elements.forEach(element => element.classList.remove("opacity-50"));
+                    }
+                    // 전체 치아 상태 반영
+                    if (mUpToothY.classList.contains("opacity-50")) {
+                        mAllToothY.classList.add("opacity-50");
+                    }
+                }
 
-                case "modal-allToothY":
+                // 상악과 하악 둘 중 하나라도 선택되지 않으면 전체 치아 선택 버튼 해제
+                if (!mUpToothY.classList.contains("opacity-50") || !mDownToothY.classList.contains("opacity-50")) {
                     mAllToothY.classList.remove("opacity-50");
-                    [...mYUpToothValues, ...mYDownToothValues].forEach(toothValue => toothValue.classList.remove("opacity-50"));
-                    break;
+                }
+            }
 
-                case "modal-downToothY":
-                    mDownToothY.classList.remove("opacity-50");
-                    mYDownToothValues.forEach(yDownToothValue => yDownToothValue.classList.remove("opacity-50"));
-                    break;
+            // 현재 버튼 상태 토글 (선택 해제)
+            if (isCurrentlySelected) {
+                button.classList.remove("opacity-50");
+                elements.forEach(element => element.classList.remove("opacity-50"));
             }
         }
 
