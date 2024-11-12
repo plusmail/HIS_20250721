@@ -34,7 +34,7 @@ function goToMaterialManagementPage() {
 
 
 // WebSocket을 위한 전역 변수 설정
-const socket = new SockJS("/ws");
+const socket = new SockJS("http://localhost:8080/ws");
 
 document.addEventListener("DOMContentLoaded", function () {
     const stompClient = Stomp.over(socket);
@@ -122,23 +122,23 @@ function requestPatientCounts() {
 function updatePatientCounts(counts) {
     console.log("updatePa----->", counts)
     console.log("updatePa----->", counts.homeGeneralPatientCount)
-    const generalCount = counts.homeGeneralPatientCount !== null ? counts.homeGeneralPatientCount : 0;
+    const generalCount = counts.homeGeneralPatientCount !== undefined ? counts.homeGeneralPatientCount : 0;
     const surgeryCount = counts.homeSurgeryCount !== undefined ? counts.homeSurgeryCount : 0;
     const newCount = counts.homeNewPatientCount !== undefined ? counts.homeNewPatientCount : 0;
 
-    document.getElementById('homeGeneralPatientCount').textContent = counts.homeGeneralPatientCount;
+    document.getElementById('homeGeneralPatientCount').textContent = generalCount;
     document.getElementById('homeSurgeryCount').textContent = surgeryCount;
     document.getElementById('homeNewPatientCount').textContent = newCount;
 }
 
 // 진료 접수 페이지로 이동
 function goToReception() {
-    window.location.href = "http://localhost:8080/reception";
+    window.location.href = "/reception";
 }
 
 // 진료 예약 페이지로 이동
 function goToReservation() {
-    window.location.href = "http://localhost:8080/reservation";
+    window.location.href = "/reservation";
 }
 
 
