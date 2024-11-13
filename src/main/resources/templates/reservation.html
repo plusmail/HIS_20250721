@@ -129,19 +129,26 @@
 
 
         function loadContent(page, st) {
-            PageName = st
+            PageName = st;
             $("#bodyContent").load(page, function (response, status, xhr) {
                 if (status === "error") {
                     $("#bodyContent").html("<p>페이지를 로드하는 데 실패했습니다: " + xhr.status + " " + xhr.statusText + "</p>");
                 } else {
                     $("#bodyContent").html(response);
 
+                    // sessionStorage에서 'selectedPatient' 정보 가져오기
                     patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
 
-
+                    // 예약 등록 탭인지를 확인하여 버튼 숨기기/보이기
+                    if (st === 'registerAdd') {
+                        // 예약등록 탭일 경우 '개인 예약 현황' 버튼 숨기기
+                        $(".button_test_2").hide();
+                    } else {
+                        // 다른 탭일 경우 '개인 예약 현황' 버튼 보이기
+                        $(".button_test_2").show();
+                    }
                 }
             });
-
         }
 
 
