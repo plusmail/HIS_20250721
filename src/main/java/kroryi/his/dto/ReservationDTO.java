@@ -11,7 +11,7 @@ import lombok.ToString;
 public class ReservationDTO {
     private Long seq;
     private String reservationDate;
-    private String department;
+    private String name;
     private boolean snsNotification;
     private String chartNumber;
     private String doctor;
@@ -24,12 +24,12 @@ public class ReservationDTO {
     }
 
     public ReservationDTO(Long seq, String reservationDate,
-                          String department, boolean snsNotification, String chartNumber, String doctor, String treatmentType, String patientNote,
+                          String name, boolean snsNotification, String chartNumber, String doctor, String treatmentType, String patientNote,
                           String reservationStatusCheck) {
         super();
         this.seq = seq;
         this.reservationDate = reservationDate;
-        this.department = department;
+        this.name = name;
         this.snsNotification = snsNotification;
         this.chartNumber = chartNumber;
         this.doctor = doctor;

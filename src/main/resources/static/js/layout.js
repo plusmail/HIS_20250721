@@ -232,10 +232,10 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             })
         }
         else if (window.location.href.includes("/reservation")) {
-            let department = document.getElementById('departmentInput');
+            let name = document.getElementById('departmentInput');
             let chartNumber = document.getElementById('chart-numberInput');
-            if (department) {
-                department.value = menu_name;
+            if (name) {
+                name.value = menu_name;
             }
             if (chartNumber) {
                 chartNumber.value = menu_chartNum;

@@ -75,7 +75,7 @@ function dateReservationList(selectedDate) {
                 row.id = 'reservationTableListParent';
                 row.innerHTML =
                     `<td>${time}</td>
-                     <td>${item.department}</td>
+                     <td>${item.name}</td>
                      <td>${item.patientNote}</td>
                     `;
                 row.onclick = function () {
@@ -202,7 +202,7 @@ function SelectData(responseData) {
         reservationTimeElement.value = combinedDateTime[1]; // 시간
 
         // 환자 이름
-        departmentElement.value = responseData[0].department;
+        departmentElement.value = responseData[0].name;
 
         // SMS 발송
         snsNotificationElement.checked = responseData[0].snsNotification === "true";
@@ -256,7 +256,7 @@ function saveUpdate() {
     const formattedDateTime = `${reservationDate}T${hour}:${minute}`;
 
     // 환자 이름
-    const department = document.getElementById('departmentInput').value;
+    const name = document.getElementById('departmentInput').value;
 
     // SMS 발송 허용 여부
     const snsNotification = document.getElementById('sns-notification').checked ? "true" : "false";
@@ -270,10 +270,11 @@ function saveUpdate() {
     // 치료 유형
     const treatmentType = document.getElementById('treatment-type').value;
 
-    if (!department || !chartNumber || !doctor || !treatmentType) {
+    if (!name || !chartNumber || !doctor || !treatmentType) {
         alert("부서, 차트 번호, 의사, 치료 유형을 모두 입력해 주세요.");
         return; // 빈값이 있으면 중지
     }
+
     // 환자 노트
     const patientNote = document.getElementById('patient-note').value;
 
@@ -290,13 +291,12 @@ function saveUpdate() {
         return; // 빈값이 있으면 중지
     }
 
-
     const indexNumber = document.getElementById('index-number').innerHTML.trim();
 
     // 보낼 데이터 객체로 변환
     const reservation_data = {
         reservationDate: formattedDateTime, // 변경된 부분
-        department: department,
+        name: name,
         snsNotification: snsNotification,
         chartNumber: chartNumber,
         doctor: doctor,
@@ -343,6 +343,12 @@ function saveUpdate() {
                             dateReservationList(dateOnly);
                             indexNumberElement.innerHTML = res.seq;
                         });
+
+                        // 예약 성공 메시지
+                        alert("성공적으로 예약되었습니다.");
+
+                        // 폼 초기화
+                        rReset(true);
                     })
                     .catch(error => {
                         console.error('실패:', error);
@@ -361,6 +367,12 @@ function saveUpdate() {
                             const dateOnly = new Date(formattedDateTime).toLocaleDateString('en-CA');
                             dateReservationList(dateOnly);
                             console.log("!!!!!!!!!!" + indexNumber);
+
+                            // 예약 성공 메시지
+                            alert("성공적으로 예약되었습니다.");
+
+                            // 폼 초기화
+                            rReset(true);
                         })
                         .catch(error => {
                             console.error('실패:', error);
@@ -372,6 +384,7 @@ function saveUpdate() {
             console.error('오류 발생:', error);
         });
 }
+
 
 
 function deleteReservation() {

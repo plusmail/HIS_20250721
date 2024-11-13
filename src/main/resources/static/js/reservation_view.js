@@ -48,7 +48,7 @@ function dateReservationList(selectedDate) {
                 row.id = 'reservationTableListParent'; // ID 추가
                 row.innerHTML = `
                                 <td>${time}</td>
-                                <td>${item.department}</td>
+                                <td>${item.name}</td>
                                 <td>${item.patientNote}</td>
                                 `; // 각 열에 데이터 삽입
                 row.onclick = function () {
@@ -110,7 +110,7 @@ async function fu_reservation_list_all(type) {
             row.id = 'reservationTableListParent'; // ID 추가
             row.innerHTML = `
                                 <td>${time}</td>
-                                <td>${item.department}</td>
+                                <td>${item.name}</td>
                                 <td>${item.patientNote}</td>
                                 `; // 각 열에 데이터 삽입
             row.onclick = function () {
@@ -161,7 +161,7 @@ async function fu_reservation_list_all(type) {
             info: `
             <div class="reservation ${treatmentClass}" style="display: flex; padding-right: 10px;">
                 <div style="flex: 3; padding-right: 20px; border-right: 2px solid gray; display: flex; justify-content: center; align-items: center;">
-                    ${item.department}
+                    ${item.name}
                 </div>
                 <div style="flex: 7; padding-left: 20px;">
                     ${item.patientNote} <br> ${item.treatmentType}
@@ -238,7 +238,7 @@ async function generateTimetable(data) {
         return {
             time: time,
             doctor: item.doctor,
-            info: `${item.department} <br> ${item.patientNote} (${item.treatmentType})` // 여러 정보 결합
+            info: `${item.name} <br> ${item.patientNote} (${item.treatmentType})` // 여러 정보 결합
         };
     });
 
@@ -344,7 +344,7 @@ async function generateTimetable(data) {
             info: `
             <div class="reservation ${treatmentClass}" style="display: flex; padding-right: 10px;">
     <div style="flex: 3; padding-right: 20px; border-right: 2px solid gray; display: flex; justify-content: center; align-items: center;">
-        ${item.department}
+        ${item.name}
     </div>
     <div style="flex: 7; padding-left: 20px;">
         ${item.patientNote} <br> ${item.treatmentType}
