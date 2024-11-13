@@ -58,9 +58,23 @@ patient_register.addEventListener("click", (e) => {
         firstVisit: firstVisit.value,
         memos: [] // 메모 데이터를 담을 배열
     };
+    console.log(chartNum.value)
 
     function setPatientFields(result) {
         console.log("Received result:", result);
+        const rows = Array.from(table.getElementsByTagName('tr'));
+        const totalRows = rows.length;
+        rows.forEach((row, index) => {
+            const reverseIndex = totalRows - 1 - index; // Calculate the reverse index
+            const mmoCell = row.querySelector(`#mmo_${reverseIndex}`);
+
+            if (mmoCell && mmoCell.value === "undefined") {
+                const memo = result.memos[reverseIndex]; // Fetch the memo object
+                if (memo) {
+                    mmoCell.value = memo.mmo; // Assign only the 'mmo' field from the memo object
+                }
+            }
+        });
 
         // 단일 필드 값 설정
         name.value = result.name || '';
@@ -104,6 +118,7 @@ patient_register.addEventListener("click", (e) => {
             console.log(e);
         });
     } else {
+        console.log("!!!!!!!!!!!")
         // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
         const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
         const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
@@ -117,12 +132,12 @@ patient_register.addEventListener("click", (e) => {
             // 각 메모를 배열에 추가
             if (memoRegDate && memoContent) {
                 patientObj.memos.push({
-                    mmo: mmo.value,
+                    // mmo: mmo.value,
                     regDate: memoRegDate.value,
                     content: memoContent.value
                 });
                 console.log(mmo.value);
-                console.log(memoContent.value);
+                console.log(patientObj);
             }
         });
         addPatient(patientObj).then(setPatientFields).catch(e => {
