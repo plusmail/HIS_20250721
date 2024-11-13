@@ -22,11 +22,11 @@ public class ChatMessage {
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", referencedColumnName = "mid") // Member.mid를 참조
     private Member sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id")  // 수신자 필드
+    @JoinColumn(name = "recipient_id", referencedColumnName = "mid") // Member.mid를 참조
     private Member recipient;
 
     @ManyToOne(fetch = FetchType.LAZY)

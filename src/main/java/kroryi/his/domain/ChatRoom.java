@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import kroryi.his.dto.ChatMessageDTO;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,18 +24,21 @@ public class ChatRoom {
 
     private String roomName;
 
+    private String lastMessage;
+
+    private LocalDateTime lastMessageTimestamp;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "chat_room_members",  // 조인 테이블 이름
-            joinColumns = @JoinColumn(name = "chat_room_id"),  // ChatRoom 쪽의 외래키
-            inverseJoinColumns = @JoinColumn(name = "member_mid")  // Member 쪽의 외래키
+            name = "chat_room_members",
+            joinColumns = @JoinColumn(name = "chat_room_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_mid", referencedColumnName = "mid") // Member.mid를 참조
     )
     private Set<Member> members = new HashSet<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private Set<ChatMessage> messages = new HashSet<>();
 
-    // Set으로 memberMids 필드 추가
     @ElementCollection
     private Set<String> memberMids;
 

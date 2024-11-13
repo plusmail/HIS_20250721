@@ -1,16 +1,27 @@
-patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
-console.log(patientInfos);
-sessionCallData(patientInfos);
-
 // 이벤트 리스너 등록
 window.addEventListener('sessionStorageChanged', (event) => {
-    console.log('sessionStorage 값이 변경되었습니다1111:', event.detail.key, event.detail.value);
+    console.log('sessionStorage 값이 변경되었습니다:', event.detail.key, event.detail.value);
     patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
 
     sessionCallData(patientInfos);
-    console.log(patientInfos);
 });
 
+patientInfos = JSON.parse(sessionStorage.getItem('selectedPatient'));
+sessionCallData(patientInfos);
+
+function sessionCallData(responseData) {
+    const departmentElement = document.getElementById('departmentInput');
+    const chartNumberElement = document.getElementById('chart-numberInput');
+    // 'reservation-date' input의 value를 오늘 날짜로 설정
+    document.getElementById('reservation-date').value = new Date().toISOString().split('T')[0];
+
+    // 받아온 데이터로 데이터 새로 등록
+    // 환자 이름
+    departmentElement.value = responseData.name;
+    // 차트 번호
+    chartNumberElement.value = responseData.chartNum;
+
+}
 
 // 드롭다운 메뉴 초기화
 reservationTimes.forEach((time, index) => {
@@ -28,9 +39,63 @@ reservationTimes.forEach((time, index) => {
 });
 
 
+// 페이지가 로드될 때 자동으로 현재 날짜를 받아오는 코드
+document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date().toISOString().split('T')[0]; // 현재 날짜를 YYYY-MM-DD 형식으로
+    dateReservationList(today); // 오늘 날짜를 전달하여 예약 목록을 자동으로 불러오기
+});
+
+// 날짜를 클릭했을 때 호출되는 함수
+function dateReservationList(selectedDate) {
+    console.log(selectedDate);
+    fetch('reservation/selectedDatePatientList', {
+        method: 'POST', // POST 요청
+        headers: {
+            'Content-Type': 'application/json' // JSON 형식으로 데이터 전송
+        },
+        body: JSON.stringify({
+            reservationDate: selectedDate
+        }) // JSON 객체로 전송
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 실패했습니다.');
+            }
+            return response.json(); // JSON 데이터로 변환
+        })
+        .then(data => {
+            const tableBody = document.querySelector('#reservationTableList');
+            tableBody.innerHTML = ''; // 기존 내용 제거
+            data.forEach(item => {
+                const time = new Date(item.reservationDate).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const row = document.createElement('tr');
+                row.id = 'reservationTableListParent';
+                row.innerHTML =
+                    `<td>${time}</td>
+                     <td>${item.department}</td>
+                     <td>${item.patientNote}</td>
+                    `;
+                row.onclick = function () {
+
+                    if(PageName === 'registerAdd'){
+                        selectList(item.seq);
+                    }
+                };
+                tableBody.appendChild(row); // tbody에 행 추가
+
+            });
+        })
+        .catch(error => {
+            console.error('에러 발생:', error);
+        });
+}
+
+
 // 예약 목록에서 환자 정보를 눌렀을때 데이터 받아온 뒤 수정 가능한 화면 만들기
 function selectList(indexNumber) {
-
     // 보낼 데이터 객체로 변환
     const data = {
         seq: indexNumber
@@ -47,12 +112,13 @@ function selectList(indexNumber) {
         .then(response => response.json()) // 응답을 JSON으로 변환
         .then(responseData => {
             rReset();
-            rReset2(responseData);
+            SelectData(responseData);
         })
         .catch(error => {
             console.error('에러 발생:', error); // 에러 처리
         });
 }
+
 
 function rReset(reset) {
 
@@ -110,21 +176,8 @@ function rReset(reset) {
 
 }
 
-function sessionCallData(responseData) {
-    const departmentElement = document.getElementById('departmentInput');
-    const chartNumberElement = document.getElementById('chart-numberInput');
 
-    // 받아온 데이터로 데이터 새로 등록
-        // 환자 이름
-        departmentElement.value = responseData.name;
-        // 차트 번호
-        chartNumberElement.value = responseData.chartNum;
-
-}
-
-
-
-function rReset2(responseData) {
+function SelectData(responseData) {
     const reservationDateElement = document.getElementById('reservation-date');
     const reservationTimeElement = document.getElementById('test_time'); // 예약시간 요소 추가
     const departmentElement = document.getElementById('departmentInput');
@@ -140,7 +193,6 @@ function rReset2(responseData) {
     const taggedWordsDiv = document.getElementById('taggedWords');
 
 
-    console.log(("9999999999999999"))
     // 받아온 데이터로 데이터 새로 등록
 
     if (responseData.length > 0) {
@@ -218,6 +270,10 @@ function saveUpdate() {
     // 치료 유형
     const treatmentType = document.getElementById('treatment-type').value;
 
+    if (!department || !chartNumber || !doctor || !treatmentType) {
+        alert("부서, 차트 번호, 의사, 치료 유형을 모두 입력해 주세요.");
+        return; // 빈값이 있으면 중지
+    }
     // 환자 노트
     const patientNote = document.getElementById('patient-note').value;
 
@@ -229,7 +285,11 @@ function saveUpdate() {
         reservationStatusCheck = "ba";
     } else if (document.getElementById('reservation-status-none').checked) {
         reservationStatusCheck = "없음";
+    } else {
+        alert("예약 미이행 상태를 선택해 주세요.");
+        return; // 빈값이 있으면 중지
     }
+
 
     const indexNumber = document.getElementById('index-number').innerHTML.trim();
 
@@ -388,7 +448,6 @@ function addRow() {
 }
 
 
-
 function saveTerm(button) {
     const row = button.parentNode.parentNode;
     const termInput = row.querySelector('input').value.trim();
@@ -511,4 +570,3 @@ function deleteTerm(param) {
         console.error("유효하지 않은 매개변수입니다.");
     }
 }
-

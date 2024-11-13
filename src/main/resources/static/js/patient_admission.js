@@ -1218,5 +1218,3 @@ function callPatientListRender() {
 
 
 }
-
-

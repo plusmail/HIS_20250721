@@ -1,6 +1,6 @@
 /* 모달 크기 조절 */
 #Search_filter {
-    max-width: 600px; /* 모달의 최대 너비 */
+    max-width: 900px; /* 모달의 최대 너비 */
     height: 200px;
     max-height: 600px;
 }

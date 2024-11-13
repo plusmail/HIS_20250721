@@ -28,7 +28,7 @@
 <div class="modal fade" id="Plan-tooth-Modal" tabindex="-1" aria-labelledby="PlanToothModalLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-xl">
-        <div class="modal-content">
+        <div class="modal-content" style="width: 900px">
             <!-- Modal Header -->
             <div class="modal-header">
                 <h5 class="modal-title" id="PlanToothModalLabel">치아 선택</h5>
@@ -59,91 +59,92 @@
                     </div>
 
                     <!-- 메뉴바 (상악 하악 사이) -->
-                    <div class="d-flex justify-content-between mb-2">
-                        <button class="btn btn-secondary control-btn modal-up-control" id="modal-upTooth"
-                                type="button">영구치 상악
-                        </button>
-                        <button class="btn btn-secondary control-btn modal-all-control" id="modal-allTooth"
-                                type="button">전체선택
-                        </button>
-                        <button class="btn btn-secondary control-btn modal-down-control" id="modal-downTooth"
-                                type="button">영구치 하악
-                        </button>
-                    </div>
+                    <div style="display: flex">
+                        <div class="flex-column mb-2">
+                            <button class="btn btn-secondary control-btn modal-up-control" id="modal-upTooth"
+                                    type="button">영구치 상악
+                            </button>
+                            <button class="btn btn-secondary control-btn modal-all-control" id="modal-allTooth"
+                                    type="button">전체선택
+                            </button>
+                            <button class="btn btn-secondary control-btn modal-down-control" id="modal-downTooth"
+                                    type="button">영구치 하악
+                            </button>
+                        </div>
 
-                    <!-- small teeth 전체 선택 버튼 (유치 상악/하악) -->
-                    <div class="d-flex justify-content-between mb-2">
-                        <button class="btn btn-secondary control-btn modal-y-up-control" id="modal-upToothY"
-                                type="button">유치 상악
-                        </button>
-                        <button class="btn btn-secondary control-btn modal-y-all-control" id="modal-allToothY"
-                                type="button">유치 전체선택
-                        </button>
-                        <button class="btn btn-secondary control-btn modal-y-down-control" id="modal-downToothY"
-                                type="button">유치 하악
-                        </button>
-                    </div>
 
-                    <!-- small teeth (유치 상악) -->
-                    <div class="tooth-row mb-2">
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="55">55
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="54">54
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="53">53
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="52">52
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="51">51
-                        </button>
-                        <span class="upper-gap"></span>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="61">61
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="62">62
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="63">63
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="64">64
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="65">65
-                        </button>
-                    </div>
+                        <!-- small teeth (유치 상악) -->
+                        <div class="tooth-row  mt-4">
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="55">55
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="54">54
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="53">53
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="52">52
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="51">51
+                            </button>
+                            <span class="upper-gap"></span>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="85">
+                                85
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="84">
+                                84
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="83">
+                                83
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="82">
+                                82
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="81">
+                                81
+                            </button>
+                        </div>
+                        <div class="tooth-row mt-4">
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="61">61
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="62">62
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="63">63
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="64">64
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-up-tooth" type="button" value="65">65
+                            </button>
+                            <span class="lower-gap"></span>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="71">
+                                71
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="72">
+                                72
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="73">
+                                73
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="74">
+                                74
+                            </button>
+                            <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="75">
+                                75
+                            </button>
+                        </div>
 
-                    <!-- small teeth (유치 하악) -->
-                    <div class="tooth-row mb-2">
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="85">
-                            85
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="84">
-                            84
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="83">
-                            83
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="82">
-                            82
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="81">
-                            81
-                        </button>
-                        <span class="lower-gap"></span>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="71">
-                            71
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="72">
-                            72
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="73">
-                            73
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="74">
-                            74
-                        </button>
-                        <button class="btn btn-light small-tooth-btn modal-y-down-tooth" type="button" value="75">
-                            75
-                        </button>
-                    </div>
+                        <!-- small teeth 전체 선택 버튼 (유치 상악/하악) -->
+                        <div class="flex-column mb-2">
+                            <button class="btn btn-secondary control-btn modal-y-up-control" id="modal-upToothY"
+                                    type="button">유치 상악
+                            </button>
+                            <button class="btn btn-secondary control-btn modal-y-all-control" id="modal-allToothY"
+                                    type="button">유치 전체선택
+                            </button>
+                            <button class="btn btn-secondary control-btn modal-y-down-control" id="modal-downToothY"
+                                    type="button">유치 하악
+                            </button>
+                        </div>
 
+                    </div>
                     <!-- 하악 (아랫니) -->
                     <div class="tooth-row mb-2">
                         <button class="btn btn-danger tooth-btn modal-down-tooth" type="button" value="48">48
