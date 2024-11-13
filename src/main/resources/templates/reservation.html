@@ -33,9 +33,9 @@
 
                                     <!-- 캘린더 구간 -->
                                     <div class="calendar">
-                                        <div class="calendar-header">
+                                        <div class="calendar-header" style="text-align: center">
                                             <button onclick="prevMonth()" class="btn btn-secondary">이전</button>
-                                            <span id="monthYear"></span>
+                                            <span id="monthYear" style="font-weight: bold"></span>
                                             <button onclick="nextMonth()" class="btn btn-secondary">다음</button>
                                         </div>
                                         <table class="table">
@@ -143,6 +143,7 @@
                     if (st === 'registerAdd') {
                         // 예약등록 탭일 경우 '개인 예약 현황' 버튼 숨기기
                         $(".button_test_2").hide();
+                        dateReservationList(selectedDate);
                     } else {
                         // 다른 탭일 경우 '개인 예약 현황' 버튼 보이기
                         $(".button_test_2").show();
@@ -150,6 +151,7 @@
                 }
             });
         }
+
 
 
         let selectedDate = '';  // 전역 변수로 선택된 날짜 저장
