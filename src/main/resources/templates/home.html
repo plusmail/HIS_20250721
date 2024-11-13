@@ -20,7 +20,7 @@
                 <div class="home-card">
                     <div class="home-card-header text-center d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 flex-grow-1 text-center">진료현황</h4>
-                        <i class="bi bi-box-arrow-in-up-right fs-5" onclick="goToReception()"></i>
+                        <i class="bi bi-box-arrow-in-up-right fs-5 move-to-reception" onclick="goToReception()"></i>
                     </div>
                     <div class="home-card-body">
                         <div class="row">
@@ -79,7 +79,7 @@
                 <div class="home-card">
                     <div class="home-card-header text-center d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 flex-grow-1 text-center">진료구분</h4>
-                        <i class="bi bi-box-arrow-in-up-right fs-5" onclick="goToReservation()"></i>
+                        <i class="bi bi-box-arrow-in-up-right fs-5 move-to-reservation" onclick="goToReservation()"></i>
                     </div>
                     <div class="home-card-body">
                         <div class="row">
@@ -141,7 +141,7 @@
                 <div class="home-card">
                     <div class="home-card-header text-center d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 flex-grow-1 text-center">공지사항</h4>
-                        <i class="bi bi-box-arrow-in-up-right fs-5"></i>
+                        <i class="bi bi-box-arrow-in-up-right fs-5 move-to-board-list" onclick="goToBoardList()"></i>
                     </div>
                     <div class="home-card-body">
                         <div class="fixed-box">
@@ -150,10 +150,17 @@
                                 <tr>
                                     <th>제목</th>
                                     <th>내용</th>
-                                    <th>등록일</th>
+                                    <th>작성일</th>
                                 </tr>
                                 </thead>
-                                <tbody id="home-noticeList">
+                                <tbody th:if="${not #lists.isEmpty(latestPosts)}">
+                                <tr th:each="post : ${latestPosts}">
+                                    <td th:text="${post.title}"></td>
+                                    <td th:text="${#strings.abbreviate(post.content, 10)}"></td>
+                                    <td th:text="${#temporals.format(post.regDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                </tr>
+                                </tbody>
+                                <tbody th:if="${#lists.isEmpty(latestPosts)}">
                                 <tr>
                                     <td colspan="3">등록된 공지사항이 없습니다.</td>
                                 </tr>
@@ -163,6 +170,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- 최소보관수량 미달 품목 리스트 Section -->
             <div class="col-lg-4 mb-4">
                 <div class="home-card">

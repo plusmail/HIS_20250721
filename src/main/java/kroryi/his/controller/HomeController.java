@@ -3,14 +3,17 @@ package kroryi.his.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kroryi.his.domain.Board;
 import kroryi.his.dto.BoardDTO;
 import kroryi.his.dto.MemberSecurityDTO;
 import kroryi.his.dto.PageRequestDTO;
 import kroryi.his.dto.PageResponseDTO;
 import kroryi.his.service.BoardService;
 import kroryi.his.service.PatientRegisterService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +25,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
@@ -32,16 +40,51 @@ public class HomeController {
     private final PatientRegisterService patientRegisterService;
     private final BoardService boardService;
 
+    //    @Autowired
+//    public HomeController(BoardService boardService, PatientRegisterService patientRegisterService) {
+//        this.boardService = boardService;
+//        this.patientRegisterService = patientRegisterService;
+//    }
+//
+
+
+
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal UserDetails user, Model model, HttpSession session) {
-        model.addAttribute("user",user.getUsername());
-        session.setAttribute("user", user);
-        log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+        try {
+            if (user != null) {
+                model.addAttribute("user", user.getUsername());
+                session.setAttribute("user", user);
+            } else {
+                return "redirect:/login"; // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+            }
+            log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
-        log.info("세선 값 {}", session.getAttribute("user"));
-        log.info("User authorities: {}", user.getUsername());
-        log.info("User authorities: {}", user.getAuthorities());
-        return "home";
+            List<BoardDTO> latestPosts = boardService.getLatestPosts();
+
+            // 포맷된 날짜를 포함하는 DTO 리스트 생성
+            List<BoardDTO> boardDTOS = latestPosts.stream()
+                    .map(post -> new BoardDTO(post.getBno(), post.getTitle(), post.getContent(),
+                            post.getRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))) // 날짜 포맷팅
+                    .collect(Collectors.toList());
+
+            model.addAttribute("latestPosts", boardDTOS);
+
+            log.info("최신 게시글: {}", boardDTOS); // 포맷된 게시글 로그
+            log.info("세선 값 {}", session.getAttribute("user"));
+            log.info("User authorities: {}", user.getAuthorities());
+
+            log.info("최신 게시글: {}", latestPosts);
+
+            log.info("세선 값 {}", session.getAttribute("user"));
+            log.info("User authorities: {}", user.getAuthorities());
+
+            return "home";
+
+        } catch (Exception e) {
+            log.error("홈페이지 로드중 오류 발생", e);
+            return "error";
+        }
     }
 
     //    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
@@ -60,7 +103,9 @@ public class HomeController {
 
     //    진료예약
     @GetMapping("/reservation")
-    public String reservation() { return "reservation"; }
+    public String reservation() {
+        return "reservation";
+    }
 
     //    진료차트
     @GetMapping("/medical_chart")
@@ -92,7 +137,7 @@ public class HomeController {
 //        PageResponseDTO<BoardListReplyCountDTO> responseDTO = boardService.listWithReplyCount(pageRequestDTO);
 //        PageResponseDTO<BoardListAllDTO> responseDTO = boardService.listWithAll(pageRequestDTO);
 
-        log.info("!!!!!!!!!!"+responseDTO);
+        log.info("!!!!!!!!!!" + responseDTO);
 
         model.addAttribute("responseDTO", responseDTO);
 
