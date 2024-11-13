@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -18,4 +19,5 @@ public class ChatRoomDTO {
     private Set<String> memberMids;
     private List<String> recipientIds;  // 기본 수신자 ID
     private ChatMessageDTO lastMessage;
+    private LocalDateTime lastMessageTimestamp;
 }

@@ -32,9 +32,6 @@ public interface MemberRepository extends JpaRepository<Member, String>, MemberS
 
     boolean existsByMid(String mid);
 
-    @Query("select m.mid, m.name from Member m")
-    List<Object[]> findUserIdsAndNames();
-
     // 사용자 ID와 비밀번호로 사용자 검색
     Optional<Member> findByMidAndPassword(String mid, String password);
 
