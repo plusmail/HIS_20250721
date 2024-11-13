@@ -120,23 +120,23 @@ patient_register.addEventListener("click", (e) => {
     } else {
         console.log("!!!!!!!!!!!")
         // 메모 테이블에서 동적으로 추가된 모든 메모를 가져옴
-        const table = document.getElementById('memoTable').getElementsByTagName('tbody')[0];
-        const rows = Array.from(table.getElementsByTagName('tr')); // 모든 테이블 행 가져오기
-
+        const rows = document.querySelectorAll('.new-row');  // 모든 테이블 행 가져오기
+        console.log(rows)
         rows.forEach((row, index) => {
+            console.log(row)
+            console.log(index)
             // 각 행의 메모 날짜와 내용을 추출
-            const mmo = row.querySelector(`#mmo_${index}`);
-            const memoRegDate = row.querySelector(`#memoRegDate_${index}`);
-            const memoContent = row.querySelector(`#memoContent_${index}`);
-
+            // 각 행의 메모 날짜와 내용을 추출 (index 대신 직접 클래스 또는 태그로 선택)
+            const memoRegDate = row.querySelector('input[name="memoRegDate"]');
+            const memoContent = row.querySelector('textarea[name="memoContent"]');
+            console.log(memoRegDate+"130")
+            console.log(memoContent+"131")
             // 각 메모를 배열에 추가
             if (memoRegDate && memoContent) {
                 patientObj.memos.push({
-                    // mmo: mmo.value,
                     regDate: memoRegDate.value,
                     content: memoContent.value
                 });
-                console.log(mmo.value);
                 console.log(patientObj);
             }
         });
