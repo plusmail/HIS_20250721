@@ -30,7 +30,7 @@ function dateReservationList(selectedDate) {
 
             const timetable = document.getElementById('timetable');
             // 선택된 날짜를 화면에 표시
-            if(timetable){
+            if (timetable) {
                 document.getElementById('selectedDate').innerText = `선택된 날짜: ${selectedDate}`;
                 generateTimetable(data);
             }
@@ -53,7 +53,7 @@ function dateReservationList(selectedDate) {
                                 `; // 각 열에 데이터 삽입
                 row.onclick = function () {
 
-                    if(PageName === 'registerAdd'){
+                    if (PageName === 'registerAdd') {
                         selectList(item.seq);
                     }
                 };
@@ -76,7 +76,7 @@ async function fu_reservation_list_all(type) {
     // 환자 데이터를 임시로 담을 변수
     let temp_data = [];
 
-    if(type==="personal") {
+    if (type === "personal") {
 
 // reservation_list_all 배열에서 순차적으로 접근
         for (let i = 0; i < reservation_list_all.length; i++) {
