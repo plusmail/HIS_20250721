@@ -1,7 +1,7 @@
 const searchModal = new bootstrap.Modal(document.querySelector(".SearchModal"))
 const closeBtn = document.querySelector(".closeBtn")
 const patient_name_keyword = document.querySelector("#patient_name_keyword")
-let departmentElement = document.getElementById('departmentInput');
+let nameElement = document.getElementById('departmentInput');
 const chartNumberElement = document.getElementById('chart-number');
 
 let selectedRow = null; // 클릭된 행을 저장할 변수
