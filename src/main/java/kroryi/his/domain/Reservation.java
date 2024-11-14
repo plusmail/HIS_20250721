@@ -23,8 +23,8 @@ public class Reservation {
     @Column(name = "reservation_date")
     private String reservationDate;
 
-    @Column(name = "department")
-    private String department;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "sns_notification")
     private boolean snsNotification;
@@ -50,12 +50,12 @@ public class Reservation {
     }
 
     public Reservation(long seq, String reservationDate,
-                       String department, boolean snsNotification, String chartNumber, String doctor, String treatmentType, String patientNote,
+                       String name, boolean snsNotification, String chartNumber, String doctor, String treatmentType, String patientNote,
                        String reservationStatusCheck) {
         super();
         this.seq = seq;
         this.reservationDate = reservationDate;
-        this.department = department;
+        this.name = name;
         this.snsNotification = snsNotification;
         this.chartNumber = chartNumber;
         this.doctor = doctor;

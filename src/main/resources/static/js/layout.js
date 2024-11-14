@@ -1,7 +1,7 @@
 const searchModal = new bootstrap.Modal(document.querySelector(".SearchModal"))
 const closeBtn = document.querySelector(".closeBtn")
 const patient_name_keyword = document.querySelector("#patient_name_keyword")
-let departmentElement = document.getElementById('departmentInput');
+let nameElement = document.getElementById('departmentInput');
 const chartNumberElement = document.getElementById('chart-number');
 
 let selectedRow = null; // 클릭된 행을 저장할 변수
@@ -232,10 +232,10 @@ document.querySelector(".SearchBtn").addEventListener("click", () => {
             })
         }
         else if (window.location.href.includes("/reservation")) {
-            let department = document.getElementById('departmentInput');
+            let name = document.getElementById('departmentInput');
             let chartNumber = document.getElementById('chart-numberInput');
-            if (department) {
-                department.value = menu_name;
+            if (name) {
+                name.value = menu_name;
             }
             if (chartNumber) {
                 chartNumber.value = menu_chartNum;

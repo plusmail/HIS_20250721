@@ -152,6 +152,8 @@
 <!-- 왼쪽 아래에 떠 있는 채팅 버튼 -->
 <button id="chatButton" class="chat-button">
     <i class="bi bi-chat"></i>
+    <!-- 알림 배지 -->
+    <span id="notificationBadge" class="notification-badge" style="display: none;">!</span>
 </button>
 
 <!-- 왼쪽 채팅 패널 -->
@@ -176,7 +178,7 @@
 
 <!-- 사용자 선택 모달 -->
 <div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered custom-modal-width"> <!-- custom-modal-width 클래스를 추가 -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="userSelectionModalLabel">채팅방에 추가할 사용자 선택</h5>
@@ -193,7 +195,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- 중앙에 위치할 Bootstrap 채팅 모달 -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
@@ -215,8 +216,6 @@
         </div>
     </div>
 </div>
-
-
 
 <!--home-->
 <div layout:fragment="home" style="width: 100%"></div>

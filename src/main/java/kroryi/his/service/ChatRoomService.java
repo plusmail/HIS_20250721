@@ -24,4 +24,6 @@ public interface ChatRoomService {
                                  LocalDateTime timestamp);
 
     void deleteChatRoom(Long roomId);
+
+    ChatRoomDTO createOrGetPrivateChatRoom(String member1Mid, String member2Mid);
 }
