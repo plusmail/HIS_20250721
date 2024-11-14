@@ -231,9 +231,4 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         // WebSocket으로 환자 수 전송
         redisTemplate.convertAndSend("/pub/admission", message);
     }
-    }
-
-
-
-
-
+}
