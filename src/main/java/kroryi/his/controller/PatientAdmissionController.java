@@ -20,6 +20,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -288,6 +290,24 @@ public class PatientAdmissionController {
         int status3 = patientAdmissionRepository.countByTreatStatusAndTodayReception("3");
         MessageRequest messageRequest = new MessageRequest(status1, status2, status3);
         return ResponseEntity.ok(messageRequest);
+    }
+
+    @GetMapping("/count/{date}/{status}")
+    public ResponseEntity<Long> getPatientCount(@PathVariable String date, @PathVariable String status) {
+        try {
+            // 날짜 형식이 맞는지 체크
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false); // 엄격한 날짜 검증
+
+            // 날짜가 올바른 형식이 아니라면 예외 발생
+            sdf.parse(date);
+
+            long count = patientAdmissionService.getPatientCountByDateAndStatus(date, status);
+            return ResponseEntity.ok(count);
+        } catch (ParseException e) {
+            // 날짜 형식 오류 처리
+            return ResponseEntity.badRequest().body(0L); // 400 Bad Request 응답
+        }
     }
 
 }

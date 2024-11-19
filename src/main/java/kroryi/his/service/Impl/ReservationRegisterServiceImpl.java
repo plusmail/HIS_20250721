@@ -125,10 +125,6 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
         // 웹소켓을 통해 카운트 전송
         messagingTemplate.convertAndSend("/topic/patientCounts", counts);
 
-        Map<String, Integer> counts = getPatientCounts();
-
-        // 웹소켓을 통해 카운트 전송
-        messagingTemplate.convertAndSend("/topic/patientCounts", counts);
     }
 
     @Override
