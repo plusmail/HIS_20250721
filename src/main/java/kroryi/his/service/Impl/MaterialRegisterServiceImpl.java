@@ -3,8 +3,7 @@ package kroryi.his.service.Impl;
 import kroryi.his.domain.CompanyRegister;
 import kroryi.his.domain.MaterialRegister;
 import kroryi.his.dto.MaterialDTO;
-import kroryi.his.repository.CompanyRegisterRepository;
-import kroryi.his.repository.MaterialRegisterRepository;
+import kroryi.his.repository.*;
 import kroryi.his.service.MaterialRegisterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +23,8 @@ public class MaterialRegisterServiceImpl implements MaterialRegisterService {
 
     private final MaterialRegisterRepository materialRepository;
     private final CompanyRegisterRepository companyRepository;
+    private final MaterialTransactionRepository materialTransactionRepository;
+    private final MaterialStockOutRepository materialStockOutRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -67,6 +68,8 @@ public class MaterialRegisterServiceImpl implements MaterialRegisterService {
         if (!materialRepository.existsByMaterialCode(materialCode)) {
             throw new IllegalArgumentException("존재하지 않는 재료 코드입니다: " + materialCode);
         }
+//        materialStockOutRepository.deleteByMaterialCode(materialCode);
+//        materialTransactionRepository.deleteByMaterialCode(materialCode);
         materialRepository.customDeleteByMaterialCode(materialCode);
     }
 

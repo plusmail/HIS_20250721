@@ -3,6 +3,7 @@ package kroryi.his.repository;
 import kroryi.his.domain.MaterialRegister;
 import kroryi.his.domain.MaterialStockOut;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +18,9 @@ public interface MaterialStockOutRepository extends JpaRepository<MaterialStockO
     // materialCode별 총 출고량 계산
     @Query("SELECT SUM(mso.stockOut) FROM MaterialStockOut mso WHERE mso.materialRegister.materialCode = :materialCode")
     Long getTotalStockOutByMaterialCode(@Param("materialCode") String materialCode);
+
+    @Modifying
+    @Query("DELETE FROM MaterialStockOut m WHERE m.materialRegister.materialCode = :materialCode")
+    void deleteByMaterialCode(@Param("materialCode") String materialCode);
 
 }

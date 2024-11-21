@@ -35,6 +35,8 @@ public class MaterialTransactionServiceImpl implements MaterialTransactionServic
 
     private final MaterialTransactionRepository materialTransactionRepository;
 
+    private final MaterialStockOutRepository materialStockOutRepository;
+
     private final ModelMapper modelMapper;
 
 
