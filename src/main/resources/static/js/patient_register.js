@@ -129,8 +129,8 @@ patient_register.addEventListener("click", (e) => {
             // 각 행의 메모 날짜와 내용을 추출 (index 대신 직접 클래스 또는 태그로 선택)
             const memoRegDate = row.querySelector('input[name="memoRegDate"]');
             const memoContent = row.querySelector('textarea[name="memoContent"]');
-            console.log(memoRegDate+"130")
-            console.log(memoContent+"131")
+            console.log(memoRegDate + "130")
+            console.log(memoContent + "131")
             // 각 메모를 배열에 추가
             if (memoRegDate && memoContent) {
                 patientObj.memos.push({
@@ -455,6 +455,7 @@ document.querySelector("#refreshBtn").addEventListener("click", () => {
     tendency.value = '';
     firstVisit.value = '';
     lastVisit.value = '';
+    ageInput.value = '';
 
     homeNum1.value = '';
     homeNum2.value = '';
