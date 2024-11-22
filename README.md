@@ -21,7 +21,7 @@
 | **이재준** | **백지영** | **김관호** | **정수빈** | **송겹섭** | **최선아** |
 | :------: |  :------: | :------: | :------: | :------: | :------: |
 | <img src="https://avatars.githubusercontent.com/u/106502312?v=4" height=150 width=150> |<img src="https://avatars.githubusercontent.com/u/112460466?v=4" height=150 width=150> | <img src="https://avatars.githubusercontent.com/u/112460506?v=4" height=150 width=150>| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> | <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150>| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> |
-| [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) |
+| [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/bjy-98) | [GitHub](https://github.com/ho0911) | [GitHub](https://github.com/Bintori) | [GitHub](https://github.com/song424) | [GitHub](https://github.com/tjsdkek) |
   
 </div>
 
@@ -69,8 +69,8 @@
 <br />
 
 # 2. Key Features (주요 기능)
-- **회원가입**:
-  - 회원가입 시 DB에 유저정보가 등록됩니다.
+- **사용자관리**:
+  - 사용자 등록 시 권한 부여 가능.
 
 - **로그인**:
   - 사용자 인증 정보를 통해 로그인합니다.
@@ -98,71 +98,69 @@
 ## 3. 프로젝트 구조
 
 ```
-├── README.md
-├── .eslintrc.js
-├── .gitignore
-├── .prettierrc.json
-├── package-lock.json
-├── package.json
-│
-├── public
-│    └── index.html
-└── src
-     ├── App.jsx
-     ├── index.jsx
-     ├── api
-     │     └── mandarinAPI.js
-     ├── asset
-     │     ├── fonts
-     │     ├── css_sprites.png
-     │     ├── logo-404.svg
-     │     └── logo-home.svg
-     │          .
-     │          .
-     │          .
-     ├── atoms
-     │     ├── LoginData.js
-     │     └── LoginState.js
-     ├── common
-     │     ├── alert
-     │     │     ├── Alert.jsx
-     │     │     └── Alert.Style.jsx
-     │     ├── button
-     │     ├── comment
-     │     ├── inputBox
-     │     ├── post
-     │     ├── postModal
-     │     ├── product
-     │     ├── tabMenu
-     │     ├── topBanner
-     │     └── userBanner
-     ├── pages
-     │     ├── addProduct
-     │     │     ├── AddProduct.jsx
-     │     │     └── AddProduct.Style.jsx
-     │     ├── chatList
-     │     ├── chatRoom
-     │     ├── emailLogin
-     │     ├── followerList
-     │     ├── followingList
-     │     ├── home
-     │     ├── join
-     │     ├── page404
-     │     ├── postDetail
-     │     ├── postEdit
-     │     ├── postUpload
-     │     ├── productEdit
-     │     ├── profile
-     │     ├── profileEdit
-     │     ├── profileSetting
-     │     ├── search
-     │     ├── snsLogin
-     │     └── splash
-     ├── routes
-     │     ├── privateRoutes.jsx
-     │     └── privateRoutesRev.jsx  
-     └── styles
-           └── Globalstyled.jsx
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── kroryi
+│   │   │       └── his
+│   │   │           ├── config
+│   │   │           ├── controller
+│   │   │           ├── domain
+│   │   │           ├── dto
+│   │   │           ├── exception
+│   │   │           ├── mapper
+│   │   │           ├── repository
+│   │   │           │   └── search
+│   │   │           ├── service
+│   │   │           │   └── Impl
+│   │   │           └── websocket
+│   │   └── resources
+│   │       ├── static
+│   │       │   ├── css
+│   │       │   ├── js
+│   │       │   └── toothimage
+│   │       └── templates
+│   │           ├── board
+│   │           ├── layout
+│   │           └── user
+│   └── test
+│       └── java
+│           └── kroryi
+│               └── his
+└── target
+    ├── classes
+    │   ├── kroryi
+    │   │   └── his
+    │   │       ├── config
+    │   │       ├── controller
+    │   │       ├── domain
+    │   │       ├── dto
+    │   │       ├── exception
+    │   │       ├── mapper
+    │   │       ├── repository
+    │   │       │   └── search
+    │   │       ├── service
+    │   │       │   └── Impl
+    │   │       └── websocket
+    │   ├── static
+    │   │   ├── css
+    │   │   ├── js
+    │   │   └── toothimage
+    │   └── templates
+    │       ├── board
+    │       ├── layout
+    │       └── user
+    ├── generated-sources
+    │   └── annotations
+    │       └── kroryi
+    │           └── his
+    │               ├── domain
+    │               └── mapper
+    ├── generated-test-sources
+    │   └── test-annotations
+    └── test-classes
+        └── kroryi
+            └── his
 ```
 
 <br>
