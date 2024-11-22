@@ -20,14 +20,34 @@
 
 | **이재준** | **백지영** | **김관호** | **정수빈** | **송겹섭** | **최선아** |
 | :------: |  :------: | :------: | :------: | :------: | :------: |
-| <img src="https://avatars.githubusercontent.com/u/106502312?v=4" height=150 width=150> <br/> 로그인 <br/> 환자관리<br/> 진료차트 | <img src="https://avatars.githubusercontent.com/u/112460466?v=4" height=150 width=150> <br/> 홈(재고현황)<br/> 진료차트 <br/> 재고관리| <img src="https://avatars.githubusercontent.com/u/112460506?v=4" height=150 width=150> <br/> 예약페이지 | <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> <br/> 홈(공지사항)<br/>사용자관리<br/>공지사항| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> <br/> 홈(접수현황, 예약현황)<br/>접수| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> <br/> 재고관리<br/>메신저|
-
+| <img src="https://avatars.githubusercontent.com/u/106502312?v=4" height=150 width=150> |<img src="https://avatars.githubusercontent.com/u/112460466?v=4" height=150 width=150> | <img src="https://avatars.githubusercontent.com/u/112460506?v=4" height=150 width=150>| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> | <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150>| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> |
+| [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) | [GitHub](https://github.com/ksol0048) |
+  
 </div>
 
 <br>
 
 ## ⚙ 개발환경
 > skills 폴더에 있는 아이콘을 이용할 수 있습니다.
+
+### 운영체제
+<div>
+<img src="https://github.com/user-attachments/assets/2efc2c61-9b0f-4cc4-9c25-b56d9b80f854?raw=true" width="90">
+</div>
+
+### IDE
+<div>
+<img src="https://github.com/user-attachments/assets/8620ffd6-a5c5-4553-8df4-4b5750219690?raw=true" width="90">
+</div>
+
+### font-end
+<div>
+<img src="https://github.com/user-attachments/assets/657602b8-3bbc-40d7-bf0e-c2a0ae9275fb?raw=true" width="90">
+<img src="https://github.com/user-attachments/assets/e1814c3a-9972-44bd-9d9e-15f5003aff42?raw=true" width="90">
+<img src="https://github.com/user-attachments/assets/15be680f-5259-4583-8cfd-50d4361f6812?raw=true" width="90">
+
+</div>
+
 ### Back-end
 <div>
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Java.png?raw=true" width="80">
@@ -37,17 +57,13 @@
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Mysql.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Ajax.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Thymeleaf.png?raw=true" width="80">
-</div>
-
-### Infra
-<div>
-<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/AWSEC2.png?raw=true" width="80">
+<!-- <img src="https://github.com/user-attachments/assets/28b66b4b-95cf-48c6-9019-46c7a83ef12d?raw=true" width="100"> -->
+<!-- <img src="https://github.com/user-attachments/assets/f224cc4b-1e6e-4362-8a38-bd8d16d5e0f5?raw=true" width="100"> -->
 </div>
 
 ### Tools
 <div>
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Github.png?raw=true" width="80">
-<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Notion.png?raw=true" width="80">
 </div>
 
 <br />
@@ -153,43 +169,57 @@
 
 ## 4. 역할 분담
 
-### 🍊고지연
+### 이재준
 
 - **UI**
-    - 페이지 : 홈, 검색, 게시글 작성, 게시글 수정, 게시글 상세, 채팅방
-    - 공통 컴포넌트 : 게시글 템플릿, 버튼
+    - 페이지 : layout, 로그인, 환자관리, 진료차트(List목록, PLAN)
 - **기능**
-    - 유저 검색, 게시글 등록 및 수정, 게시글 상세 확인, 댓글 등록, 팔로워 게시글 불러오기, 좋아요 기능
+    - 환자 검색, 환자 등록/수정/삭제, 환자 메모장 등록/수정/삭제, 진료차트 조회(검색 필터),PLAN 등록/수정/삭제
 
 <br>
     
-### 👻김민제
+### 백지영
 
 - **UI**
-    - 페이지 : 프로필 설정, 프로필 수정, 팔로잉&팔로워 리스트, 상품 등록, 상품 수정, 채팅 목록, 404 페이지
-    - 공통 컴포넌트 : 탭메뉴, InputBox, Alert 모달, 댓글
+    - 페이지 : 홈(재고현황), 진료차트(CC, PI), 재고관리
 - **기능**
-    - 프로필 설정 및 수정 페이지 유저 아이디 유효성 및 중복 검사, 상품 등록 및 수정
+    - 재고 조회, CC/PI 등록/수정/삭제, 재료사,재료,입출고, 재고현황 조회/등록/수정/삭제 
 
 <br>
 
-### 😎양희지
+### 김관호
 
 - **UI**
-    - 페이지 : splash 페이지, sns 로그인 페이지, 로그인, 회원가입
-    - 공통 컴포넌트 : 상품 카드, 사용자 배너
+    - 페이지 : 예약
 - **기능**
-    - splash 페이지, sns로그인 페이지, 로그인 유효성 및 중복 검사, 회원가입 유효성 및 중복 검사, 이메일 검증, 프로필 설정, 접근제한 설정
+    - 환자 예약 등록/수정/삭제 및 예약 현황, 캘린더 현황 조회
 
 <br>
 
-### 🐬지창언
+### 정수빈
 
 - **UI**
-    - 페이지 : 사용자 프로필 페이지
-    - 공통 컴포넌트 : 탑배너, 하단 모달창
+    - 페이지 : 홈(공지사항), 사용자관리, 공지사항
 - **기능**
-    - 팔로우 & 언팔로우, 로그아웃, 하단 모달창, 댓글 삭제, 게시글 삭제, 상품 삭제, 사용자 게시글 앨범형 이미지, 탑 배너 뒤로가기 버튼, Alert 모달
+    - 사용자 관리 조회/등록/수정/삭제 , 공지사항 조회/등록/수정/삭제
+    
+<br>
+
+### 송경섭
+
+- **UI**
+    - 페이지 : 홈(접수 현황, 예약 현황), 접수
+- **기능**
+    - 환자 접수 접수, 진료중, 진료완료, 접수 취소 WebSocket을 활용한 실시간 반영
+    
+<br>
+
+### 최선아
+
+- **UI**
+    - 페이지 : 재고관리, 메신저
+- **기능**
+    - 기본 채팅 기능, 알람 기능, 채팅방 관리, 개별 채팅방 삭제 기능
     
 <br>
 
@@ -197,16 +227,14 @@
 
 ### 개발 기간
 
-- 전체 개발 기간 : 2022-12-09 ~ 2022-12-31
-- UI 구현 : 2022-12-09 ~ 2022-12-16
-- 기능 구현 : 2022-12-17 ~ 2022-12-31
+- 전체 개발 기간 : 2024-10-22 ~ 2024-11-14
 
 <br>
 
 ### 작업 관리
 
-- GitHub Projects와 Issues를 사용하여 진행 상황을 공유했습니다.
-- 주간회의를 진행하며 작업 순서와 방향성에 대한 고민을 나누고 GitHub Wiki에 회의 내용을 기록했습니다.
+- GitHub Projects 사용하여 진행 상황을 공유했습니다.
+- Figma를 활용하여 프로젝트의 방향성과 회의 내용을 기록했습니다.
 
 <br>
 
