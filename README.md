@@ -19,62 +19,65 @@
 <div align="center">
 
 | **이재준** | **백지영** | **김관호** | **정수빈** | **송겹섭** | **최선아** |
-| :------: |  :------: | :------: | :------: |:------: | :------: |
+| :------: |  :------: | :------: | :------: | :------: | :------: |
 | <img src="https://avatars.githubusercontent.com/u/106502312?v=4" height=150 width=150> <br/> 로그인 <br/> 환자관리<br/> 진료차트 | <img src="https://avatars.githubusercontent.com/u/112460466?v=4" height=150 width=150> <br/> 홈(재고현황)<br/> 진료차트 <br/> 재고관리| <img src="https://avatars.githubusercontent.com/u/112460506?v=4" height=150 width=150> <br/> 예약페이지 | <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> <br/> 홈(공지사항)<br/>사용자관리<br/>공지사항| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> <br/> 홈(접수현황, 예약현황)<br/>접수| <img src="https://avatars.githubusercontent.com/u/76766459?v=4" height=150 width=150> <br/> 재고관리<br/>메신저|
 
 </div>
 
 <br>
 
-## 1. 개발 환경
+## ⚙ 개발환경
+> skills 폴더에 있는 아이콘을 이용할 수 있습니다.
+### Back-end
+<div>
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Java.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringBoot.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringSecurity.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringDataJPA.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Mysql.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Ajax.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Thymeleaf.png?raw=true" width="80">
+</div>
 
-- Front : HTML, React, styled-components, Recoil
-- Back-end : 제공된 API 활용
-- 버전 및 이슈관리 : Github, Github Issues, Github Project
-- 협업 툴 : Discord, Notion, Github Wiki
-- 서비스 배포 환경 : Netlify
-- 디자인 : [Figma](https://www.figma.com/file/fAisC2pEKzxTOzet9CfqML/README(oh-my-code)?node-id=39%3A1814)
-- [커밋 컨벤션](https://github.com/likelion-project-README/README/wiki/%EC%BB%A4%EB%B0%8B-%EC%BB%A8%EB%B2%A4%EC%85%98)
-- [코드 컨벤션](https://github.com/likelion-project-README/README/wiki/%EC%BD%94%EB%93%9C-%EC%BB%A8%EB%B2%A4%EC%85%98)
-- [스프라이트](https://github.com/likelion-project-README/README/wiki/%EC%8A%A4%ED%94%84%EB%9D%BC%EC%9D%B4%ED%8A%B8)
-<br>
+### Infra
+<div>
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/AWSEC2.png?raw=true" width="80">
+</div>
 
-## 2. 채택한 개발 기술과 브랜치 전략
+### Tools
+<div>
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Github.png?raw=true" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Notion.png?raw=true" width="80">
+</div>
 
-### React, styled-component
+<br />
 
-- React
-    - 컴포넌트화를 통해 추후 유지보수와 재사용성을 고려했습니다.
-    - 유저 배너, 상단과 하단 배너 등 중복되어 사용되는 부분이 많아 컴포넌트화를 통해 리소스 절약이 가능했습니다.
-- styled-component
-    - props를 이용한 조건부 스타일링을 활용하여 상황에 알맞은 스타일을 적용시킬 수 있었습니다.
-    - 빌드될 때 고유한 클래스 이름이 부여되어 네이밍 컨벤션을 정하는 비용을 절약할 수 있었습니다.
-    - S dot naming을 통해 일반 컴포넌트와 스타일드 컴포넌트를 쉽게 구별하도록 했습니다.
-    
-### Recoil
+# 2. Key Features (주요 기능)
+- **회원가입**:
+  - 회원가입 시 DB에 유저정보가 등록됩니다.
 
-- 최상위 컴포넌트를 만들어 props로 유저 정보를 내려주는 방식의 경우 불필요한 props 전달이 발생합니다. 따라서, 필요한 컴포넌트 내부에서만 상태 값을 가져다 사용하기 위해 상태 관리 라이브러리를 사용하기로 했습니다.
-- Redux가 아닌 Recoil을 채택한 이유
-    - Recoil은 React만을 위한 라이브러리로, 사용법도 기존의 useState 훅을 사용하는 방식과 유사해 학습비용을 낮출 수 있었습니다.
-    - 또한 Redux보다 훨씬 적은 코드라인으로 작동 가능하다는 장점이 있었습니다.
-- 로그인과 최초 프로필 설정 시 유저 정보를 atom에 저장하여 필요한 컴포넌트에서 구독하는 방식으로 사용했습니다.
+- **로그인**:
+  - 사용자 인증 정보를 통해 로그인합니다.
 
-### eslint, prettier
+- **내 동아리 일정관리**:
+  - 캘린더 UI를 통해 동아리 관련 일정 추가&삭제가 가능합니다.
+  - 체크박스를 통해 종료되거나 이미 수행한 일정을 표시할 수 있습니다.
 
-- 정해진 규칙에 따라 자동적으로 코드 스타일을 정리해 코드의 일관성을 유지하고자 했습니다.
-- 코드 품질 관리는 eslint에, 코드 포맷팅은 prettier에 일임해 사용했습니다.
-- airbnb의 코딩 컨벤션을 참고해 사용했고, 예외 규칙은 팀원들과 협의했습니다.
-- 협업 시 매번 컨벤션을 신경 쓸 필요 없이 빠르게 개발하는 데에 목적을 두었습니다.
+- **동아리 찾기**:
+  - 대학 내 동아리를 검색할 수 있습니다.
+  - 검색 시 해당 동아리가 업로드한 홍보글이 보여집니다.
 
-### 브랜치 전략
+- **동아리 홍보**:
+  - 홍보글 등록을 통해 동아리를 홍보할 수 있습니다.
 
-- Git-flow 전략을 기반으로 main, develop 브랜치와 feature 보조 브랜치를 운용했습니다.
-- main, develop, Feat 브랜치로 나누어 개발을 하였습니다.
-    - **main** 브랜치는 배포 단계에서만 사용하는 브랜치입니다.
-    - **develop** 브랜치는 개발 단계에서 git-flow의 master 역할을 하는 브랜치입니다.
-    - **Feat** 브랜치는 기능 단위로 독립적인 개발 환경을 위하여 사용하고 merge 후 각 브랜치를 삭제해주었습니다.
+- **동아리 만들기**:
+  - 새로운 동아리를 만들어 관리할 수 있습니다.
 
-<br>
+- **동아리 프로필**:
+  - 동아리 홍보글에서 동아리 이름(링크)를 클릭하면 해당 동아리 프로필로 이동합니다.
+  - 동아리 프로필에서는 동아리 소개, 동아리 활동사진 갤러리, 동아리 홍보글 기록관 등을 볼 수 있습니다.
+
+<br/>
 
 ## 3. 프로젝트 구조
 
