@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cancelReception();
     updateRowNumbers();
 
+
     updateWaitingPatientCount();
     updateTreatmentPatientCount();
     updateCompletePatientCount();
@@ -685,22 +686,23 @@ function formatRvTime(rvTime) {
 
 
 // 대기 중 테이블에 환자 추가
+let draggedRow = null;
+
+// 환자 추가 함수 (드래그 앤 드롭 포함)
 function addPatientToWaitingTable(patient) {
-    // 대기 테이블에 추가된 환자 목록을 확인 (pid 기반으로 중복 체크)
     const existingRows = waitingPatientsTable.getElementsByTagName('tr');
     const isDuplicate = Array.from(existingRows).some(row => {
-        const pidCell = row.querySelector('td:nth-child(7)'); // 7번째 열 (pid 열)
-        return pidCell && pidCell.textContent === patient.pid.toString(); // pid 비교
+        const pidCell = row.querySelector('td:nth-child(7)');
+        return pidCell && pidCell.textContent === patient.pid.toString();
     });
 
     if (isDuplicate) {
-        console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다. 추가하지 않습니다.`);
-        return; // 중복된 환자는 추가하지 않음
+        console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다.`);
+        return;
     }
 
-    // 새로운 환자 데이터 추가
     const row = waitingPatientsTable.insertRow();
-    const currentRowCount = existingRows.length + 1; // 새로운 행 번호
+    const currentRowCount = existingRows.length + 1;
     const formattedRvTime = formatRvTime(patient.rvTime);
 
     const doctorOptions = doctorNames.map(name => `<option value="${name}">${name}</option>`).join('');
@@ -721,23 +723,31 @@ function addPatientToWaitingTable(patient) {
     }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
     `;
-    console.log("환자 pid:", patient.pid);
-    console.log("접수 시간:", patient.receptionTime);
 
-    // 클릭 이벤트 추가
+    // 드래그 앤 드롭 이벤트 추가
+    row.setAttribute('draggable', 'true');
+    row.addEventListener('dragstart', () => {
+        draggedRow = row;
+        row.style.opacity = '0.5'; // 드래그 시 반투명 처리
+    });
+
+    row.addEventListener('dragend', () => {
+        draggedRow = null;
+        row.style.opacity = ''; // 드래그 종료 시 스타일 초기화
+    });
+
     row.addEventListener('click', () => {
-        // 선택된 행이 있으면 선택 해제
         const previouslySelected = waitingPatientsTable.querySelector('tr.selected');
         if (previouslySelected) {
             previouslySelected.classList.remove('selected');
         }
-        // 현재 행 선택
         row.classList.add('selected');
     });
 
-    updateWaitingPatientCount(); // 대기 환자 수 업데이트
-    updateRowNumbers(); // 행 번호 업데이트
+    updateWaitingPatientCount();
+    updateRowNumbers();
 }
+
 
 
 
@@ -1164,16 +1174,7 @@ function callPatientListRender() {
                 }) : 'N/A';
 
                 if (patient.treatStatus === '1') {
-                    waitingPatientsBody.innerHTML += `
-                        <tr>
-                            <td>${waitingPatientsBody.children.length + 1}</td>
-                            <td>${patient.chartNum || 'N/A'}</td>
-                            <td>${patient.paName || 'N/A'}</td>
-                            <td>${patient.mainDoc || 'N/A'}</td>
-                            <td>${formattedReceptionTime}</td>
-                            <td>${formattedRvTime}</td>
-                        </tr>
-                    `;
+                   loadWaiting();
                     waitingCount++;
                 }
 
