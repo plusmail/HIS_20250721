@@ -20,4 +20,11 @@ public class ChatRoomDTO {
     private List<String> recipientIds;  // 기본 수신자 ID
     private ChatMessageDTO lastMessage;
     private LocalDateTime lastMessageTimestamp;
+
+    // 필요한 생성자 추가
+    public ChatRoomDTO(Long id, String roomName, Set<String> memberMids) {
+        this.id = id;
+        this.roomName = roomName;
+        this.memberMids = memberMids;
+    }
 }
