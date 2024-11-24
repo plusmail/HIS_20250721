@@ -68,8 +68,8 @@ public class MaterialRegisterServiceImpl implements MaterialRegisterService {
         if (!materialRepository.existsByMaterialCode(materialCode)) {
             throw new IllegalArgumentException("존재하지 않는 재료 코드입니다: " + materialCode);
         }
-//        materialStockOutRepository.deleteByMaterialCode(materialCode);
-//        materialTransactionRepository.deleteByMaterialCode(materialCode);
+        materialStockOutRepository.deleteByMaterialCode(materialCode);
+        materialTransactionRepository.deleteByMaterialCode(materialCode);
         materialRepository.customDeleteByMaterialCode(materialCode);
     }
 
