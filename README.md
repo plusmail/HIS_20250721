@@ -241,7 +241,9 @@
 
 ## 6. 주요 기능(수정진행 필요)
 
-- [접근제한 설정](https://github.com/likelion-project-README/README/wiki/README-6.%EC%8B%A0%EA%B2%BD-%EC%93%B4-%EB%B6%80%EB%B6%84_%EC%A0%91%EA%B7%BC%EC%A0%9C%ED%95%9C-%EC%84%A4%EC%A0%95)
+- [접근제한 설정](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5-%EC%A0%91%EA%B7%BC%EC%A0%9C%ED%95%9C)
+
+- [Session Storage](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5-%EC%A0%91%EA%B7%BC%EC%A0%9C%ED%95%9C)
 
 - [Web Socket](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5%E2%80%90-WebSocket)
 
@@ -250,7 +252,7 @@
 ## 7. 페이지별 기능(영상추가 및 내용 수정 필요요)
 
 ### [로그인]
-- 서비스 접속 초기화면으로 splash 화면이 잠시 나온 뒤 다음 페이지가 나타납니다.
+- 서비스 접속 초기화면으로 로그인 성공 시 홈 페이지가 나타납니다.
     - 로그인이 되어 있지 않은 경우 : SNS 로그인 페이지
     - 로그인이 되어 있는 경우 : README 홈 화면
 - SNS(카카오톡, 구글, 페이스북) 로그인 기능은 구현되어 있지 않습니다.
@@ -259,7 +261,7 @@
 
 <br>
 
-### [Layout && 홈]
+### [Layout/홈]
 - 이메일 주소와 비밀번호를 입력하면 입력창에서 바로 유효성 검사가 진행되고 통과하지 못한 경우 각 경고 문구가 입력창 하단에 표시됩니다.
 - 이메일 주소의 형식이 유효하지 않거나 이미 가입된 이메일일 경우 또는 비밀번호가 6자 미만일 경우에는 각 입력창 하단에 경구 문구가 나타납니다.
 - 작성이 완료된 후, 유효성 검사가 통과된 경우 다음 버튼이 활성화되며, 버튼을 클릭하면 프로필 설정 화면이 나타납니다.
