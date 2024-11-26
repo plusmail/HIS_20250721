@@ -243,7 +243,7 @@
 
 - [접근제한 설정](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5-%EC%A0%91%EA%B7%BC%EC%A0%9C%ED%95%9C)
 
-- [Session Storage](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5-%EC%A0%91%EA%B7%BC%EC%A0%9C%ED%95%9C)
+- [Session Storage](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5-Session-Storage)
 
 - [Web Socket](https://github.com/ksol0048/HIS/wiki/6.-%EC%A3%BC%EC%9A%94%EA%B8%B0%EB%8A%A5%E2%80%90-WebSocket)
 
