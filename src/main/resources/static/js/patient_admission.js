@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 chartNum: selectedPatient.chartNum,
                 paName: selectedPatient.name || "N/A",
                 mainDoc: null,
-                rvTime: null,
+                rvTime: null,  // 예약 시간이 설정될 때 이 값이 서버에서 올바르게 채워짐
                 receptionTime: new Date().toISOString(),
                 // pid는 서버에서 받아올 예정
             };
@@ -253,34 +253,39 @@ document.addEventListener("DOMContentLoaded", function () {
                             throw new Error(text || '환자 접수 실패');
                         });
                     }
-                    return response.json();
+                    return response.json();  // 응답을 JSON 형태로 파싱
                 })
                 .then(data => {
-                    // 서버에서 받은 데이터에 pid와 rvTime이 포함된 상태
-                    console.log("서버 응답으로 받은 환자 데이터:", data);
+                    // 서버에서 받은 응답 확인
+                    console.log("서버 응답으로 받은 데이터:", data);
 
-                    // 응답에서 pid 값을 잘 받아오는지 확인
+                    // 응답에서 pid와 rvTime 값을 확인
                     if (data && data.data && data.data.pid) {
                         patientData.pid = data.data.pid;  // pid 설정
                     } else {
                         console.error("pid가 서버 응답에 포함되지 않았습니다.");
                     }
-                    patientData.rvTime = data.rvTime;
-                    console.log("1111111111111111", data.rvTime);
+
+                    if (data.rvTime) {
+                        patientData.rvTime = data.rvTime;  // rvTime 설정
+                        console.log("서버에서 받은 rvTime:", data.rvTime);  // rvTime 값 출력
+                    } else {
+                        console.error("rvTime이 서버 응답에 포함되지 않았습니다.");
+                    }
 
                     // 대기 테이블에 추가할 환자 데이터
                     console.log("대기 테이블에 추가할 환자 데이터:", patientData);
 
                     alert("환자 접수가 완료되었습니다.");
 
-                    // 환자 리스트 갱신 함수 호출
+                    // 환자 리스트 갱신 함수 호출 (rvTime이 설정된 이후에 호출)
                     callPatientListRender();
 
                     // WebSocket을 통해 대기 환자 데이터 브로드캐스트
                     stompClient.send("/topic/waitingPatients", {}, JSON.stringify(patientData));
 
                     // 테이블에 추가
-                    loadWaiting();
+                    loadWaiting();  // rvTime이 설정된 후에 호출
 
                 })
                 .catch(error => {
@@ -697,7 +702,7 @@ function addPatientToWaitingTable(patient) {
     });
 
     if (isDuplicate) {
-        console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다. 추가하지 않습니다.`);
+        // console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다. 추가하지 않습니다.`);
         return; // 중복된 환자는 추가하지 않음
     }
 
@@ -785,8 +790,6 @@ function addPatientToWaitingTable(patient) {
     updateWaitingPatientCount(); // 대기 환자 수 업데이트
     updateRowNumbers(); // 행 번호 업데이트
 }
-
-
 
 
 // 현재 시간을 포맷팅하는 함수
@@ -1212,7 +1215,7 @@ function callPatientListRender() {
                 }) : 'N/A';
 
                 if (patient.treatStatus === '1') {
-                   loadWaiting();
+                    loadWaiting();
                     waitingCount++;
                 }
 

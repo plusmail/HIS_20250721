@@ -55,30 +55,29 @@ public class PatientAdmissionController {
         System.out.println("환자 등록 요청 수신: " + patientAdmissionDTO);
         Map<String, Object> response = new HashMap<>();
 
-        // 차트 번호로 예약 정보를 가져오기
-        Optional<Reservation> reservation = reservationRepository.findFirstByChartNumber(String.valueOf(patientAdmissionDTO.getChartNum()));
+        // 차트 번호로 오늘 날짜 예약 정보 가져오기
+        String chartNumber = String.valueOf(patientAdmissionDTO.getChartNum());
+        List<Reservation> reservations = reservationRepository.findTodayReservationsByChartNumber(chartNumber);
 
         // 예약 정보가 존재하면 rvTime(예약 날짜)을 설정
-        if (reservation.isPresent()) {
-            String reservationDateString = reservation.get().getReservationDate(); // "2024-10-21T10:30" 형식
-
+        if (!reservations.isEmpty()) {
+            // 예약 정보가 있다면 첫 번째 예약의 날짜를 설정 (예약이 하나라고 가정)
+            String reservationDateString = reservations.get(0).getReservationDate(); // "2024-10-21T10:30" 형식
+            System.out.println("예약 날짜 문자열: " + reservationDateString);
             try {
                 // 문자열을 LocalDateTime으로 변환
                 LocalDateTime reservationDateTime = LocalDateTime.parse(reservationDateString);
 
-                // 오늘 날짜와 예약 날짜 비교
-                LocalDate today = LocalDate.now();
-                if (reservationDateTime.toLocalDate().isEqual(today)) {
-                    patientAdmissionDTO.setRvTime(reservationDateTime); // 예약 시간이 오늘이라면 설정
-                } else {
-                    patientAdmissionDTO.setRvTime(null); // 예약 날짜가 오늘이 아닐 경우 null로 설정
-                }
+                // 예약 시간이 오늘이라면 rvTime을 설정
+                patientAdmissionDTO.setRvTime(reservationDateTime); // 예약 시간이 오늘이라면 설정
+                System.out.println("설정된 예약 시간: " + reservationDateTime);
             } catch (DateTimeParseException e) {
                 response.put("message", "예약 날짜 형식이 잘못되었습니다.");
                 return ResponseEntity.badRequest().body(response);
             }
         } else {
-            patientAdmissionDTO.setRvTime(null); // 예약이 없을 경우 null로 설정
+            patientAdmissionDTO.setRvTime(null); // 예약이 없거나 오늘 예약이 아닐 경우 null로 설정
+            System.out.println("예약이 없거나 오늘 예약이 아닙니다.");
         }
 
         // 현재 시간을 접수 시간으로 설정
@@ -100,6 +99,7 @@ public class PatientAdmissionController {
 
         return ResponseEntity.ok(response);
     }
+
 
 
 
