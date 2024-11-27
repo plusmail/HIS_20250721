@@ -59,7 +59,7 @@ function loadTreatment() {
             data.forEach(patient => {
                 treatmentPatients.push(patient); // 진료 중 환자 목록에 추가
                 addPatientToTreatmentTable(patient); // 테이블에 환자 목록 추가
-                console.log("진료 중 환자 정보:", patient);
+                // console.log("진료 중 환자 정보:", patient);
             });
         })
         .catch(error => {
@@ -85,7 +85,7 @@ function loadComplete() {
             data.forEach(patient => {
                 treatmentPatients.push(patient); // 진료 중 환자 목록에 추가
                 addPatientToTreatmentTable(patient); // 테이블에 환자 목록 추가
-                console.log("진료 중 환자 정보:", patient);
+                // console.log("진료 중 환자 정보:", patient);
             });
         })
         .catch(error => {
@@ -266,6 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         console.error("pid가 서버 응답에 포함되지 않았습니다.");
                     }
                     patientData.rvTime = data.rvTime;
+                    console.log("1111111111111111", data.rvTime);
 
                     // 대기 테이블에 추가할 환자 데이터
                     console.log("대기 테이블에 추가할 환자 데이터:", patientData);
@@ -291,6 +292,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("선택된 환자가 없습니다.");
         }
     });
+
 
 
 
@@ -724,6 +726,7 @@ function addPatientToWaitingTable(patient) {
     `;
     console.log("환자 pid:", patient.pid);
     console.log("접수 시간:", patient.receptionTime);
+    console.log("예약 시간:", formattedRvTime);
 
     // 클릭 이벤트 추가
     row.addEventListener('click', () => {
@@ -842,12 +845,12 @@ const formatReceptionTime = (dateTimeString) => {
 
 
 function addPatientToTreatmentTable(patient) {
-    console.log('진료 중 환자 테이블에 추가하는 환자:', patient); // 데이터 확인
+    // console.log('진료 중 환자 테이블에 추가하는 환자:', patient); // 데이터 확인
 
     // 중복 체크: pid로 기존 환자 확인
     const isPatientAlreadyAdded = treatmentPatients.some(p => p.pid === patient.pid);
     if (isPatientAlreadyAdded) {
-        console.log(`중복된 환자 제외: ${patient.paName} (PID: ${patient.pid})`);
+        // console.log(`중복된 환자 제외: ${patient.paName} (PID: ${patient.pid})`);
         return; // 중복된 환자라면 함수를 종료
     }
 
