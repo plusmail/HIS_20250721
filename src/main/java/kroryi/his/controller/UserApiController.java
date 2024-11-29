@@ -44,7 +44,7 @@ public class UserApiController {
 
     @GetMapping("/paginglist")
     @ResponseBody
-    public PageResponseDTO<MemberListAllDTO> getPagingList(PageRequestDTO pageRequestDTO, Model model,@RequestParam("page") int page) {
+    public PageResponseDTO<MemberListAllDTO> getPagingList(PageRequestDTO pageRequestDTO, Model model, @RequestParam("page") int page) {
         if (pageRequestDTO.getPage() < 1) {
             pageRequestDTO.setPage(1);
         }
@@ -66,7 +66,7 @@ public class UserApiController {
         Map<String, Object> response = new HashMap<>();
         log.info("response---------{}", response);
         try {
-            log.info("~~~~~~~~~~~~: {}",memberJoinDTO);
+            log.info("~~~~~~~~~~~~: {}", memberJoinDTO);
             memberService.join(memberJoinDTO);
             response.put("success", true);
             response.put("message", "등록 성공");
@@ -164,8 +164,6 @@ public class UserApiController {
     }
 
 
-
-
     @RequestMapping("/admin/admin_management")
     public String main() {
 
@@ -185,7 +183,6 @@ public class UserApiController {
 
         return result;
     }
-
 
 
     @GetMapping("/edit/{id}")
