@@ -98,42 +98,37 @@ document.getElementById('addCompanyBtn').addEventListener('click', (event) => {
             }
 
             // 최종적으로 업체 등록 또는 수정 요청
-            fetch(url, {
+            return fetch(url, {
                 method: method,
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(companyData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-
-                    if (data.success) {
-                        alert(data.message);  // 성공 메시지 출력
-
-                        // 폼 리셋
-                        document.getElementById('companyForm').reset();
-
-                        // 전체 데이터 다시 불러오기
-                        loadCompanyList();
-                    } else {
-                        alert(data.message || "업체 등록/수정에 실패했습니다.");  // 서버에서 전달된 메시지 출력
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert(`서버와의 통신 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
-                });
+            });
+        })
+        .then(response => {
+            // 응답 본문을 JSON으로 파싱
+            return response.json().then(data => ({
+                status: response.status,
+                ok: response.ok,
+                body: data
+            }));
+        })
+        .then(({ status, ok, body }) => {
+            if (ok) {
+                alert(body.message || "업체가 성공적으로 수정되었습니다.");
+                document.getElementById('companyForm').reset();
+                loadCompanyList();
+            } else {
+                alert(body.message || `오류가 발생했습니다. 상태 코드: ${status}`);
+            }
         })
         .catch(error => {
-            console.error("업체 코드 확인 중 오류 발생:", error);
+            console.error("Error:", error);
+            alert(`서버와의 통신 중 오류가 발생했습니다. 상세 내용: ${error.message}`);
         });
 });
+
 
 
 

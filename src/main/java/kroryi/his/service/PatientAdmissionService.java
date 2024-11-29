@@ -5,6 +5,7 @@ import kroryi.his.domain.PatientAdmission;
 import kroryi.his.dto.PatientAdmissionDTO;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,5 +35,7 @@ public interface PatientAdmissionService {
     void registerAdmission(PatientAdmission patientAdmission);
 
     void sendPatientCounts();
+
+    long getPatientCountByDateAndStatus(String date, String status) throws ParseException;
 
 }

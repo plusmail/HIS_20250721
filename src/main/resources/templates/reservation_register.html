@@ -28,13 +28,12 @@
 
             <div class="form-group">
                 <label for="departmentInput">환자이름</label>
-                <input type="text" id="departmentInput" name="department" class="form-control">
+                <input type="text" id="departmentInput" name="name" class="form-control">
             </div>
 
             <div class="form-group">
                 <label for="sns-notification">SNS 발송</label>
                 <input type="checkbox" id="sns-notification" name="sns-notification" class="form-check-input">
-                <label class="form-check-label" for="sns-notification">발송 여부</label>
             </div>
 
             <div class="form-group">
@@ -96,7 +95,7 @@
             <div class="index-number" id="index-number"></div>
 
             <div class="btn-group mt-3 d-flex justify-content-between">
-                <button type="button" onclick="saveUpdate()" class="btn btn-success">저장</button>
+                <button type="button" onclick="saveUpdate()" class="btn btn-success">저장/수정</button>
                 <button type="button" onclick="rReset(true)" class="btn btn-warning">초기화</button>
                 <button type="button" onclick="deleteReservation()" class="btn btn-danger">삭제</button>
             </div>
@@ -113,7 +112,7 @@
                 <thead class="thead-light">
                 <tr>
                     <th style="width: 50%;">진료명</th>
-                    <th style="width: 14%;">추가</th>
+                    <th style="width: 14%;">작성</th>
                     <th style="width: 14%;">삭제</th>
                 </tr>
                 </thead>

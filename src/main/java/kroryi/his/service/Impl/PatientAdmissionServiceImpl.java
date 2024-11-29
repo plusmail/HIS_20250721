@@ -23,8 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -231,9 +234,16 @@ public class PatientAdmissionServiceImpl implements PatientAdmissionService {
         // WebSocket으로 환자 수 전송
         redisTemplate.convertAndSend("/pub/admission", message);
     }
+
+    @Override
+    public long getPatientCountByDateAndStatus(String date, String status) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        // 선택한 날짜의 시작과 끝을 계산
+        Date startDate = dateFormat.parse(date);
+        Date endDate = new Date(startDate.getTime() + (1000 * 60 * 60 * 24));  // 하루를 더해서 다음 날 자정
+
+        // 레파지토리 호출
+        return patientAdmissionRepository.countPatientsByDateAndStatus(startDate, endDate, status);
     }
-
-
-
-
-
+}

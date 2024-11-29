@@ -17,15 +17,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
     @Query("SELECT r FROM Reservation r WHERE r.reservationDate LIKE %:date%")
     List<Reservation> findByReservationDate(@Param("date") String date);
 
+
     // 인덱스 번호에 해당하는 예약 정보를 조회하는 메서드
     List<Reservation> findBySeq(Long seq);
 
     void deleteById(Long seq);
 
+    List<Reservation> findByChartNumberAndReservationDate(String chartNumber, String reservationDate);
 
     Optional<Reservation> findFirstByChartNumber(String chartNumber);
 
-    List<Reservation> findByChartNumberAndReservationDate(String chartNumber, String reservationDate);
+    @Query("SELECT r FROM Reservation r WHERE r.chartNumber = :chartNumber AND FUNCTION('DATE', r.reservationDate) = CURRENT_DATE")
+    List<Reservation> findTodayReservationsByChartNumber(@Param("chartNumber") String chartNumber);
+
 
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.treatmentType = '일반' AND r.reservationDate LIKE CONCAT(CURRENT_DATE, '%')")
     int getTodayGeneralPatientCount();
@@ -35,4 +39,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.treatmentType = '신환' AND r.reservationDate LIKE CONCAT(CURRENT_DATE, '%')")
     int getTodayNewPatientCount();
+
 }

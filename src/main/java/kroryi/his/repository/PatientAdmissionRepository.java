@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,8 @@ public interface PatientAdmissionRepository extends JpaRepository<PatientAdmissi
 
     @Query("SELECT COUNT(e) FROM PatientAdmission e WHERE e.treatStatus = :status AND FUNCTION('DATE', e.receptionTime) = CURRENT_DATE")
     int countByTreatStatusAndTodayReception(@Param("status") String status);
+
+    @Query("SELECT COUNT(p) FROM PatientAdmission p WHERE p.receptionTime >= :startDate AND p.receptionTime < :endDate AND p.treatStatus = :status")
+    long countPatientsByDateAndStatus(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("status") String status);
+
 }

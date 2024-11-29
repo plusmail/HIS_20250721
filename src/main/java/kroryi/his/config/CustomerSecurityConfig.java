@@ -64,6 +64,7 @@ public class CustomerSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/member/login/**").permitAll()
                                 .requestMatchers("/member/login-proc").permitAll()
+                                .requestMatchers("/api/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll() // WebSocket 경로에 대한 권한 설정
                                 .requestMatchers("/order/**").permitAll() // WebSocket 경로에 대한 권한 설정
                                 .requestMatchers("/topic/**").permitAll() // WebSocket 경로에 대한 권한 설정

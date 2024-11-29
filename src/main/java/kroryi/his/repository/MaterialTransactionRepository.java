@@ -48,4 +48,8 @@ public interface MaterialTransactionRepository extends JpaRepository<MaterialTra
     @Query("SELECT SUM(mtr.stockIn) FROM MaterialTransactionRegister mtr WHERE mtr.materialRegister.materialCode = :materialCode")
     Long getTotalStockInByMaterialCode(@Param("materialCode") String materialCode);
 
+    @Modifying
+    @Query("DELETE FROM MaterialTransactionRegister m WHERE m.materialRegister.materialCode = :materialCode")
+    void deleteByMaterialCode(@Param("materialCode") String materialCode);
+
 }

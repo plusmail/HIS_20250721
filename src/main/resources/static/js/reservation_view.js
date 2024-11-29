@@ -25,7 +25,6 @@ function dateReservationList(selectedDate) {
             const tableBody = document.querySelector('#reservationTableList');
 
             // 테이블의 기존 데이터를 지우고 새 데이터를 추가
-            // 해당 작업은 다른 날짜를 클릭했을때 기존 내용을 지워야 하기 때문임
             tableBody.innerHTML = ''; // 기존 내용 제거
 
             const timetable = document.getElementById('timetable');
@@ -34,25 +33,26 @@ function dateReservationList(selectedDate) {
                 document.getElementById('selectedDate').innerText = `선택된 날짜: ${selectedDate}`;
                 generateTimetable(data);
             }
+
+            // 예약 데이터 시간순으로 정렬
+            data.sort((a, b) => new Date(a.reservationDate) - new Date(b.reservationDate));
+
             // 데이터 배열을 순회하여 테이블에 추가
             data.forEach(item => {
-
                 // 시간만 추출 (예: "2024-10-21T00:13" -> "00:13")
                 const time = new Date(item.reservationDate).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
 
-
                 const row = document.createElement('tr'); // 새로운 행 생성
                 row.id = 'reservationTableListParent'; // ID 추가
                 row.innerHTML = `
                                 <td>${time}</td>
-                                <td>${item.department}</td>
+                                <td>${item.name}</td>
                                 <td>${item.patientNote}</td>
                                 `; // 각 열에 데이터 삽입
                 row.onclick = function () {
-
                     if (PageName === 'registerAdd') {
                         selectList(item.seq);
                     }
@@ -66,6 +66,7 @@ function dateReservationList(selectedDate) {
             console.error('에러 발생:', error);
         });
 }
+
 
 async function fu_reservation_list_all(type) {
 
@@ -110,7 +111,7 @@ async function fu_reservation_list_all(type) {
             row.id = 'reservationTableListParent'; // ID 추가
             row.innerHTML = `
                                 <td>${time}</td>
-                                <td>${item.department}</td>
+                                <td>${item.name}</td>
                                 <td>${item.patientNote}</td>
                                 `; // 각 열에 데이터 삽입
             row.onclick = function () {
@@ -161,7 +162,7 @@ async function fu_reservation_list_all(type) {
             info: `
             <div class="reservation ${treatmentClass}" style="display: flex; padding-right: 10px;">
                 <div style="flex: 3; padding-right: 20px; border-right: 2px solid gray; display: flex; justify-content: center; align-items: center;">
-                    ${item.department}
+                    ${item.name}
                 </div>
                 <div style="flex: 7; padding-left: 20px;">
                     ${item.patientNote} <br> ${item.treatmentType}
@@ -238,7 +239,7 @@ async function generateTimetable(data) {
         return {
             time: time,
             doctor: item.doctor,
-            info: `${item.department} <br> ${item.patientNote} (${item.treatmentType})` // 여러 정보 결합
+            info: `${item.name} <br> ${item.patientNote} (${item.treatmentType})` // 여러 정보 결합
         };
     });
 
@@ -330,7 +331,7 @@ async function generateTimetable(data) {
 
         // 예약 타입에 맞는 클래스 이름을 설정
         let treatmentClass = '';
-        if (item.treatmentType === '리콜') {
+        if (item.treatmentType === '신환') {
             treatmentClass = 'recall';  // 리콜 예약
         } else if (item.treatmentType === '수술') {
             treatmentClass = 'surgery'; // 수술 예약
@@ -344,7 +345,7 @@ async function generateTimetable(data) {
             info: `
             <div class="reservation ${treatmentClass}" style="display: flex; padding-right: 10px;">
     <div style="flex: 3; padding-right: 20px; border-right: 2px solid gray; display: flex; justify-content: center; align-items: center;">
-        ${item.department}
+        ${item.name}
     </div>
     <div style="flex: 7; padding-left: 20px;">
         ${item.patientNote} <br> ${item.treatmentType}
@@ -382,7 +383,7 @@ async function generateTimetable(data) {
                     reservationDiv.classList.add("reservation"); // 기본 스타일 클래스 추가
 
                     // treatmentType에 따라 스타일 클래스 추가
-                    if (r.treatmentType === "리콜") {
+                    if (r.treatmentType === "신환") {
                         reservationDiv.classList.add("recall"); // 리콜 예약 스타일
                     } else if (r.treatmentType === "수술") {
                         reservationDiv.classList.add("surgery"); // 수술 예약 스타일

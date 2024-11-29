@@ -649,7 +649,19 @@ document.getElementById('deleteStockTransactionBtn').addEventListener('click', f
                 alert('출고 기록이 삭제되었습니다.');
                 clearStockTransactionForm();  // 출고 필드만 초기화
                 setStockDate();
-                loadOutgoingTransactionList(document.getElementById('selectedMaterialCode').textContent);  // 삭제 후에도 재료 목록 다시 로딩
+                loadOutgoingTransactionList(document.getElementById('selectedMaterialCode').textContent);// 삭제 후에도 재료 목록 다시 로딩
+
+                const materialCode = document.getElementById('selectedMaterialCode').textContent;
+                fetch(`/inventory_management/getCurrentStock?materialCode=${encodeURIComponent(materialCode)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 서버에서 받은 현재고량을 화면에 표시
+                        document.getElementById('selectedMaterialStock').textContent = data.remainingStock != null ? data.remainingStock.toLocaleString() : 0;
+                    })
+                    .catch(error => {
+                        console.error('현재고량을 불러오는 중 오류 발생:', error);
+                        document.getElementById('selectedMaterialStock').textContent = 'N/A';
+                    });
             } else {
                 throw new Error('출고 기록 삭제에 실패했습니다.');
             }
