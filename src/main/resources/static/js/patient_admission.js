@@ -59,7 +59,7 @@ function loadTreatment() {
             data.forEach(patient => {
                 treatmentPatients.push(patient); // 진료 중 환자 목록에 추가
                 addPatientToTreatmentTable(patient); // 테이블에 환자 목록 추가
-                console.log("진료 중 환자 정보:", patient);
+                // console.log("진료 중 환자 정보:", patient);
             });
         })
         .catch(error => {
@@ -85,7 +85,7 @@ function loadComplete() {
             data.forEach(patient => {
                 treatmentPatients.push(patient); // 진료 중 환자 목록에 추가
                 addPatientToTreatmentTable(patient); // 테이블에 환자 목록 추가
-                console.log("진료 중 환자 정보:", patient);
+                // console.log("진료 중 환자 정보:", patient);
             });
         })
         .catch(error => {
@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 chartNum: selectedPatient.chartNum,
                 paName: selectedPatient.name || "N/A",
                 mainDoc: null,
-                rvTime: null,
+                rvTime: null,  // 예약 시간이 설정될 때 이 값이 서버에서 올바르게 채워짐
                 receptionTime: new Date().toISOString(),
                 // pid는 서버에서 받아올 예정
             };
@@ -253,33 +253,39 @@ document.addEventListener("DOMContentLoaded", function () {
                             throw new Error(text || '환자 접수 실패');
                         });
                     }
-                    return response.json();
+                    return response.json();  // 응답을 JSON 형태로 파싱
                 })
                 .then(data => {
-                    // 서버에서 받은 데이터에 pid와 rvTime이 포함된 상태
-                    console.log("서버 응답으로 받은 환자 데이터:", data);
+                    // 서버에서 받은 응답 확인
+                    console.log("서버 응답으로 받은 데이터:", data);
 
-                    // 응답에서 pid 값을 잘 받아오는지 확인
+                    // 응답에서 pid와 rvTime 값을 확인
                     if (data && data.data && data.data.pid) {
                         patientData.pid = data.data.pid;  // pid 설정
                     } else {
                         console.error("pid가 서버 응답에 포함되지 않았습니다.");
                     }
-                    patientData.rvTime = data.rvTime;
+
+                    if (data.rvTime) {
+                        patientData.rvTime = data.rvTime;  // rvTime 설정
+                        console.log("서버에서 받은 rvTime:", data.rvTime);  // rvTime 값 출력
+                    } else {
+                        console.error("rvTime이 서버 응답에 포함되지 않았습니다.");
+                    }
 
                     // 대기 테이블에 추가할 환자 데이터
                     console.log("대기 테이블에 추가할 환자 데이터:", patientData);
 
                     alert("환자 접수가 완료되었습니다.");
 
-                    // 환자 리스트 갱신 함수 호출
+                    // 환자 리스트 갱신 함수 호출 (rvTime이 설정된 이후에 호출)
                     callPatientListRender();
 
                     // WebSocket을 통해 대기 환자 데이터 브로드캐스트
                     stompClient.send("/topic/waitingPatients", {}, JSON.stringify(patientData));
 
                     // 테이블에 추가
-                    loadWaiting();
+                    loadWaiting();  // rvTime이 설정된 후에 호출
 
                 })
                 .catch(error => {
@@ -291,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("선택된 환자가 없습니다.");
         }
     });
+
 
 
 
@@ -686,23 +693,22 @@ function formatRvTime(rvTime) {
 
 
 // 대기 중 테이블에 환자 추가
-let draggedRow = null;
-
-// 환자 추가 함수 (드래그 앤 드롭 포함)
 function addPatientToWaitingTable(patient) {
+    // 대기 테이블에 추가된 환자 목록을 확인 (pid 기반으로 중복 체크)
     const existingRows = waitingPatientsTable.getElementsByTagName('tr');
     const isDuplicate = Array.from(existingRows).some(row => {
-        const pidCell = row.querySelector('td:nth-child(7)');
-        return pidCell && pidCell.textContent === patient.pid.toString();
+        const pidCell = row.querySelector('td:nth-child(7)'); // 7번째 열 (pid 열)
+        return pidCell && pidCell.textContent === patient.pid.toString(); // pid 비교
     });
 
     if (isDuplicate) {
-        console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다.`);
-        return;
+        // console.log(`환자 ${patient.paName} (pid: ${patient.pid})는 이미 대기 목록에 존재합니다. 추가하지 않습니다.`);
+        return; // 중복된 환자는 추가하지 않음
     }
 
+    // 새로운 환자 데이터 추가
     const row = waitingPatientsTable.insertRow();
-    const currentRowCount = existingRows.length + 1;
+    const currentRowCount = existingRows.length + 1; // 새로운 행 번호
     const formattedRvTime = formatRvTime(patient.rvTime);
 
     const doctorOptions = doctorNames.map(name => `<option value="${name}">${name}</option>`).join('');
@@ -723,32 +729,67 @@ function addPatientToWaitingTable(patient) {
     }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
     `;
+    console.log("환자 pid:", patient.pid);
+    console.log("접수 시간:", patient.receptionTime);
+    console.log("예약 시간:", formattedRvTime);
 
-    // 드래그 앤 드롭 이벤트 추가
-    row.setAttribute('draggable', 'true');
-    row.addEventListener('dragstart', () => {
-        draggedRow = row;
-        row.style.opacity = '0.5'; // 드래그 시 반투명 처리
-    });
-
-    row.addEventListener('dragend', () => {
-        draggedRow = null;
-        row.style.opacity = ''; // 드래그 종료 시 스타일 초기화
-    });
-
+    // 클릭 이벤트 추가
     row.addEventListener('click', () => {
+        // 선택된 행이 있으면 선택 해제
         const previouslySelected = waitingPatientsTable.querySelector('tr.selected');
         if (previouslySelected) {
             previouslySelected.classList.remove('selected');
         }
+        // 현재 행 선택
         row.classList.add('selected');
     });
 
-    updateWaitingPatientCount();
-    updateRowNumbers();
+    // 드래그 앤 드롭 이벤트 추가
+    row.setAttribute('draggable', 'true'); // 행을 드래그할 수 있도록 설정
+
+    // 드래그 시작 시
+    row.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData('text/plain', patient.pid); // 환자 PID를 드래그 데이터로 설정
+        row.classList.add('dragging'); // 드래그 중인 행을 표시
+    });
+
+    // 드래그 종료 시
+    row.addEventListener('dragend', () => {
+        row.classList.remove('dragging'); // 드래그 종료 후 행 상태 복원
+    });
+
+    // 다른 행으로 드래그가 가능하도록
+    row.addEventListener('dragover', (event) => {
+        event.preventDefault(); // 기본 동작(예: 다른 행 위로 드래그하는 것)을 방지
+        row.classList.add('dragover'); // 드래그 중인 행이 해당 행 위에 있을 때 표시
+    });
+
+    row.addEventListener('dragleave', () => {
+        row.classList.remove('dragover'); // 드래그가 다른 행을 벗어날 때 상태 제거
+    });
+
+    // 드래그된 행을 실제로 다른 행으로 놓을 때
+    row.addEventListener('drop', (event) => {
+        event.preventDefault();
+        row.classList.remove('dragover'); // 드래그가 끝난 후 표시 제거
+
+        const draggedPid = event.dataTransfer.getData('text/plain'); // 드래그된 환자의 PID
+
+        // draggedPid를 통해 해당 행을 찾기
+        const draggedRow = Array.from(waitingPatientsTable.rows).find(r => {
+            return r.cells[6] && r.cells[6].textContent === draggedPid.toString(); // PID가 일치하는 행 찾기
+        });
+
+        if (draggedRow && draggedRow !== row) {
+            // 드래그된 행을 현재 행 위치에 삽입
+            row.parentNode.insertBefore(draggedRow, row); // 기존 행 위치 변경
+            updateRowNumbers(); // 행 번호 업데이트
+        }
+    });
+
+    updateWaitingPatientCount(); // 대기 환자 수 업데이트
+    updateRowNumbers(); // 행 번호 업데이트
 }
-
-
 
 
 // 현재 시간을 포맷팅하는 함수
@@ -807,12 +848,12 @@ const formatReceptionTime = (dateTimeString) => {
 
 
 function addPatientToTreatmentTable(patient) {
-    console.log('진료 중 환자 테이블에 추가하는 환자:', patient); // 데이터 확인
+    // console.log('진료 중 환자 테이블에 추가하는 환자:', patient); // 데이터 확인
 
     // 중복 체크: pid로 기존 환자 확인
     const isPatientAlreadyAdded = treatmentPatients.some(p => p.pid === patient.pid);
     if (isPatientAlreadyAdded) {
-        console.log(`중복된 환자 제외: ${patient.paName} (PID: ${patient.pid})`);
+        // console.log(`중복된 환자 제외: ${patient.paName} (PID: ${patient.pid})`);
         return; // 중복된 환자라면 함수를 종료
     }
 
@@ -1174,7 +1215,7 @@ function callPatientListRender() {
                 }) : 'N/A';
 
                 if (patient.treatStatus === '1') {
-                   loadWaiting();
+                    loadWaiting();
                     waitingCount++;
                 }
 
