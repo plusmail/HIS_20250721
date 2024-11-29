@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -130,13 +129,7 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
 
     @Override
     public List<ReservationDTO> getReservations(String chartNumber, String reservationDate) {
-        // 현재 날짜를 가져옴
-        String today = LocalDate.now().toString();  // 오늘 날짜를 "yyyy-MM-dd" 형식으로 가져옴
-
-        // 오늘 날짜와 차트 번호에 맞는 예약 정보만 가져오기
-        List<Reservation> reservations = reRepo.findTodayReservationsByChartNumber(chartNumber);
-
-        // 예약 정보를 ReservationDTO로 변환하여 반환
+        List<Reservation> reservations = reRepo.findByChartNumberAndReservationDate(chartNumber, reservationDate);
         return reservations.stream()
                 .map(reservation -> new ReservationDTO(
                         reservation.getSeq(),
@@ -151,7 +144,6 @@ public class ReservationRegisterServiceImpl implements ReservationRegisterServic
                 ))
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public int getGeneralPatientCount() {
