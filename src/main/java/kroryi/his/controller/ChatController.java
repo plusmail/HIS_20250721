@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -135,6 +136,35 @@ public class ChatController {
         return ResponseEntity.noContent().build(); // HTTP 204 반환
     }
 
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<ChatRoomDTO> getChatRoomById(@PathVariable Long roomId) {
+        Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(roomId);
+
+        // 채팅방이 존재하지 않을 경우 404 반환
+        if (chatRoomOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        ChatRoom chatRoom = chatRoomOptional.get();
+
+        // 채팅방 이름이 null 또는 빈 문자열이면 기본값 설정
+        String roomName = (chatRoom.getRoomName() != null && !chatRoom.getRoomName().isEmpty())
+                ? chatRoom.getRoomName()
+                : "알 수 없는 채팅방";
+
+        // ChatRoomDTO 생성
+        ChatRoomDTO chatRoomDTO = new ChatRoomDTO(
+                chatRoom.getId(),
+                roomName, // 안전한 이름 전달
+                chatRoom.getMembers().stream()
+                        .map(Member::getMid)
+                        .collect(Collectors.toSet())
+        );
+
+        return ResponseEntity.ok(chatRoomDTO); // 올바른 DTO 반환
+    }
+
+
     // 채팅 메시지 저장
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<ChatMessageDTO> postMessage(
@@ -205,8 +235,25 @@ public class ChatController {
 
     // WebSocket 메시지 전송 - 실시간 채팅
     @MessageMapping("/chat.send/{roomId}")
-    public void sendMessage(@Payload String messageJson) throws JsonProcessingException {
+    public void sendMessage(@DestinationVariable Long roomId, @Payload String messageJson) throws JsonProcessingException {
         log.info("Received raw JSON message: {}", messageJson);
+
+        // 채팅방 존재 여부 확인
+        if (!chatRoomRepository.existsById(roomId)) {
+            log.warn("채팅방이 존재하지 않습니다: roomId = {}", roomId);
+
+            // 에러 메시지 전송
+            ChatMessageDTO errorResponse = ChatMessageDTO.builder()
+                    .roomId(roomId)
+                    .content("더 이상 채팅방이 존재하지 않습니다.")
+                    .senderId("System")
+                    .senderName("System")
+                    .build();
+
+            String errorJson = objectMapper.writeValueAsString(errorResponse);
+            messagingTemplate.convertAndSend("/topic/rooms/" + roomId, errorJson); // 에러 메시지 전송
+            return; // 메시지 처리를 중단
+        }
 
         // JSON 메시지를 ChatMessageDTO로 변환
         ChatMessageDTO message = objectMapper.readValue(messageJson, ChatMessageDTO.class);

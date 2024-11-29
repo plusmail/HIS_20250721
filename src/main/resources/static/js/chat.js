@@ -668,3 +668,4 @@ function closeChatRoom() {
 
     console.log("Chat room closed and WebSocket subscription cleared.");
 }
+
