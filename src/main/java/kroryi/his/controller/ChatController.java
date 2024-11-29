@@ -205,34 +205,6 @@ public class ChatController {
         return Collections.emptyList(); // 멤버가 없는 경우 빈 리스트 반환
     }
 
-    @GetMapping("/rooms/{roomId}")
-    public ResponseEntity<ChatRoomDTO> getChatRoomById(@PathVariable Long roomId) {
-        Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(roomId);
-
-        // 채팅방이 존재하지 않을 경우 404 반환
-        if (chatRoomOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        ChatRoom chatRoom = chatRoomOptional.get();
-
-        // 채팅방 이름이 null 또는 빈 문자열이면 기본값 설정
-        String roomName = (chatRoom.getRoomName() != null && !chatRoom.getRoomName().isEmpty())
-                ? chatRoom.getRoomName()
-                : "알 수 없는 채팅방";
-
-        // ChatRoomDTO 생성
-        ChatRoomDTO chatRoomDTO = new ChatRoomDTO(
-                chatRoom.getId(),
-                roomName, // 안전한 이름 전달
-                chatRoom.getMembers().stream()
-                        .map(Member::getMid)
-                        .collect(Collectors.toSet())
-        );
-
-        return ResponseEntity.ok(chatRoomDTO); // 올바른 DTO 반환
-    }
-
     // WebSocket 메시지 전송 - 실시간 채팅
     @MessageMapping("/chat.send/{roomId}")
     public void sendMessage(@DestinationVariable Long roomId, @Payload String messageJson) throws JsonProcessingException {
