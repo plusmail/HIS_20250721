@@ -26,18 +26,12 @@ if [ -z "$CONTAINER_NAME" ]; then
 fi
 log_info "webapp 컨테이너 이름: $CONTAINER_NAME"
 
-# 3. 컨테이너가 실행 중이면 stop
-if sudo docker ps | grep -q "$CONTAINER_NAME"; then
-    log_info "컨테이너가 실행 중입니다. 중지합니다."
-    sudo docker stop "$CONTAINER_NAME"
-fi
-
-# 4. target 디렉토리 완전 삭제 및 재생성 (JAR 파일/디렉토리 꼬임 방지)
+# 3. target 디렉토리 완전 삭제 및 재생성 (JAR 파일/디렉토리 꼬임 방지)
 log_info "target 디렉토리 완전 삭제 및 재생성 중..."
 rm -rf target/
 mkdir -p target
 
-# 5. Maven으로 JAR 파일 빌드
+# 4. Maven으로 JAR 파일 빌드
 log_info "Maven으로 JAR 파일 빌드 중..."
 if ./mvnw clean package -DskipTests; then
     log_success "JAR 파일 빌드 완료"
@@ -46,7 +40,7 @@ else
     exit 1
 fi
 
-# 6. 빌드된 JAR 파일 찾기
+# 5. 빌드된 JAR 파일 찾기
 JAR_FILE=$(find target -name "*.jar" -type f | head -n 1)
 if [ -z "$JAR_FILE" ]; then
     log_error "빌드된 JAR 파일을 찾을 수 없습니다"
@@ -54,11 +48,18 @@ if [ -z "$JAR_FILE" ]; then
 fi
 log_info "빌드된 JAR 파일: $JAR_FILE"
 
-# 7. 컨테이너가 존재하지 않으면 up -d webapp
+# 6. 컨테이너가 없으면 up -d webapp (생성 및 시작)
 if ! sudo docker ps -a | grep "$CONTAINER_NAME" > /dev/null; then
-    log_warning "컨테이너($CONTAINER_NAME)가 존재하지 않습니다. 자동으로 실행합니다."
+    log_warning "컨테이너($CONTAINER_NAME)가 존재하지 않습니다. 자동으로 생성합니다."
     sudo docker-compose up -d webapp
     sleep 5
+fi
+
+# 7. 컨테이너가 실행 중이면 stop (항상 stop)
+if sudo docker ps | grep -q "$CONTAINER_NAME"; then
+    log_info "컨테이너가 실행 중입니다. 중지합니다."
+    sudo docker stop "$CONTAINER_NAME"
+    sleep 2
 fi
 
 # 8. JAR 파일을 컨테이너에 복사
