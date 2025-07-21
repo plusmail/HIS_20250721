@@ -1,53 +1,59 @@
 version: "3"
 services:
-  webapp:
+  his_app:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - database
+      - his_mysql
     ports:
       - "8092:8092"
-    container_name: his_server
+    container_name: his_app
     hostname: his_app
     volumes:
-      - ./src/main/resources/templates:/app/src/main/resources/templates
+      - ./src:/app/src
+      - ./target:/app/target
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/his?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://his_mysql:3306/his?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: edurootroot
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_REDIS_HOST: his_redis_server
-
+      SPRING_REDIS_HOST: his_redis
     networks:
       - his
 
-  database:
-    image: ubuntu/mysql
-    container_name: his_db
+  his_mysql:
+    image: mysql:8.0
+    container_name: his_mysql
     restart: always
     environment:
-      - MYSQL_DATABASE=his
-      - MYSQL_ROOT_HOST=%
-      - MYSQL_ROOT_PASSWORD=edurootroot
-
+      MYSQL_DATABASE: his
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: edurootroot
     ports:
       - "53306:3306"
     volumes:
       - ./db/data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
     networks:
       - his
-    hostname: his_database
-    cap_add:
-      - SYS_NICE
-  redis:
-    image: redis:latest
-    container_name: his_redis_server
-    networks:
-      - his
+    hostname: his_mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  his_redis:
+    image: redis:7-alpine
+    container_name: his_redis
+    restart: always
     ports:
-      - "36379:6379"
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - his
 
 networks:
   his:
+    driver: bridge
