@@ -80,7 +80,6 @@ public class CustomerSecurityConfig {
                         .passwordParameter("password") // 폼에서 비밀번호 필드 매핑
                         .loginProcessingUrl("/member/login-proc") // 로그인 처리 URL
                         .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트할 URL
-                        .failureUrl("/member/login?error=true") // 로그인 실패 시 리다이렉트할 URL
                         .permitAll()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -89,7 +88,7 @@ public class CustomerSecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1)
-                        .expiredUrl("/member/login?expired")
+                        .expiredUrl("/login?expired")
                 )
                 .userDetailsService(userDetailsService)
                 .logout(logout -> logout
