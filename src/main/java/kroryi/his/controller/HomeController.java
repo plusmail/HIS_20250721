@@ -50,13 +50,15 @@ public class HomeController {
 
 
     @GetMapping("/home")
-    public String home(@AuthenticationPrincipal UserDetails user, Model model, HttpSession session) {
+    public String home(@AuthenticationPrincipal Object user, Model model, HttpSession session) {
+        System.out.println("user class: " + (user != null ? user.getClass() : "null"));
+        System.out.println("user: " + user);
         try {
             if (user != null) {
                 model.addAttribute("user", user.getUsername());
                 session.setAttribute("user", user);
             } else {
-                return "redirect:/login"; // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+                return "redirect:/member/login";
             }
             log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
