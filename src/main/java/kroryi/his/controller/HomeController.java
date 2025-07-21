@@ -52,13 +52,17 @@ public class HomeController {
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal UserDetails user, Model model, HttpSession session) {
         try {
+            log.info("홈페이지 접근 - 사용자: {}", user != null ? user.getUsername() : "null");
+            log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+            
             if (user != null) {
                 model.addAttribute("user", user.getUsername());
                 session.setAttribute("user", user);
+                log.info("User authorities: {}", user.getAuthorities());
             } else {
-                return "redirect:/login"; // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+                log.warn("인증되지 않은 사용자가 홈페이지에 접근");
+                return "redirect:/member/login";
             }
-            log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
             List<BoardDTO> latestPosts = boardService.getLatestPosts();
 
@@ -69,15 +73,8 @@ public class HomeController {
                     .collect(Collectors.toList());
 
             model.addAttribute("latestPosts", boardDTOS);
-
-            log.info("최신 게시글: {}", boardDTOS); // 포맷된 게시글 로그
-            log.info("세선 값 {}", session.getAttribute("user"));
-            log.info("User authorities: {}", user.getAuthorities());
-
-            log.info("최신 게시글: {}", latestPosts);
-
-            log.info("세선 값 {}", session.getAttribute("user"));
-            log.info("User authorities: {}", user.getAuthorities());
+            log.info("최신 게시글: {}", boardDTOS);
+            log.info("세션 값: {}", session.getAttribute("user"));
 
             return "home";
 
