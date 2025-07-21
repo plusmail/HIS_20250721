@@ -58,7 +58,7 @@ public class HomeController {
                 model.addAttribute("user", user.getUsername());
                 session.setAttribute("user", user);
             } else {
-                return "redirect:/member/login";
+                // return "redirect:/member/login";
             }
             log.info("Current Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
