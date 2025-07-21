@@ -214,9 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("접수 버튼이 클릭되었습니다.");
 
         // 권한 체크
-        const hasPermission = globalUserData.authorities.some(auth =>
-            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
-        );
+        const hasPermission = globalUserData.authorities.some(auth => auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE');
 
         if (!hasPermission) {
             alert("권한이 없습니다. 의사 또는 간호사만 환자를 등록할 수 있습니다.");
@@ -231,21 +229,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 서버에 저장하기 위해 환자 데이터 객체 생성
             const patientData = {
-                chartNum: selectedPatient.chartNum,
-                paName: selectedPatient.name || "N/A",
-                mainDoc: null,
-                rvTime: null,  // 예약 시간이 설정될 때 이 값이 서버에서 올바르게 채워짐
-                receptionTime: new Date().toISOString(),
-                // pid는 서버에서 받아올 예정
+                chartNum: selectedPatient.chartNum, paName: selectedPatient.name || "N/A", mainDoc: null, rvTime: null,  // 예약 시간이 설정될 때 이 값이 서버에서 올바르게 채워짐
+                receptionTime: new Date().toISOString(), // pid는 서버에서 받아올 예정
             };
 
             // 환자 등록을 위한 AJAX 요청
             fetch("/api/patient-admission/register", {
-                method: "POST",
-                headers: {
+                method: "POST", headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify(patientData)
+                }, body: JSON.stringify(patientData)
             })
                 .then(response => {
                     if (!response.ok) {
@@ -299,8 +291,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
-
     treatmentPatientsTable.addEventListener('click', (event) => {
         const targetRow = event.target.closest('tr'); // 클릭한 행 찾기
 
@@ -329,9 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("startTreatmentButton->", selectedRow)
 
         // 권한 체크를 직접 수행합니다.
-        const hasPermission = globalUserData.authorities.some(auth =>
-            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
-        );
+        const hasPermission = globalUserData.authorities.some(auth => auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE');
 
         // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
         if (!hasPermission) {
@@ -398,11 +386,9 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(`환자 정보 - 차트 번호: ${chartNum}, 이름: ${paName}, 접수 시간: ${receptionTime}, 의사: ${selectedDoctor}, PID: ${pid}`);
 
             fetch("/api/patient-admission/treatment/start", {
-                method: "PUT",
-                headers: {
+                method: "PUT", headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify(patientData)
+                }, body: JSON.stringify(patientData)
 
             })
                 .then(response => {
@@ -433,9 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 진료 완료 버튼 클릭 시 모달 표시
     completeTreatmentButton.addEventListener("click", function () {
         // 권한 체크를 직접 수행합니다.
-        const hasPermission = globalUserData.authorities.some(auth =>
-            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
-        );
+        const hasPermission = globalUserData.authorities.some(auth => auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE');
 
         // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
         if (!hasPermission) {
@@ -493,25 +477,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // DB에 저장할 데이터 준비
             const dataToSend = {
-                chartNum,
-                paName,
-                treatStatus: "3", // 진료 완료 상태
-                mainDoc: selectedDoctor,
-                receptionTime: formattedReceptionTimeForDB, // 변환된 receptionTime 사용
+                chartNum, paName, treatStatus: "3", // 진료 완료 상태
+                mainDoc: selectedDoctor, receptionTime: formattedReceptionTimeForDB, // 변환된 receptionTime 사용
                 viTime: formattedViTimeForDB, // viTime을 여기에서 사용
-                rvTime: formattedRvTimeForDB,
-                completionTime: completionTime.toISOString(), // 추가된 진료 완료 시간
+                rvTime: formattedRvTimeForDB, completionTime: completionTime.toISOString(), // 추가된 진료 완료 시간
             };
 
             console.log("저장할 데이터:", dataToSend);
 
             // API 호출
             fetch("/api/patient-admission/completeTreatment", {
-                method: "PUT",
-                headers: {
+                method: "PUT", headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dataToSend)
+                }, body: JSON.stringify(dataToSend)
             })
                 .then(response => {
                     if (!response.ok) {
@@ -542,7 +520,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
     const formatViTimeForDB = (timeString) => {
         if (!timeString) return null;
 
@@ -569,7 +546,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return `${year}-${month}-${day}T${hour}:${minute}:00`; // 'T' 추가
     };
-
 
 
     const formatReceptionTimeForDB = (timeString) => {
@@ -626,6 +602,7 @@ function formatCompleteTime(completionTime) {
 
     return `${amPm} ${hours.toString().padStart(2, '0')}:${minutes}`;
 }
+
 function formatRvTimeForDB(rvTime) {
     const date = new Date(rvTime);
     if (isNaN(date.getTime())) {
@@ -685,9 +662,7 @@ function formatRvTime(rvTime) {
 
     const date = new Date(rvTime);
     return date.toLocaleString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true // 오전/오후 형식
+        hour: '2-digit', minute: '2-digit', hour12: true // 오전/오후 형식
     });
 }
 
@@ -724,8 +699,7 @@ function addPatientToWaitingTable(patient) {
         </td>
         <td>${formattedRvTime || ''}</td>
         <td>${patient.receptionTime ? new Date(patient.receptionTime).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
+        hour: '2-digit', minute: '2-digit'
     }) : 'N/A'}</td>
         <td style="display: none;">${patient.pid}</td>
     `;
@@ -861,9 +835,7 @@ function addPatientToTreatmentTable(patient) {
     treatmentPatientCount++; // 진료 중 환자 수 증가
 
     const formattedReceptionTime = formatReceptionTime(patient.receptionTime); // 접수 시간을 포맷팅
-    const treatmentStartTime = patient.viTime
-        ? formatCurrentTime(new Date(new Date(patient.viTime).setHours(new Date(patient.viTime).getHours() + 15)))
-        : formatCurrentTime(new Date()); // 진료 시작 시간 포맷팅
+    const treatmentStartTime = patient.viTime ? formatCurrentTime(new Date(new Date(patient.viTime).setHours(new Date(patient.viTime).getHours() + 15))) : formatCurrentTime(new Date()); // 진료 시작 시간 포맷팅
 
     // 새 행의 내용 설정
     row.innerHTML = `
@@ -1022,7 +994,7 @@ async function fetchPatientStatus() {
         return data; // 파싱된 데이터를 반환
     } catch (error) {
         console.error("Error fetching patient status:", error);
-        return { status1: 0, status2: 0, status3: 0 }; // 오류 발생 시 기본값 반환
+        return {status1: 0, status2: 0, status3: 0}; // 오류 발생 시 기본값 반환
     }
 }
 
@@ -1093,9 +1065,7 @@ function cancelReception() {
     // 취소 버튼 클릭 이벤트
     cancelReceptionButton.addEventListener("click", function () {
         // 권한 체크를 직접 수행합니다.
-        const hasPermission = globalUserData.authorities.some(auth =>
-            auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE'
-        );
+        const hasPermission = globalUserData.authorities.some(auth => auth.authority === 'ROLE_DOCTOR' || auth.authority === 'ROLE_NURSE');
 
         // 권한이 없으면 경고 메시지를 표시하고 등록 과정을 중단합니다.
         if (!hasPermission) {
@@ -1152,7 +1122,6 @@ function cancelReception() {
 }
 
 
-
 // 날짜를 선택할 때 환자 정보를 가져오는 이벤트 리스너
 function callDate() {
     document.getElementById('currentDate').addEventListener('change', callPatientList);
@@ -1198,20 +1167,16 @@ function callPatientListRender() {
             // 환자 데이터를 각 테이블에 추가
             data.forEach(patient => {
                 const formattedReceptionTime = patient.receptionTime ? new Date(patient.receptionTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    hour: '2-digit', minute: '2-digit'
                 }) : 'N/A';
                 const formattedRvTime = patient.rvTime ? new Date(patient.rvTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    hour: '2-digit', minute: '2-digit'
                 }) : 'N/A';
                 const formattedViTime = patient.viTime ? new Date(patient.viTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    hour: '2-digit', minute: '2-digit'
                 }) : 'N/A';
                 const formattedCpTime = patient.completionTime ? new Date(patient.completionTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    hour: '2-digit', minute: '2-digit'
                 }) : 'N/A';
 
                 if (patient.treatStatus === '1') {
@@ -1261,6 +1226,7 @@ function callPatientListRender() {
             console.error('문제가 발생했습니다:', error);
         });
 }
+
 // 카운트를 업데이트하는 함수들
 function updateWaitingCountLabel(count) {
     const waitingHeader = document.querySelector("#waitingPatientsTable th[colspan='6']");

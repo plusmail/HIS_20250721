@@ -1,0 +1,53 @@
+version: "3"
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "8092:8092"
+    container_name: his_server
+    hostname: his_app
+    volumes:
+      - ./src/main/resources/templates:/app/src/main/resources/templates
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/his?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: edurootroot
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_REDIS_HOST: his_redis_server
+
+    networks:
+      - his
+
+  database:
+    image: ubuntu/mysql
+    container_name: his_db
+    restart: always
+    environment:
+      - MYSQL_DATABASE=his
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=edurootroot
+
+    ports:
+      - "53306:3306"
+    volumes:
+      - ./db/data:/var/lib/mysql
+    networks:
+      - his
+    hostname: his_database
+    cap_add:
+      - SYS_NICE
+  redis:
+    image: redis:latest
+    container_name: his_redis_server
+    networks:
+      - his
+    ports:
+      - "36379:6379"
+
+networks:
+  his:
