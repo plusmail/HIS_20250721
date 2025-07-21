@@ -48,41 +48,35 @@ if [ -z "$JAR_FILE" ]; then
 fi
 log_info "빌드된 JAR 파일: $JAR_FILE"
 
-# 6. 컨테이너가 없으면 up -d webapp (생성 및 시작)
-if ! sudo docker ps -a | grep "$CONTAINER_NAME" > /dev/null; then
-    log_warning "컨테이너($CONTAINER_NAME)가 존재하지 않습니다. 자동으로 생성합니다."
-    sudo docker-compose up -d webapp
-    sleep 5
+# 6. 컨테이너가 존재하면 stop 후 완전 삭제
+if sudo docker ps -a | grep "$CONTAINER_NAME" > /dev/null; then
+    if sudo docker ps | grep -q "$CONTAINER_NAME"; then
+        log_info "컨테이너가 실행 중입니다. 중지합니다."
+        sudo docker stop "$CONTAINER_NAME"
+        for i in {1..20}; do
+            if ! sudo docker ps | grep -q "$CONTAINER_NAME"; then
+                log_info "컨테이너가 완전히 중지됨. (대기 ${i}s)"
+                break
+            fi
+            log_info "컨테이너 종료 대기 중... (${i}/20)"
+            sleep 1
+        done
+    fi
+    log_info "컨테이너 완전 삭제 중..."
+    sudo docker rm "$CONTAINER_NAME"
 fi
 
-# 7. 컨테이너가 실행 중이면 stop (항상 stop)
-if sudo docker ps | grep -q "$CONTAINER_NAME"; then
-    log_info "컨테이너가 실행 중입니다. 중지합니다."
-    sudo docker stop "$CONTAINER_NAME"
-    # 컨테이너가 완전히 종료될 때까지 대기 (최대 20초)
-    for i in {1..20}; do
-        if ! sudo docker ps | grep -q "$CONTAINER_NAME"; then
-            log_info "컨테이너가 완전히 중지됨. (대기 ${i}s)"
-            break
-        fi
-        log_info "컨테이너 종료 대기 중... (${i}/20)"
-        sleep 1
-    done
-fi
+# 7. JAR 파일을 임시로 복사 (docker-compose build context에 포함되도록)
+log_info "JAR 파일을 임시 디렉토리로 복사..."
+cp "$JAR_FILE" ./app.jar
 
-# 8. JAR 파일을 컨테이너에 복사
-log_info "JAR 파일을 컨테이너에 복사 중..."
-if sudo docker cp "$JAR_FILE" "$CONTAINER_NAME":/apps/app.jar; then
-    log_success "JAR 파일 복사 완료"
-else
-    log_error "JAR 파일 복사 실패"
-    exit 1
-fi
-
-# 9. 컨테이너 시작
-log_info "컨테이너 시작 중..."
-sudo docker start "$CONTAINER_NAME"
+# 8. 컨테이너 재생성 (up -d webapp)
+log_info "컨테이너 재생성 중..."
+sudo docker-compose up -d webapp
 sleep 5
+
+# 9. 임시 JAR 파일 삭제
+rm -f ./app.jar
 
 # 10. 컨테이너 상태 확인
 log_info "컨테이너 상태 확인 중..."
