@@ -71,8 +71,8 @@ public class CustomerSecurityConfig {
                                 .requestMatchers("/queue/**").permitAll() // WebSocket 경로에 대한 권한 설정
                                 .requestMatchers("/error/**").permitAll() // WebSocket 경로에 대한 권한 설정
                                 .requestMatchers("/api/chat/auth/currentUser").permitAll() // WebSocket 경로에 대한 권한 설정
-                                .requestMatchers("/home").authenticated()
-                                .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+
+//                        .requestMatchers("/home").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -81,14 +81,6 @@ public class CustomerSecurityConfig {
                         .passwordParameter("password") // 폼에서 비밀번호 필드 매핑
                         .loginProcessingUrl("/member/login-proc") // 로그인 처리 URL
                         .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트할 URL
-                        .successHandler((request, response, authentication) -> {
-                            log.info("로그인 성공: {}", authentication.getName());
-                            response.sendRedirect("/home");
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            log.error("로그인 실패: {}", exception.getMessage());
-                            response.sendRedirect("/member/login?error");
-                        })
                         .permitAll()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

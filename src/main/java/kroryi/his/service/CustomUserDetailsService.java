@@ -6,12 +6,16 @@ import kroryi.his.dto.MemberSecurityDTO;
 import kroryi.his.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,7 +53,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                                         "ROLE_" + memberRole.getRoleSet()))
                                 .collect(Collectors.toList())
                 );
+        // Create Authentication object
+        Authentication authentication = new UsernamePasswordAuthenticationToken(memberSecurityDTO, null, memberSecurityDTO.getAuthorities());
 
+        SecurityContextHolder.getContext().setAuthentication(authentication); // Store Authentication in SecurityContext
+
+        log.info("authentication: {}", authentication);
         log.info("memberSecurityDTO: {}", memberSecurityDTO);
 
         return memberSecurityDTO;
