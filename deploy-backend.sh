@@ -59,7 +59,8 @@ fi
 if sudo docker ps | grep -q "$CONTAINER_NAME"; then
     log_info "컨테이너가 실행 중입니다. 중지합니다."
     sudo docker stop "$CONTAINER_NAME"
-    sleep 2
+    log_info "프로세스 종료 대기 중...(10초)"
+    sleep 10
 fi
 
 # 8. JAR 파일을 컨테이너에 복사
