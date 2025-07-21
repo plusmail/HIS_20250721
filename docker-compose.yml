@@ -12,35 +12,35 @@ services:
     container_name: his_server
     hostname: his_app
     volumes:
-      - ./src/main/resources/templates:/app/src/main/resources/templates
+      - ./target/his-0.0.1-SNAPSHOT.jar:/apps/app.jar
+      - ./src/main/resources/application.properties:/apps/application.properties
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/his?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: edurootroot
       SPRING_PROFILES_ACTIVE: dev
       SPRING_REDIS_HOST: his_redis_server
-
     networks:
       - his
 
   database:
-    image: ubuntu/mysql
+    image: mysql:8.0
     container_name: his_db
     restart: always
     environment:
-      - MYSQL_DATABASE=his
-      - MYSQL_ROOT_HOST=%
-      - MYSQL_ROOT_PASSWORD=edurootroot
-
+      MYSQL_DATABASE: his
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: edurootroot
     ports:
       - "53306:3306"
     volumes:
       - ./db/data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
     networks:
       - his
     hostname: his_database
-    cap_add:
-      - SYS_NICE
+    command: --default-authentication-plugin=mysql_native_password
+
   redis:
     image: redis:latest
     container_name: his_redis_server
@@ -48,6 +48,9 @@ services:
       - his
     ports:
       - "36379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
 
 networks:
   his:
