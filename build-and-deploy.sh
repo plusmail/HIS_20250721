@@ -72,8 +72,15 @@ restart_container() {
 rebuild_image() {
     log_info "Docker 이미지 재빌드 중..."
     
-    if docker-compose build --no-cache $SERVICE_NAME; then
-        log_success "Docker 이미지 재빌드 완료"
+    # 모든 서비스 중지
+    docker-compose down
+    
+    # 기존 이미지 삭제
+    docker rmi his-webapp 2>/dev/null || true
+    
+    # 전체 서비스 재빌드
+    if docker-compose build --no-cache; then
+        log_success "모든 Docker 이미지 재빌드 완료"
     else
         log_error "Docker 이미지 재빌드 실패"
         exit 1
