@@ -50,7 +50,7 @@ public class HomeController {
 
 
     @GetMapping("/home")
-    public String home(@AuthenticationPrincipal Object user, Model model, HttpSession session) {
+    public String home(@AuthenticationPrincipal MemberSecurityDTO user, Model model, HttpSession session) {
         System.out.println("user class----->: " + (user != null ? user.getClass() : "null"));
         System.out.println("user----->: " + user);
         try {
