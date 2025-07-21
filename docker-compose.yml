@@ -24,7 +24,7 @@ services:
       - his
 
   database:
-    image: mysql:8.0
+    image: ubuntu/mysql
     container_name: his_db
     restart: always
     environment:
