@@ -56,7 +56,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Create Authentication object
         Authentication authentication = new UsernamePasswordAuthenticationToken(memberSecurityDTO, null, memberSecurityDTO.getAuthorities());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication); // Store Authentication in SecurityContext
+        // SecurityContextHolder.getContext().setAuthentication(authentication); // Store Authentication in SecurityContext
 
         log.info("authentication: {}", authentication);
         log.info("memberSecurityDTO: {}", memberSecurityDTO);
