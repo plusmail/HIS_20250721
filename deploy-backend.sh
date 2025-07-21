@@ -43,10 +43,11 @@ if [ -z "$JAR_FILE" ]; then
 fi
 log_info "빌드된 JAR 파일: $JAR_FILE"
 
-# 5. 도커 컨테이너가 실행 중인지 확인
+# 5. 도커 컨테이너가 실행 중인지 확인, 아니면 자동으로 up -d webapp
 if ! sudo docker ps | grep -q "$CONTAINER_NAME"; then
-    log_error "컨테이너($CONTAINER_NAME)가 실행 중이지 않습니다. 먼저 'docker-compose up -d'를 실행하세요."
-    exit 1
+    log_warning "컨테이너($CONTAINER_NAME)가 실행 중이지 않습니다. 자동으로 실행합니다."
+    sudo docker-compose up -d webapp
+    sleep 5
 fi
 
 # 6. JAR 파일을 컨테이너에 복사
